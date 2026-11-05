@@ -38,3 +38,18 @@ started manually from the Actions tab). The workflow needs two repository secret
 
 The IPA is signed with fake codesigning and has to be re-signed for installation, e.g. with
 AltStore or Sideloadly (which also change the bundle identifier).
+
+## Getting the IPA
+
+1. Open the repository on GitHub → **Actions** → **Personal build** → **Run workflow** (branch `main`).
+2. When the run is green, open it and download **Veilgram-ipa** from the **Artifacts** section at the
+   bottom of the run page. It is a zip file with `Telegram.ipa` inside; artifacts are kept for 14 days.
+3. Unzip it and install `Telegram.ipa` with Sideloadly or AltStore, which re-sign it with your Apple ID
+   (and can change the bundle identifier).
+
+## Notes
+
+- The "Open Telegram" button opens `tg://` links. Veilgram keeps Telegram's own URL schemes, so with
+  both apps installed iOS decides which of them handles the link.
+- Auto-archive works on the client: if the app is closed when the very first message of a new chat
+  arrives, that push notification still has sound; the chat is archived and muted on the next launch.
