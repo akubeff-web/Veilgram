@@ -1,0 +1,89 @@
+name: Personal build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: xcode-27
+    timeout-minutes: 360
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Select Xcode
+        run: |
+          XCODE_VERSION=$(python3 -c 'import json; print(json.load(open("versions.json"))["xcode"])')
+          if [ -d "/Applications/Xcode_$XCODE_VERSION.app" ]; then
+            sudo xcode-select -s "/Applications/Xcode_$XCODE_VERSION.app/Contents/Developer"
+          else
+            echo "Xcode $XCODE_VERSION is not installed, using the default one"
+          fi
+          xcodebuild -version
+
+      - name: Create build configuration
+        env:
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
+        run: |
+          if [ -z "$TG_API_ID" ] || [ -z "$TG_API_HASH" ]; then
+            echo "::error::Repository secrets TG_API_ID and TG_API_HASH are not set. Get them at https://my.telegram.org and add them in Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          if [ "$TG_API_ID" = "8" ]; then
+            echo "::error::TG_API_ID must be your own api_id, not the official one (8)."
+            exit 1
+          fi
+          python3 - <<'EOF'
+          import json, os
+          with open('build-system/appstore-configuration.json') as f:
+              configuration = json.load(f)
+          configuration['api_id'] = os.environ['TG_API_ID'].strip()
+          configuration['api_hash'] = os.environ['TG_API_HASH'].strip()
+          with open('build-system/personal-configuration.json', 'w') as f:
+              json.dump(configuration, f, indent=4)
+          EOF
+
+      - name: Restore Bazel cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/telegram-bazel-cache
+          key: telegram-bazel-cache-${{ github.run_id }}
+          restore-keys: |
+            telegram-bazel-cache-
+
+      - name: Build
+        run: |
+          BUILD_NUMBER_OFFSET="$(cat build_number_offset)"
+          COMMIT_COUNT="$(git rev-list --count HEAD)"
+          BUILD_NUMBER="$(($COMMIT_COUNT + $BUILD_NUMBER_OFFSET))"
+          echo "Build number: $BUILD_NUMBER"
+
+          python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
+          python3 -u build-system/Make/Make.py \
+            --overrideXcodeVersion \
+            --cacheDir "$HOME/telegram-bazel-cache" \
+            build \
+            --configurationPath=build-system/personal-configuration.json \
+            --codesigningInformationPath=build-system/fake-codesigning \
+            --configuration=release_arm64 \
+            --buildNumber="$BUILD_NUMBER" \
+            --outputBuildArtifactsPath="$GITHUB_WORKSPACE/artifacts"
+
+      - name: Save Bazel cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ~/telegram-bazel-cache
+          key: telegram-bazel-cache-${{ github.run_id }}
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Veilgram-ipa
+          path: artifacts/Telegram.ipa
+          retention-days: 14
+          if-no-files-found: error
