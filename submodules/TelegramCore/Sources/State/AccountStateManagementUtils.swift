@@ -4295,6 +4295,7 @@ func replayFinalState(
             }
         }
     }
+    let veilgramAutoArchivePeerIds = veilgramAutoArchiveCandidates(transaction: transaction, accountPeerId: accountPeerId, operations: finalState.state.operations, addedIncomingMessageIds: addedIncomingMessageIds)
     
     var invalidateGroupStats = Set<PeerGroupId>()
     
@@ -6247,6 +6248,8 @@ func replayFinalState(
             })
         }
     }
+    
+    veilgramApplyAutoArchive(transaction: transaction, peerIds: veilgramAutoArchivePeerIds)
     
     addedIncomingMessageIds.append(contentsOf: addedSecretMessageIds)
     
