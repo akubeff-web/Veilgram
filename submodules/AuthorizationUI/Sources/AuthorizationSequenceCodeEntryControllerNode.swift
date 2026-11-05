@@ -40,6 +40,7 @@ final class AuthorizationSequenceCodeEntryControllerNode: ASDisplayNode, UITextF
     private let dividerNode: AuthorizationDividerNode
     private var signInWithAppleButton: UIControl?
     private let proceedNode: SolidRoundedButtonNode
+    private let openTelegramNode: SolidRoundedButtonNode
     
     private let textField: TextFieldNode
     private let textSeparatorNode: ASDisplayNode
@@ -258,6 +259,10 @@ final class AuthorizationSequenceCodeEntryControllerNode: ASDisplayNode, UITextF
         self.proceedNode.animationSize = CGSize(width: 36.0, height: 36.0)
         self.proceedNode.isEnabled = false
         
+        self.openTelegramNode = SolidRoundedButtonNode(title: veilgramLocalized(self.strings, "Veilgram.OpenTelegram", self.strings.Veilgram_OpenTelegram), icon: generateVeilgramIcon(.send, size: CGSize(width: 20.0, height: 20.0), color: self.theme.list.itemCheckColors.foregroundColor), theme: SolidRoundedButtonTheme(theme: self.theme), glass: true, height: 50.0, cornerRadius: 50.0 * 0.5)
+        self.openTelegramNode.iconSpacing = 8.0
+        self.openTelegramNode.isHidden = true
+        
         super.init()
         
         self.setViewBlock({
@@ -289,6 +294,7 @@ final class AuthorizationSequenceCodeEntryControllerNode: ASDisplayNode, UITextF
         self.hintButtonNode.addSubnode(self.hintTextNode)
         self.hintButtonNode.addSubnode(self.hintArrowNode)
         self.addSubnode(self.proceedNode)
+        self.addSubnode(self.openTelegramNode)
         
         self.codeInputView.updated = { [weak self] in
             guard let strongSelf = self else {
@@ -328,6 +334,18 @@ final class AuthorizationSequenceCodeEntryControllerNode: ASDisplayNode, UITextF
         }
         
         self.nextOptionButtonNode.addTarget(self, action: #selector(self.nextOptionNodePressed), forControlEvents: .touchUpInside)
+        self.openTelegramNode.pressed = {
+            // The official app's chat with Telegram (777000), where the login code arrives; any chat
+            // list if that fails. Without the app installed this does nothing.
+            guard let url = URL(string: "tg://openmessage?user_id=777000") else {
+                return
+            }
+            UIApplication.shared.open(url, options: [:], completionHandler: { success in
+                if !success, let fallbackUrl = URL(string: "tg://") {
+                    UIApplication.shared.open(fallbackUrl, options: [:], completionHandler: nil)
+                }
+            })
+        }
         self.proceedNode.pressed = { [weak self] in
             self?.proceedPressed()
         }
@@ -815,7 +833,29 @@ final class AuthorizationSequenceCodeEntryControllerNode: ASDisplayNode, UITextF
             items.append(AuthorizationLayoutItem(node: self.nextOptionButtonNode, size: nextOptionSize, spacingBefore: AuthorizationLayoutItemSpacing(weight: 50.0, maxValue: 120.0), spacingAfter: AuthorizationLayoutItemSpacing(weight: 0.0, maxValue: 0.0)))
         }
         
-        let _ = layoutAuthorizationItems(bounds: CGRect(origin: CGPoint(x: bandMinX, y: insets.top), size: CGSize(width: bandWidth, height: layout.size.height - insets.top - insets.bottom - additionalBottomInset)), items: items, transition: transition, failIfDoesNotFit: false)
+        // Veilgram: "Open Telegram" at the bottom above the keyboard, where no other bottom button is
+        // shown. It is left out on a screen too small to fit it without covering the code field.
+        var showOpenTelegram = false
+        if VeilgramSettings.loginOpenTelegramButton, let codeType = self.codeType, self.proceedNode.isHidden, self.signInWithAppleButton?.isHidden ?? true {
+            switch codeType {
+            case .email, .emailSetupRequired, .fragment, .word, .phrase:
+                break
+            case .otherSession, .sms, .call, .flashCall, .missedCall, .firebase:
+                showOpenTelegram = true
+            }
+        }
+        if showOpenTelegram {
+            let openTelegramBottomInset = max(additionalBottomInset, 80.0)
+            showOpenTelegram = layoutAuthorizationItems(bounds: CGRect(origin: CGPoint(x: bandMinX, y: insets.top), size: CGSize(width: bandWidth, height: layout.size.height - insets.top - insets.bottom - openTelegramBottomInset)), items: items, transition: transition, failIfDoesNotFit: true)
+        }
+        if showOpenTelegram {
+            let openTelegramHeight = self.openTelegramNode.updateLayout(width: bottomMaximumWidth - inset * 2.0, transition: transition)
+            let openTelegramSize = CGSize(width: bottomMaximumWidth - inset * 2.0, height: openTelegramHeight)
+            transition.updateFrame(node: self.openTelegramNode, frame: CGRect(origin: CGPoint(x: bottomBandMinX + floorToScreenPixels((bottomBandWidth - openTelegramSize.width) / 2.0), y: layout.size.height - insets.bottom - openTelegramSize.height - inset), size: openTelegramSize))
+        } else {
+            let _ = layoutAuthorizationItems(bounds: CGRect(origin: CGPoint(x: bandMinX, y: insets.top), size: CGSize(width: bandWidth, height: layout.size.height - insets.top - insets.bottom - additionalBottomInset)), items: items, transition: transition, failIfDoesNotFit: false)
+        }
+        self.openTelegramNode.isHidden = !showOpenTelegram
         
         if let codeType = self.codeType {
             let yOffset: CGFloat = layout.size.width > 320.0 ? 18.0 : 5.0
