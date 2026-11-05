@@ -155,6 +155,9 @@ final class AuthorizedApplicationContext {
     private var showCallsTabDisposable: Disposable?
     private var showNewsTab: Bool
     private var showNewsTabDisposable: Disposable?
+    private var veilgramShowContactsTab: Bool
+    private var veilgramShowNewsTab: Bool
+    private var veilgramTabsDisposable: Disposable?
     private var enablePostboxTransactionsDiposable: Disposable?
     
     init(sharedApplicationContext: SharedApplicationContext, mainWindow: Window1, context: AccountContextImpl, accountManager: AccountManager<TelegramAccountManagerTypes>, showCallsTab: Bool, reinitializedNotificationSettings: @escaping () -> Void) {
@@ -170,6 +173,8 @@ final class AuthorizedApplicationContext {
         
         self.showCallsTab = showCallsTab
         self.showNewsTab = isNewsFeedEnabled(appConfiguration: context.currentAppConfiguration.with { $0 })
+        self.veilgramShowContactsTab = VeilgramSettings.tabContacts
+        self.veilgramShowNewsTab = VeilgramSettings.tabNews
         
         self.notificationController = NotificationContainerController(context: context)
         
@@ -835,6 +840,21 @@ final class AuthorizedApplicationContext {
             self.rootController.updateRootControllers(showCallsTab: self.showCallsTab, showNewsTab: value)
         })
         
+        // Veilgram tab switches; the Calls tab stays on CallListSettings.showTab above.
+        self.veilgramTabsDisposable = (VeilgramSettings.updated
+        |> deliverOnMainQueue).start(next: { [weak self] _ in
+            guard let self else {
+                return
+            }
+            let showContactsTab = VeilgramSettings.tabContacts
+            let showNewsTab = VeilgramSettings.tabNews
+            if self.veilgramShowContactsTab != showContactsTab || self.veilgramShowNewsTab != showNewsTab {
+                self.veilgramShowContactsTab = showContactsTab
+                self.veilgramShowNewsTab = showNewsTab
+                self.rootController.updateRootControllers(showCallsTab: self.showCallsTab, showNewsTab: self.showNewsTab)
+            }
+        })
+        
         self.rootController.setForceInCallStatusBar((self.context.sharedContext as! SharedAccountContextImpl).currentCallStatusBarNode)
         if let groupCallController = self.context.sharedContext.currentGroupCallController as? VoiceChatController {
             if let overlayController = groupCallController.currentOverlayController {
@@ -847,6 +867,7 @@ final class AuthorizedApplicationContext {
     deinit {
         self.context.account.postbox.clearCaches()
         self.showNewsTabDisposable?.dispose()
+        self.veilgramTabsDisposable?.dispose()
         self.context.account.shouldKeepOnlinePresence.set(.single(false))
         self.context.account.shouldBeServiceTaskMaster.set(.single(.never))
         self.loggedOutDisposable.dispose()

@@ -213,13 +213,15 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
         contactsController.switchToChatsController = {  [weak self] in
             self?.openChatsController(activateSearch: false)
         }
-        controllers.append(contactsController)
+        if VeilgramSettings.tabContacts {
+            controllers.append(contactsController)
+        }
         
         if showCallsTab {
             controllers.append(callListController)
         }
         controllers.append(chatListController)
-        if showNewsTab {
+        if showNewsTab && VeilgramSettings.tabNews {
             controllers.append(newsController)
         }
         
@@ -259,12 +261,14 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
             return
         }
         var controllers: [ViewController] = []
-        controllers.append(self.contactsController!)
+        if VeilgramSettings.tabContacts {
+            controllers.append(self.contactsController!)
+        }
         if showCallsTab {
             controllers.append(self.callListController!)
         }
         controllers.append(self.chatListController!)
-        if showNewsTab, let newsController = self.newsController {
+        if showNewsTab && VeilgramSettings.tabNews, let newsController = self.newsController {
             controllers.append(newsController)
         }
         controllers.append(self.accountSettingsController!)
