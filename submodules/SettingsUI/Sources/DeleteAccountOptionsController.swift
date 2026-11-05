@@ -200,32 +200,17 @@ public func deleteAccountOptionsController(context: AccountContext, navigationCo
         let _ = (activeAccountsAndPeers(context: context)
         |> take(1)
         |> deliverOnMainQueue
-        ).start(next: { accountAndPeer, accountsAndPeers in
-            var maximumAvailableAccounts: Int = 3
-            if accountAndPeer?.1.isPremium == true && !context.account.testingEnvironment {
-                maximumAvailableAccounts = 4
-            }
+        ).start(next: { _, accountsAndPeers in
             var count: Int = 1
-            for (accountContext, peer, _) in accountsAndPeers {
+            for (accountContext, _, _) in accountsAndPeers {
                 if !accountContext.account.testingEnvironment {
-                    if peer.isPremium {
-                        maximumAvailableAccounts = 4
-                    }
                     count += 1
                 }
             }
-
-            if count >= maximumAvailableAccounts {
-                var replaceImpl: ((ViewController) -> Void)?
-                let controller = PremiumLimitScreen(context: context, subject: .accounts, count: Int32(count), action: {
-                    let controller = PremiumIntroScreen(context: context, source: .accounts)
-                    replaceImpl?(controller)
-                    return true
-                })
-                replaceImpl = { [weak controller] c in
-                    controller?.replace(with: c)
-                }
-                pushControllerImpl?(controller)
+            
+            if count >= maximumNumberOfAccounts {
+                let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+                presentControllerImpl?(textAlertController(context: context, title: nil, text: presentationData.strings.Premium_MaxAccountsNoPremiumText("\(maximumNumberOfAccounts)").string, actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})], parseMarkdown: true), nil)
             } else {
                 context.sharedContext.beginNewAuth(testingEnvironment: context.account.testingEnvironment)
 
