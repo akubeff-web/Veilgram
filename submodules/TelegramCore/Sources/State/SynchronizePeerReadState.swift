@@ -441,6 +441,12 @@ func synchronizePeerReadState(network: Network, postbox: Postbox, stateManager: 
             return confirmSynchronized(postbox: postbox, peerId: peerId)
             |> ignoreValues
         }
+        if VeilgramSettings.ghostRead {
+            // Ghost mode: the read mark stays local. Validation would see it ahead of the
+            // server (localReadMarkIsAheadOfServer) and retry forever, so skip both and confirm.
+            return confirmSynchronized(postbox: postbox, peerId: peerId)
+            |> ignoreValues
+        }
         var signal: Signal<Never, PeerReadStateValidationError> = .complete()
         if push {
             signal = signal

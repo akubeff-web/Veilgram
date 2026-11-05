@@ -147,6 +147,14 @@ private func requestActivity(postbox: Postbox, network: Network, accountPeerId: 
             if peerId == accountPeerId {
                 return .complete()
             }
+            if VeilgramSettings.ghostTyping {
+                switch activity {
+                case .speakingInGroupCall?:
+                    break
+                default:
+                    return .complete()
+                }
+            }
             if let channel = peer as? TelegramChannel, case .broadcast = channel.info {
                 if let activity = activity {
                     switch activity {

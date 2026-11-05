@@ -53,10 +53,17 @@ private final class AccountPresenceManagerImpl {
             }, queue: self.queue)
             self.onlineTimer = timer
             timer.start()
+            if VeilgramSettings.ghostOnline {
+                return
+            }
             request = self.network.request(Api.functions.account.updateStatus(offline: .boolFalse))
         } else {
             self.onlineTimer?.invalidate()
             self.onlineTimer = nil
+            if VeilgramSettings.ghostOnline {
+                // offline: true would also move "last seen" to now.
+                return
+            }
             request = self.network.request(Api.functions.account.updateStatus(offline: .boolTrue))
         }
         self.isPerformingUpdate.set(true)
