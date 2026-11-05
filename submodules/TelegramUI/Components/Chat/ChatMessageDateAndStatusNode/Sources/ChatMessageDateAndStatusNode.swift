@@ -269,6 +269,7 @@ public class ChatMessageDateAndStatusNode: ASDisplayNode {
         var canViewReactionList: Bool
         var animationCache: AnimationCache
         var animationRenderer: MultiAnimationRenderer
+        var isDeletedRemotely: Bool
         
         public init(
             context: AccountContext,
@@ -294,7 +295,8 @@ public class ChatMessageDateAndStatusNode: ASDisplayNode {
             hasAutoremove: Bool,
             canViewReactionList: Bool,
             animationCache: AnimationCache,
-            animationRenderer: MultiAnimationRenderer
+            animationRenderer: MultiAnimationRenderer,
+            isDeletedRemotely: Bool = false
         ) {
             self.context = context
             self.presentationData = presentationData
@@ -320,6 +322,7 @@ public class ChatMessageDateAndStatusNode: ASDisplayNode {
             self.canViewReactionList = canViewReactionList
             self.animationCache = animationCache
             self.animationRenderer = animationRenderer
+            self.isDeletedRemotely = isDeletedRemotely
         }
     }
     
@@ -331,6 +334,7 @@ public class ChatMessageDateAndStatusNode: ASDisplayNode {
     private var clockMinNode: ASImageNode?
     private let dateNode: TextNode
     private var impressionIcon: ASImageNode?
+    private var deletedIcon: ASImageNode?
     private var reactionNodes: [MessageReaction.Reaction: StatusReactionNode] = [:]
     private let reactionButtonsContainer = ReactionButtonsAsyncLayoutContainer()
     private var reactionButtonNode: HighlightTrackingButtonNode?
@@ -392,6 +396,7 @@ public class ChatMessageDateAndStatusNode: ASDisplayNode {
         
         var currentBackgroundNode = self.backgroundNode
         var currentImpressionIcon = self.impressionIcon
+        var currentDeletedIcon = self.deletedIcon
         var currentRepliesIcon = self.repliesIcon
         var currentStarsIcon = self.starsIcon
 
@@ -640,6 +645,28 @@ public class ChatMessageDateAndStatusNode: ASDisplayNode {
                 impressionWidth = impressionSize.width + 3.0
             } else {
                 currentImpressionIcon = nil
+            }
+            
+            // Veilgram: a trash icon left of the date for a message deleted on the server. It takes
+            // its place in the same leading offset as the views icon, which moves the date over.
+            var deletedIconImage: UIImage?
+            var deletedIconWidth: CGFloat = 0.0
+            if arguments.isDeletedRemotely {
+                let deletedIconSide = floor(dateFont.pointSize * 12.0 / 11.0)
+                deletedIconImage = veilgramCachedIcon(.trash, size: CGSize(width: deletedIconSide, height: deletedIconSide), color: dateColor)
+            }
+            if let deletedIconImage {
+                if currentDeletedIcon == nil {
+                    let iconNode = ASImageNode()
+                    iconNode.isLayerBacked = true
+                    iconNode.displayWithoutProcessing = true
+                    iconNode.displaysAsynchronously = false
+                    currentDeletedIcon = iconNode
+                }
+                deletedIconWidth = deletedIconImage.size.width + 3.0
+                impressionWidth += deletedIconWidth
+            } else {
+                currentDeletedIcon = nil
             }
             
             var repliesIconSize = CGSize()
@@ -1165,8 +1192,25 @@ public class ChatMessageDateAndStatusNode: ASDisplayNode {
                         
                         let _ = dateApply()
                         
+                        if let currentDeletedIcon, let deletedIconImage {
+                            let deletedIconFrame = CGRect(origin: CGPoint(x: leftOffset + leftInset + backgroundInsets.left, y: backgroundInsets.top + 1.0 + offset + verticalInset + floor((date.size.height - deletedIconImage.size.height) / 2.0)), size: deletedIconImage.size)
+                            if currentDeletedIcon.image !== deletedIconImage {
+                                currentDeletedIcon.image = deletedIconImage
+                            }
+                            if currentDeletedIcon.supernode == nil {
+                                strongSelf.deletedIcon = currentDeletedIcon
+                                strongSelf.addSubnode(currentDeletedIcon)
+                                currentDeletedIcon.frame = deletedIconFrame
+                            } else {
+                                animation.animator.updateFrame(layer: currentDeletedIcon.layer, frame: deletedIconFrame, completion: nil)
+                            }
+                        } else if let deletedIcon = strongSelf.deletedIcon {
+                            deletedIcon.removeFromSupernode()
+                            strongSelf.deletedIcon = nil
+                        }
+                        
                         if let currentImpressionIcon = currentImpressionIcon {
-                            let impressionIconFrame = CGRect(origin: CGPoint(x: leftOffset + leftInset + backgroundInsets.left, y: backgroundInsets.top + 1.0 + offset + verticalInset + floor((date.size.height - impressionSize.height) / 2.0)), size: impressionSize)
+                            let impressionIconFrame = CGRect(origin: CGPoint(x: leftOffset + leftInset + backgroundInsets.left + deletedIconWidth, y: backgroundInsets.top + 1.0 + offset + verticalInset + floor((date.size.height - impressionSize.height) / 2.0)), size: impressionSize)
                             currentImpressionIcon.displaysAsynchronously = false
                             if currentImpressionIcon.image !== impressionImage {
                                 currentImpressionIcon.image = impressionImage
