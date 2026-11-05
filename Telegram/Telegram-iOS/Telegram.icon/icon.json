@@ -17,13 +17,17 @@
           ],
           "fill-specializations" : [
             {
-              "appearance" : "dark",
-              "value" : "automatic"
+              "value" : {
+                "linear-gradient" : [
+                  "srgb:0.78431,0.78431,0.81176,1.00000",
+                  "srgb:0.58824,0.58824,0.62353,1.00000"
+                ]
+              }
             }
           ],
           "glass" : true,
-          "image-name" : "Plane.svg",
-          "name" : "Plane",
+          "image-name" : "Fold.svg",
+          "name" : "Fold",
           "position-specializations" : [
             {
               "idiom" : "watchOS",
@@ -51,19 +55,49 @@
             {
               "value" : {
                 "linear-gradient" : [
-                  "display-p3:0.21569,0.68627,0.89020,1.00000",
-                  "srgb:0.11373,0.57647,0.82353,1.00000"
+                  "srgb:0.96078,0.96078,0.97255,1.00000",
+                  "srgb:0.81176,0.81176,0.83529,1.00000"
                 ]
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "srgb:0.00000,0.47843,1.00000,1.00000"
               }
             }
           ],
           "glass" : true,
+          "image-name" : "Veil.svg",
+          "name" : "Veil",
+          "position-specializations" : [
+            {
+              "idiom" : "watchOS",
+              "value" : {
+                "scale" : 1.35,
+                "translation-in-points" : [
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "blend-mode-specializations" : [
+            {
+              "value" : "normal"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "normal"
+            }
+          ],
+          "fill-specializations" : [
+            {
+              "value" : {
+                "linear-gradient" : [
+                  "srgb:0.10196,0.10196,0.11373,1.00000",
+                  "srgb:0.01961,0.01961,0.02353,1.00000"
+                ]
+              }
+            }
+          ],
+          "glass" : false,
           "hidden-specializations" : [
             {
               "value" : false
@@ -73,8 +107,8 @@
               "value" : false
             }
           ],
-          "image-name" : "Oval.svg",
-          "name" : "Oval",
+          "image-name" : "Background.svg",
+          "name" : "Background",
           "position-specializations" : [
             {
               "idiom" : "watchOS",
