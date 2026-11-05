@@ -195,6 +195,8 @@ extension PeerInfoScreenNode {
                         }
                     }))
                 })]), in: .window(.root))
+        case .veilgram:
+            push(veilgramSettingsController(context: self.context))
         case .faq:
             self.openFaq()
         case .tips:

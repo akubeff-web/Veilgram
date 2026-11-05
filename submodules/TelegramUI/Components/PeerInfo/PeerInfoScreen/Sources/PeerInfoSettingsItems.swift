@@ -19,6 +19,7 @@ enum SettingsSection: Int, CaseIterable {
     case phone
     case accounts
     case myProfile
+    case veilgram
     case wallet
     case proxy
     case apps
@@ -151,6 +152,10 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
         
         items[.myProfile]!.append(PeerInfoScreenDisclosureItem(id: 0, text: presentationData.strings.Settings_MyProfile, icon: PresentationResourcesSettings.myProfile, action: {
             interaction.openSettings(.profile)
+        }))
+        
+        items[.veilgram]!.append(PeerInfoScreenDisclosureItem(id: 0, text: veilgramLocalized(presentationData.strings, "Veilgram.Title", presentationData.strings.Veilgram_Title), icon: VeilgramSettingsIcons.main, action: {
+            interaction.openSettings(.veilgram)
         }))
         
         if WalletConfiguration.with(appConfiguration: context.currentAppConfiguration.with { $0 }).isAvailable {

@@ -439,3 +439,21 @@ private func veilgramAddSvgArc(path: CGMutablePath, from start: CGPoint, to end:
     let transform = CGAffineTransform(a: cosPhi * rx, b: sinPhi * rx, c: -sinPhi * ry, d: cosPhi * ry, tx: cx, ty: cy)
     path.addRelativeArc(center: CGPoint(), radius: 1.0, startAngle: startAngle, delta: delta, transform: transform)
 }
+
+/// Tile icons for the Veilgram rows in Settings, generated once.
+public enum VeilgramSettingsIcons {
+    public static let main = generateVeilgramSettingsIcon(.venetianMask, backgroundColor: UIColor(rgb: 0x3A3A3C))
+    public static let ghost = generateVeilgramSettingsIcon(.ghost, backgroundColor: UIColor(rgb: 0x5856D6))
+    public static let ghostOnline = generateVeilgramSettingsIcon(.wifiOff, backgroundColor: UIColor(rgb: 0x5856D6))
+    public static let ghostTyping = generateVeilgramSettingsIcon(.penOff, backgroundColor: UIColor(rgb: 0x5856D6))
+    public static let ghostRead = generateVeilgramSettingsIcon(.checkCheck, backgroundColor: UIColor(rgb: 0x5856D6))
+    public static let ghostStories = generateVeilgramSettingsIcon(.circleDashed, backgroundColor: UIColor(rgb: 0x5856D6))
+    public static let keepDeleted = generateVeilgramSettingsIcon(.eyeOff, backgroundColor: UIColor(rgb: 0xFF3B30))
+    public static let deletedIcon = generateVeilgramSettingsIcon(.trash, backgroundColor: UIColor(rgb: 0xFF3B30))
+    public static let autoArchive = generateVeilgramSettingsIcon(.archive, backgroundColor: UIColor(rgb: 0xFF9500))
+    public static let autoArchiveGroups = generateVeilgramSettingsIcon(.users, backgroundColor: UIColor(rgb: 0xFF9500))
+    public static let tabContacts = generateVeilgramSettingsIcon(.user, backgroundColor: UIColor(rgb: 0x007AFF))
+    public static let tabCalls = generateVeilgramSettingsIcon(.phone, backgroundColor: UIColor(rgb: 0x34C759))
+    public static let tabNews = generateVeilgramSettingsIcon(.newspaper, backgroundColor: UIColor(rgb: 0xFF2D55))
+    public static let loginButton = generateVeilgramSettingsIcon(.send, backgroundColor: UIColor(rgb: 0x2AABEE))
+}
