@@ -34,6 +34,11 @@ All of them can be switched in Settings → Veilgram, and take effect immediatel
   chosen words are hidden everywhere.
 - **Protected content**: copying, forwarding, saving and screenshots in chats that forbid them;
   view-once and timed media do not start their timer when opened.
+- **Ghost exceptions**: ghost mode can be turned off for single chats (long press on the chat avatar);
+  the same menu jumps to the first message and counts messages per participant.
+- **Read All Chats**, **auto-reply** once to new chats, **streamer mode**, hiding the own phone number,
+  the user id and registration month in profiles, switches for each Premium element, and faster
+  downloads and uploads.
 - **Unlimited accounts** without Premium. Every signed-in account stays connected, so many of them
   cost memory and battery.
 - **Tab bar and stories**: Contacts, Calls and News tabs and the stories row can be hidden.
