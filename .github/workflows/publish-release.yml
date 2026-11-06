@@ -1,0 +1,61 @@
+name: Publish release
+
+# Publishes the IPA of a finished Personal build as a GitHub release asset. Note: the IPA
+# contains the api_id/api_hash it was built with, and releases of a public repository are public.
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Personal build run id (empty = latest successful one)
+        required: false
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find the build
+        id: build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID=$(gh run list -R "$GITHUB_REPOSITORY" --workflow personal-build.yml --status success --limit 1 --json databaseId -q '.[0].databaseId')
+          fi
+          if [ -z "$RUN_ID" ]; then
+            echo "::error::No successful Personal build run found."
+            exit 1
+          fi
+          echo "Using run $RUN_ID"
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Download the IPA
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.build.outputs.run_id }}
+        run: |
+          mkdir -p download
+          gh run download "$RUN_ID" -R "$GITHUB_REPOSITORY" -D download
+          find download -type f
+          IPA=$(find download -type f -name '*.ipa' | head -n 1)
+          if [ -z "$IPA" ]; then
+            echo "::error::The run has no .ipa artifact."
+            exit 1
+          fi
+          cp "$IPA" Veilgram.ipa
+          ls -la Veilgram.ipa
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.build.outputs.run_id }}
+        run: |
+          TAG="build-$RUN_ID"
+          gh release create "$TAG" Veilgram.ipa -R "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Veilgram (build run $RUN_ID)" \
+            --notes "Unofficial Veilgram build from Personal build run $RUN_ID. Install with Sideloadly or AltStore."
