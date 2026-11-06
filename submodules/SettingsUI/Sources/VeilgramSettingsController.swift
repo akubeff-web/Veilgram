@@ -9,14 +9,17 @@ import ItemListUI
 import PresentationDataUtils
 import AccountContext
 import LocalizedPeerData
+import UndoUI
 
 private final class VeilgramSettingsControllerArguments {
     let update: (VeilgramSettings.Key, Bool) -> Void
     let updateShowCallsTab: (Bool) -> Void
     let openDeletedLog: () -> Void
     let updateKeywords: (String) -> Void
+    let readAllChats: () -> Void
 
-    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void) {
+    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void, readAllChats: @escaping () -> Void) {
+        self.readAllChats = readAllChats
         self.update = update
         self.updateShowCallsTab = updateShowCallsTab
         self.openDeletedLog = openDeletedLog
@@ -26,6 +29,7 @@ private final class VeilgramSettingsControllerArguments {
 
 private enum VeilgramSettingsSection: Int32 {
     case ghost
+    case readAll
     case presence
     case deleted
     case archive
@@ -44,6 +48,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case ghostRead(Bool)
     case ghostStories(Bool)
     case ghostFooter
+
+    case readAllChats
 
     case alwaysOnline(Bool)
     case alwaysOnlineFooter
@@ -87,6 +93,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
         switch self {
         case .ghost, .ghostOnline, .ghostTyping, .ghostRead, .ghostStories, .ghostFooter:
             return VeilgramSettingsSection.ghost.rawValue
+        case .readAllChats:
+            return VeilgramSettingsSection.readAll.rawValue
         case .alwaysOnline, .alwaysOnlineFooter:
             return VeilgramSettingsSection.presence.rawValue
         case .keepDeleted, .deletedIcon, .editHistory, .deletedLog, .keepDeletedFooter:
@@ -122,10 +130,12 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 4
         case .ghostFooter:
             return 5
-        case .alwaysOnline:
+        case .readAllChats:
             return 6
-        case .alwaysOnlineFooter:
+        case .alwaysOnline:
             return 7
+        case .alwaysOnlineFooter:
+            return 8
         case .keepDeleted:
             return 10
         case .deletedIcon:
@@ -211,6 +221,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.ghostStories, "Veilgram.GhostStories", strings.Veilgram_GhostStories, value, { arguments.update(.ghostStories, $0) })
         case .ghostFooter:
             return footerItem("Veilgram.GhostInfo", strings.Veilgram_GhostInfo)
+        case .readAllChats:
+            return ItemListActionItem(presentationData: presentationData, systemStyle: .glass, title: veilgramLocalized(strings, "Veilgram.ReadAllChats", strings.Veilgram_ReadAllChats), kind: .generic, alignment: .natural, sectionId: self.section, style: .blocks, action: {
+                arguments.readAllChats()
+            })
         case let .alwaysOnline(value):
             return switchItem(VeilgramSettingsIcons.alwaysOnline, "Veilgram.AlwaysOnline", strings.Veilgram_AlwaysOnline, value, { arguments.update(.alwaysOnline, $0) })
         case .alwaysOnlineFooter:
@@ -290,6 +304,8 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     }
     entries.append(.ghostFooter)
 
+    entries.append(.readAllChats)
+
     entries.append(.alwaysOnline(VeilgramSettings.value(.alwaysOnline)))
     entries.append(.alwaysOnlineFooter)
 
@@ -339,6 +355,7 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
 
 public func veilgramSettingsController(context: AccountContext) -> ViewController {
     var pushImpl: ((ViewController) -> Void)?
+    var presentImpl: ((ViewController) -> Void)?
     let arguments = VeilgramSettingsControllerArguments(
         update: { key, value in
             VeilgramSettings.set(key, value)
@@ -377,6 +394,15 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
         },
         updateKeywords: { text in
             VeilgramSettings.setFilterKeywordsText(text)
+        },
+        readAllChats: {
+            let _ = (veilgramReadAllChats(account: context.account)
+            |> deliverOnMainQueue).start(completed: {
+                let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+                presentImpl?(UndoOverlayController(presentationData: presentationData, content: .succeed(text: veilgramLocalized(presentationData.strings, "Veilgram.ReadAllChatsDone", presentationData.strings.Veilgram_ReadAllChatsDone), timeout: nil, customUndoText: nil), elevatedLayout: false, action: { _ in
+                    return false
+                }))
+            })
         }
     )
 
@@ -404,6 +430,9 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
     let controller = ItemListController(context: context, state: signal)
     pushImpl = { [weak controller] c in
         controller?.push(c)
+    }
+    presentImpl = { [weak controller] c in
+        controller?.present(c, in: .current)
     }
     return controller
 }

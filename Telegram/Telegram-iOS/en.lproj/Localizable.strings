@@ -17298,3 +17298,5 @@ Error: %8$@";
 "Veilgram.FirstMessage" = "First Message";
 "Veilgram.MessageCounter" = "Message Count";
 "Veilgram.MessageCounterEmpty" = "Nothing to count here.";
+"Veilgram.ReadAllChats" = "Read All Chats";
+"Veilgram.ReadAllChatsDone" = "All chats are read.";

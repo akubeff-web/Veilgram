@@ -482,3 +482,38 @@ public func veilgramSendReadReceipt(account: Account, peerId: PeerId) -> Signal<
     }
     |> then(Signal<Void, NoError>.single(Void()))
 }
+
+/// Veilgram: marks every chat of the main list and the archive read. In ghost mode, where the read
+/// marks would stay local, the read receipts are sent as well, one chat after another.
+public func veilgramReadAllChats(account: Account) -> Signal<Never, NoError> {
+    return account.postbox.transaction { transaction -> [PeerId] in
+        var peerIds: [PeerId] = []
+        for groupId in [PeerGroupId.root, Namespaces.PeerGroup.archive] {
+            for peerId in transaction.getUnreadChatListPeerIds(groupId: groupId, filterPredicate: nil, additionalFilter: nil, stopOnFirstMatch: false) {
+                _internal_togglePeerUnreadMarkInteractively(transaction: transaction, network: account.network, viewTracker: account.viewTracker, peerId: peerId, setToValue: false)
+                peerIds.append(peerId)
+            }
+        }
+        return peerIds
+    }
+    |> mapToSignal { peerIds -> Signal<Never, NoError> in
+        if !VeilgramSettings.ghostRead {
+            return .complete()
+        }
+        let cloudPeerIds = peerIds.filter { peerId in
+            switch peerId.namespace {
+            case Namespaces.Peer.CloudUser, Namespaces.Peer.CloudGroup, Namespaces.Peer.CloudChannel:
+                return true
+            default:
+                return false
+            }
+        }
+        var signal: Signal<Never, NoError> = .complete()
+        for peerId in cloudPeerIds {
+            signal = signal
+            |> then(veilgramSendReadReceipt(account: account, peerId: peerId)
+            |> ignoreValues)
+        }
+        return signal
+    }
+}

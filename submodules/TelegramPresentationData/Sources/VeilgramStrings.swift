@@ -38,6 +38,8 @@ private let veilgramRussianStrings: [String: String] = [
     "Veilgram.DetailsForwarded": "Отправлено в оригинале",
     "Veilgram.DetailsDeleted": "Удалено",
     "Veilgram.Copied": "Скопировано",
+    "Veilgram.ReadAllChats": "Прочитать все чаты",
+    "Veilgram.ReadAllChatsDone": "Все чаты прочитаны.",
     "Veilgram.FirstMessage": "К первому сообщению",
     "Veilgram.MessageCounter": "Счётчик сообщений",
     "Veilgram.MessageCounterEmpty": "Здесь нечего считать.",
