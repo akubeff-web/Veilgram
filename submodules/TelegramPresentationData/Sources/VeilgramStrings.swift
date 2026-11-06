@@ -38,6 +38,7 @@ private let veilgramRussianStrings: [String: String] = [
     "Veilgram.DetailsForwarded": "Отправлено в оригинале",
     "Veilgram.DetailsDeleted": "Удалено",
     "Veilgram.Copied": "Скопировано",
+    "Veilgram.HideStories": "Скрыть ленту историй",
     "Veilgram.HideBlocked": "Скрывать заблокированных в группах",
     "Veilgram.KeywordFilter": "Скрывать сообщения со словами",
     "Veilgram.KeywordsPlaceholder": "Слова: каждое с новой строки или через запятую",

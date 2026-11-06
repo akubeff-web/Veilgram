@@ -2185,7 +2185,7 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
             if self.previewing {
                 self.storiesReady.set(.single(true))
             } else {
-                self.storySubscriptionsDisposable = (self.context.engine.messages.storySubscriptions(isHidden: self.location == .chatList(groupId: .archive))
+                self.storySubscriptionsDisposable = (veilgramFilteredStorySubscriptions(self.context.engine.messages.storySubscriptions(isHidden: self.location == .chatList(groupId: .archive)))
                 |> deliverOnMainQueue).startStrict(next: { [weak self] rawStorySubscriptions in
                     guard let self else {
                         return
@@ -2245,7 +2245,7 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
                 })
                 
                 if case .chatList(.root) = self.location {
-                    self.storyArchiveSubscriptionsDisposable = (self.context.engine.messages.storySubscriptions(isHidden: true)
+                    self.storyArchiveSubscriptionsDisposable = (veilgramFilteredStorySubscriptions(self.context.engine.messages.storySubscriptions(isHidden: true))
                     |> deliverOnMainQueue).startStrict(next: { [weak self] rawStoryArchiveSubscriptions in
                         guard let self else {
                             return
@@ -7605,4 +7605,20 @@ public func resolveChatListNavigationTarget(navigationController: NavigationCont
     }
     
     return nil
+}
+
+/// Veilgram: with the stories row hidden, the chat list is given no story subscriptions at all.
+private func veilgramFilteredStorySubscriptions(_ signal: Signal<EngineStorySubscriptions, NoError>) -> Signal<EngineStorySubscriptions, NoError> {
+    let hideStories = VeilgramSettings.updated
+    |> map { _ -> Bool in
+        return VeilgramSettings.hideStories
+    }
+    |> distinctUntilChanged
+    return combineLatest(signal, hideStories)
+    |> map { subscriptions, hideStories -> EngineStorySubscriptions in
+        if hideStories {
+            return EngineStorySubscriptions(accountItem: nil, items: [], hasMoreToken: nil)
+        }
+        return subscriptions
+    }
 }

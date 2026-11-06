@@ -24,10 +24,11 @@ public enum VeilgramSettings {
         case confirmSend
         case hideBlocked
         case keywordFilter
+        case hideStories
 
         public var defaultValue: Bool {
             switch self {
-            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter:
+            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories:
                 return false
             default:
                 return true
@@ -115,6 +116,10 @@ public enum VeilgramSettings {
 
     public static var tabNews: Bool {
         return value(.tabNews)
+    }
+
+    public static var hideStories: Bool {
+        return value(.hideStories)
     }
 
     public static var hideBlocked: Bool {

@@ -68,6 +68,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case tabContacts(Bool)
     case tabCalls(Bool)
     case tabNews(Bool)
+    case hideStories(Bool)
 
     case loginButton(Bool)
     case loginButtonFooter
@@ -86,7 +87,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.sending.rawValue
         case .hideBlocked, .keywordFilter, .keywords, .filterFooter:
             return VeilgramSettingsSection.filter.rawValue
-        case .tabsHeader, .tabContacts, .tabCalls, .tabNews:
+        case .tabsHeader, .tabContacts, .tabCalls, .tabNews, .hideStories:
             return VeilgramSettingsSection.tabs.rawValue
         case .loginButton, .loginButtonFooter:
             return VeilgramSettingsSection.login.rawValue
@@ -147,6 +148,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 42
         case .tabNews:
             return 43
+        case .hideStories:
+            return 44
         case .loginButton:
             return 50
         case .loginButtonFooter:
@@ -226,6 +229,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.tabCalls, "Veilgram.TabCalls", strings.Veilgram_TabCalls, value, { arguments.updateShowCallsTab($0) })
         case let .tabNews(value):
             return switchItem(VeilgramSettingsIcons.tabNews, "Veilgram.TabNews", strings.Veilgram_TabNews, value, { arguments.update(.tabNews, $0) })
+        case let .hideStories(value):
+            return switchItem(VeilgramSettingsIcons.hideStories, "Veilgram.HideStories", strings.Veilgram_HideStories, value, { arguments.update(.hideStories, $0) })
         case let .loginButton(value):
             return switchItem(VeilgramSettingsIcons.loginButton, "Veilgram.LoginButton", strings.Veilgram_LoginButton, value, { arguments.update(.loginOpenTelegramButton, $0) })
         case .loginButtonFooter:
@@ -278,6 +283,7 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     entries.append(.tabContacts(VeilgramSettings.value(.tabContacts)))
     entries.append(.tabCalls(showCallsTab))
     entries.append(.tabNews(VeilgramSettings.value(.tabNews)))
+    entries.append(.hideStories(VeilgramSettings.value(.hideStories)))
 
     entries.append(.loginButton(VeilgramSettings.value(.loginOpenTelegramButton)))
     entries.append(.loginButtonFooter)

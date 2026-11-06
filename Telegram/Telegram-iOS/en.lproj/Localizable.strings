@@ -17287,3 +17287,4 @@ Error: %8$@";
 "Veilgram.KeywordFilter" = "Hide Messages with Words";
 "Veilgram.KeywordsPlaceholder" = "Words, one per line or separated by commas";
 "Veilgram.FilterInfo" = "Messages from people you blocked are hidden in groups and channels. Private chats with them stay as they are. Incoming messages containing any of the words are hidden in every chat.";
+"Veilgram.HideStories" = "Hide Stories Row";

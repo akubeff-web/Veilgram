@@ -489,6 +489,7 @@ public enum VeilgramSettingsIcons {
     public static let confirmSend = generateVeilgramSettingsIcon(.send, backgroundColor: UIColor(rgb: 0x007AFF))
     public static let hideBlocked = generateVeilgramSettingsIcon(.eyeOff, backgroundColor: UIColor(rgb: 0xAF52DE))
     public static let keywordFilter = generateVeilgramSettingsIcon(.filter, backgroundColor: UIColor(rgb: 0xAF52DE))
+    public static let hideStories = generateVeilgramSettingsIcon(.circleDashed, backgroundColor: UIColor(rgb: 0xFF9500))
     public static let autoArchive = generateVeilgramSettingsIcon(.archive, backgroundColor: UIColor(rgb: 0xFF9500))
     public static let autoArchiveGroups = generateVeilgramSettingsIcon(.users, backgroundColor: UIColor(rgb: 0xFF9500))
     public static let tabContacts = generateVeilgramSettingsIcon(.user, backgroundColor: UIColor(rgb: 0x007AFF))
