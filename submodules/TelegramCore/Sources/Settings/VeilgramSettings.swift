@@ -32,10 +32,14 @@ public enum VeilgramSettings {
         case streamerMode
         case autoReply
         case autoReplyContacts
+        case hidePremiumBadges
+        case hidePremiumBanners
+        case hidePremiumOffers
+        case hideGifts
 
         public var defaultValue: Bool {
             switch self {
-            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce, .hidePhone, .streamerMode, .autoReply, .autoReplyContacts:
+            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce, .hidePhone, .streamerMode, .autoReply, .autoReplyContacts, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts:
                 return false
             default:
                 return true
@@ -173,6 +177,22 @@ public enum VeilgramSettings {
 
     public static var keepViewOnce: Bool {
         return value(.keepViewOnce)
+    }
+
+    public static var hidePremiumBadges: Bool {
+        return value(.hidePremiumBadges)
+    }
+
+    public static var hidePremiumBanners: Bool {
+        return value(.hidePremiumBanners)
+    }
+
+    public static var hidePremiumOffers: Bool {
+        return value(.hidePremiumOffers)
+    }
+
+    public static var hideGifts: Bool {
+        return value(.hideGifts)
     }
 
     public static var autoReply: Bool {

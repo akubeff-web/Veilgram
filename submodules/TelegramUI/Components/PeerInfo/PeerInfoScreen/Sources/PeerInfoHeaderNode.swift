@@ -668,9 +668,9 @@ final class PeerInfoHeaderNode: ASDisplayNode {
                 credibilityIcon = .fake
             } else if peer.isScam {
                 credibilityIcon = .scam
-            } else if let emojiStatus = peer.emojiStatus {
+            } else if !VeilgramSettings.hidePremiumBadges, let emojiStatus = peer.emojiStatus {
                 statusIcon = .emojiStatus(emojiStatus)
-            } else if peer.isPremium && !premiumConfiguration.isPremiumDisabled && (peer.id != self.context.account.peerId || self.isSettings || self.isMyProfile) {
+            } else if peer.isPremium && !premiumConfiguration.isPremiumDisabled && !VeilgramSettings.hidePremiumBadges && (peer.id != self.context.account.peerId || self.isSettings || self.isMyProfile) {
                 credibilityIcon = .premium
             } else {
                 credibilityIcon = .none

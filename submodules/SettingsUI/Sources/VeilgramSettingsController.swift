@@ -40,6 +40,7 @@ private enum VeilgramSettingsSection: Int32 {
     case filter
     case protected
     case screen
+    case premium
     case tabs
     case login
 }
@@ -88,6 +89,12 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case hidePhone(Bool)
     case screenFooter
 
+    case premiumHeader
+    case hidePremiumBadges(Bool)
+    case hidePremiumBanners(Bool)
+    case hidePremiumOffers(Bool)
+    case hideGifts(Bool)
+
     case tabsHeader
     case tabContacts(Bool)
     case tabCalls(Bool)
@@ -119,6 +126,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.protected.rawValue
         case .streamerMode, .hidePhone, .screenFooter:
             return VeilgramSettingsSection.screen.rawValue
+        case .premiumHeader, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts:
+            return VeilgramSettingsSection.premium.rawValue
         case .tabsHeader, .tabContacts, .tabCalls, .tabNews, .hideStories:
             return VeilgramSettingsSection.tabs.rawValue
         case .loginButton, .loginButtonFooter:
@@ -194,6 +203,16 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 39
         case .screenFooter:
             return 40
+        case .premiumHeader:
+            return 41
+        case .hidePremiumBadges:
+            return 42
+        case .hidePremiumBanners:
+            return 43
+        case .hidePremiumOffers:
+            return 44
+        case .hideGifts:
+            return 45
         case .tabsHeader:
             return 50
         case .tabContacts:
@@ -301,6 +320,16 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.hidePhone, "Veilgram.HidePhone", strings.Veilgram_HidePhone, value, { arguments.update(.hidePhone, $0) })
         case .screenFooter:
             return footerItem("Veilgram.ScreenInfo", strings.Veilgram_ScreenInfo)
+        case .premiumHeader:
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.PremiumHeader", strings.Veilgram_PremiumHeader).uppercased(), sectionId: self.section)
+        case let .hidePremiumBadges(value):
+            return switchItem(VeilgramSettingsIcons.premiumItem, "Veilgram.HidePremiumBadges", strings.Veilgram_HidePremiumBadges, value, { arguments.update(.hidePremiumBadges, $0) })
+        case let .hidePremiumBanners(value):
+            return switchItem(VeilgramSettingsIcons.premiumItem, "Veilgram.HidePremiumBanners", strings.Veilgram_HidePremiumBanners, value, { arguments.update(.hidePremiumBanners, $0) })
+        case let .hidePremiumOffers(value):
+            return switchItem(VeilgramSettingsIcons.premiumItem, "Veilgram.HidePremiumOffers", strings.Veilgram_HidePremiumOffers, value, { arguments.update(.hidePremiumOffers, $0) })
+        case let .hideGifts(value):
+            return switchItem(VeilgramSettingsIcons.premiumItem, "Veilgram.HideGifts", strings.Veilgram_HideGifts, value, { arguments.update(.hideGifts, $0) })
         case .tabsHeader:
             return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.Tabs", strings.Veilgram_Tabs).uppercased(), sectionId: self.section)
         case let .tabContacts(value):
@@ -375,6 +404,12 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     entries.append(.streamerMode(VeilgramSettings.value(.streamerMode)))
     entries.append(.hidePhone(VeilgramSettings.value(.hidePhone)))
     entries.append(.screenFooter)
+
+    entries.append(.premiumHeader)
+    entries.append(.hidePremiumBadges(VeilgramSettings.value(.hidePremiumBadges)))
+    entries.append(.hidePremiumBanners(VeilgramSettings.value(.hidePremiumBanners)))
+    entries.append(.hidePremiumOffers(VeilgramSettings.value(.hidePremiumOffers)))
+    entries.append(.hideGifts(VeilgramSettings.value(.hideGifts)))
 
     entries.append(.tabsHeader)
     entries.append(.tabContacts(VeilgramSettings.value(.tabContacts)))

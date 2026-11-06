@@ -3563,12 +3563,12 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                                 currentCredibilityIconContent = .text(color: item.presentationData.theme.chat.message.incoming.scamColor, string: item.presentationData.strings.Message_ScamAccount.uppercased())
                             } else if peer.isFake {
                                 currentCredibilityIconContent = .text(color: item.presentationData.theme.chat.message.incoming.scamColor, string: item.presentationData.strings.Message_FakeAccount.uppercased())
-                            } else if let emojiStatus = peer.emojiStatus {
+                            } else if !VeilgramSettings.hidePremiumBadges, let emojiStatus = peer.emojiStatus {
                                 currentStatusIconContent = .animation(content: .customEmoji(fileId: emojiStatus.fileId), size: CGSize(width: 32.0, height: 32.0), placeholderColor: item.presentationData.theme.list.mediaPlaceholderColor, themeColor: item.presentationData.theme.list.itemAccentColor, loopMode: .count(2))
                                 if let color = emojiStatus.color {
                                     currentStatusIconParticleColor = UIColor(rgb: UInt32(bitPattern: color))
                                 }
-                            } else if peer.isPremium && !premiumConfiguration.isPremiumDisabled {
+                            } else if peer.isPremium && !premiumConfiguration.isPremiumDisabled && !VeilgramSettings.hidePremiumBadges {
                                 currentCredibilityIconContent = .premium(color: item.presentationData.theme.list.itemAccentColor)
                             }
                             
@@ -3594,12 +3594,12 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                         currentCredibilityIconContent = .text(color: item.presentationData.theme.chat.message.incoming.scamColor, string: item.presentationData.strings.Message_ScamAccount.uppercased())
                     } else if peer.isFake {
                         currentCredibilityIconContent = .text(color: item.presentationData.theme.chat.message.incoming.scamColor, string: item.presentationData.strings.Message_FakeAccount.uppercased())
-                    } else if let emojiStatus = peer.emojiStatus {
+                    } else if !VeilgramSettings.hidePremiumBadges, let emojiStatus = peer.emojiStatus {
                         currentStatusIconContent = .animation(content: .customEmoji(fileId: emojiStatus.fileId), size: CGSize(width: 32.0, height: 32.0), placeholderColor: item.presentationData.theme.list.mediaPlaceholderColor, themeColor: item.presentationData.theme.list.itemAccentColor, loopMode: .count(2))
                         if let color = emojiStatus.color {
                             currentStatusIconParticleColor = UIColor(rgb: UInt32(bitPattern: color))
                         }
-                    } else if peer.isPremium && !premiumConfiguration.isPremiumDisabled {
+                    } else if peer.isPremium && !premiumConfiguration.isPremiumDisabled && !VeilgramSettings.hidePremiumBadges {
                         currentCredibilityIconContent = .premium(color: item.presentationData.theme.list.itemAccentColor)
                     }
                     

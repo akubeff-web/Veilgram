@@ -282,12 +282,12 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
     
     let premiumConfiguration = PremiumConfiguration.with(appConfiguration: context.currentAppConfiguration.with { $0 })
     let isPremiumDisabled = premiumConfiguration.isPremiumDisabled
-    if !isPremiumDisabled || context.isPremium {
+    if (!isPremiumDisabled || context.isPremium) && !VeilgramSettings.hidePremiumOffers {
         items[.payment]!.append(PeerInfoScreenDisclosureItem(id: 100, label: .text(""), text: presentationData.strings.Settings_Premium, icon: PresentationResourcesSettings.premium, action: {
             interaction.openSettings(.premium)
         }))
     }
-    if let starsState = data.starsState {
+    if let starsState = data.starsState, !VeilgramSettings.hidePremiumOffers || abs(starsState.balance.value) > 0 {
         if !isPremiumDisabled || abs(starsState.balance.value) > 0 {
             let balanceText: NSAttributedString
             if abs(starsState.balance.value) > 0 {
@@ -321,12 +321,12 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
             }))
         }
     }
-    if !isPremiumDisabled || context.isPremium {
+    if (!isPremiumDisabled || context.isPremium) && !VeilgramSettings.hidePremiumOffers {
         items[.payment]!.append(PeerInfoScreenDisclosureItem(id: 104, label: .text(""), additionalBadgeLabel: nil, text: presentationData.strings.Settings_Business, icon: PresentationResourcesSettings.business, action: {
             interaction.openSettings(.businessSetup)
         }))
     }
-    if let starsState = data.starsState {
+    if let starsState = data.starsState, !VeilgramSettings.hideGifts {
         if !isPremiumDisabled || starsState.balance > StarsAmount.zero {
             items[.payment]!.append(PeerInfoScreenDisclosureItem(id: 105, label: .text(""), text: presentationData.strings.Settings_SendGift, icon: PresentationResourcesSettings.premiumGift, action: {
                 interaction.openSettings(.premiumGift)

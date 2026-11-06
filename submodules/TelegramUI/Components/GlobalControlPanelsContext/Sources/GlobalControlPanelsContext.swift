@@ -482,6 +482,16 @@ public final class GlobalControlPanelsContext {
                     guard let self else {
                         return
                     }
+                    var chatListNotice = chatListNotice
+                    if VeilgramSettings.hidePremiumBanners, let notice = chatListNotice {
+                        // Veilgram: the banners that sell Premium, Stars or gifts.
+                        switch notice {
+                        case .premiumUpgrade, .premiumAnnualDiscount, .premiumRestore, .xmasPremiumGift, .birthdayPremiumGift, .premiumGrace, .starsSubscriptionLowBalance:
+                            chatListNotice = nil
+                        default:
+                            break
+                        }
+                    }
                     if self.chatListNotice != chatListNotice {
                         self.chatListNotice = chatListNotice
                         self.notifyStateUpdated()

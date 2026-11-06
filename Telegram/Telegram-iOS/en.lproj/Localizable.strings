@@ -17306,3 +17306,8 @@ Error: %8$@";
 "Veilgram.AutoReplyPlaceholder" = "Reply text";
 "Veilgram.AutoReplyContacts" = "Also to Contacts";
 "Veilgram.AutoReplyInfo" = "When someone who is not a contact starts a chat with you, this message is sent to them once, however many messages they send. Bots are never answered. The reply goes out while Veilgram is running; if it was suspended, when you open it.";
+"Veilgram.PremiumHeader" = "Hide Premium";
+"Veilgram.HidePremiumBadges" = "Stars and Emoji Statuses";
+"Veilgram.HidePremiumBanners" = "Banners in the Chat List";
+"Veilgram.HidePremiumOffers" = "Premium, Stars and Business in Settings";
+"Veilgram.HideGifts" = "Gift Buttons";
