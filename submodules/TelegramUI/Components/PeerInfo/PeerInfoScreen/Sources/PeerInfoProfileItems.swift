@@ -106,6 +106,8 @@ func infoItems(
         let ItemAbout = 3003
         let ItemNote = 3004
         let ItemAppFooter = 3005
+        let ItemVeilgramId = 3010
+        let ItemVeilgramRegistration = 3011
         let ItemAffiliate = 4000
         let ItemAffiliateInfo = 4001
         let ItemBusinessHours = 5000
@@ -221,6 +223,20 @@ func infoItems(
                     }
                 )
             )
+        }
+        
+        // Veilgram: the user id (a tap copies it) and the month the account was registered, which the
+        // server only gives in a new chat with someone who is not a contact.
+        let veilgramUserId = "\(user.id.id._internalGetInt64Value())"
+        items[currentPeerInfoSection]!.append(PeerInfoScreenLabeledValueItem(id: ItemVeilgramId, label: "ID", text: veilgramUserId, action: { _, _ in
+            UIPasteboard.general.string = veilgramUserId
+        }, requestLayout: { animated in
+            interaction.requestLayout(animated)
+        }))
+        if let registrationDate = (data.cachedData as? CachedUserData)?.peerStatusSettings?.registrationDate, !registrationDate.isEmpty {
+            items[currentPeerInfoSection]!.append(PeerInfoScreenLabeledValueItem(id: ItemVeilgramRegistration, label: veilgramLocalized(presentationData.strings, "Veilgram.Registered", presentationData.strings.Veilgram_Registered), text: registrationDate, action: nil, requestLayout: { animated in
+                interaction.requestLayout(animated)
+            }))
         }
         
         if let cachedData = data.cachedData as? CachedUserData {

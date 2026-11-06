@@ -38,6 +38,7 @@ private let veilgramRussianStrings: [String: String] = [
     "Veilgram.DetailsForwarded": "Отправлено в оригинале",
     "Veilgram.DetailsDeleted": "Удалено",
     "Veilgram.Copied": "Скопировано",
+    "Veilgram.Registered": "Регистрация",
     "Veilgram.StreamerMode": "Режим стримера",
     "Veilgram.HidePhone": "Скрыть мой номер",
     "Veilgram.ScreenInfo": "Режим стримера показывает «Veilgram» вместо названий чатов и превью сообщений в списке чатов, в заголовке чата и во всплывающих уведомлениях; аватарки остаются. Скрытие номера меняет только то, что видно на экране.",
