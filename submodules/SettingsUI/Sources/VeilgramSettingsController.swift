@@ -41,6 +41,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
 
     case keepDeleted(Bool)
     case deletedIcon(Bool)
+    case editHistory(Bool)
     case keepDeletedFooter
 
     case autoArchive(Bool)
@@ -61,7 +62,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.ghost.rawValue
         case .alwaysOnline, .alwaysOnlineFooter:
             return VeilgramSettingsSection.presence.rawValue
-        case .keepDeleted, .deletedIcon, .keepDeletedFooter:
+        case .keepDeleted, .deletedIcon, .editHistory, .keepDeletedFooter:
             return VeilgramSettingsSection.deleted.rawValue
         case .autoArchive, .autoArchiveGroups, .autoArchiveFooter:
             return VeilgramSettingsSection.archive.rawValue
@@ -94,8 +95,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 10
         case .deletedIcon:
             return 11
-        case .keepDeletedFooter:
+        case .editHistory:
             return 12
+        case .keepDeletedFooter:
+            return 13
         case .autoArchive:
             return 20
         case .autoArchiveGroups:
@@ -153,6 +156,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.keepDeleted, "Veilgram.KeepDeleted", strings.Veilgram_KeepDeleted, value, { arguments.update(.keepDeleted, $0) })
         case let .deletedIcon(value):
             return switchItem(VeilgramSettingsIcons.deletedIcon, "Veilgram.DeletedIcon", strings.Veilgram_DeletedIcon, value, { arguments.update(.deletedIcon, $0) })
+        case let .editHistory(value):
+            return switchItem(VeilgramSettingsIcons.editHistory, "Veilgram.EditHistorySetting", strings.Veilgram_EditHistorySetting, value, { arguments.update(.editHistory, $0) })
         case .keepDeletedFooter:
             return footerItem("Veilgram.KeepDeletedInfo", strings.Veilgram_KeepDeletedInfo)
         case let .autoArchive(value):
@@ -197,6 +202,7 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     if VeilgramSettings.value(.keepDeleted) {
         entries.append(.deletedIcon(VeilgramSettings.value(.deletedIcon)))
     }
+    entries.append(.editHistory(VeilgramSettings.value(.editHistory)))
     entries.append(.keepDeletedFooter)
 
     entries.append(.autoArchive(VeilgramSettings.value(.autoArchive)))

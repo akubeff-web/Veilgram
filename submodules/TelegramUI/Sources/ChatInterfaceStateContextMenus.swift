@@ -2122,6 +2122,45 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
             }, action: noAction)))
         }
 
+        if messages.count == 1, message.id.namespace == Namespaces.Message.Cloud {
+            let strings = chatPresentationInterfaceState.strings
+            let editHistory = message.veilgramEditHistory
+            if !editHistory.isEmpty {
+                actions.append(.action(ContextMenuActionItem(text: veilgramLocalized(strings, "Veilgram.EditHistory", strings.Veilgram_EditHistory), icon: { theme in
+                    return veilgramCachedIcon(.history, size: CGSize(width: 24.0, height: 24.0), color: theme.actionSheet.primaryTextColor)
+                }, action: { _, f in
+                    f(.dismissWithoutContent)
+                    var rows: [(label: String, value: String)] = [(veilgramLocalized(strings, "Veilgram.EditHistoryCurrent", strings.Veilgram_EditHistoryCurrent), message.text)]
+                    for entry in editHistory.reversed() {
+                        rows.append((veilgramFormatFullDate(entry.date), entry.text))
+                    }
+                    controllerInteraction.navigationController()?.pushViewController(veilgramRowsController(context: context, title: veilgramLocalized(strings, "Veilgram.EditHistory", strings.Veilgram_EditHistory), rows: rows))
+                })))
+            }
+            actions.append(.action(ContextMenuActionItem(text: veilgramLocalized(strings, "Veilgram.Details", strings.Veilgram_Details), icon: { theme in
+                return veilgramCachedIcon(.info, size: CGSize(width: 24.0, height: 24.0), color: theme.actionSheet.primaryTextColor)
+            }, action: { _, f in
+                f(.dismissWithoutContent)
+                var rows: [(label: String, value: String)] = []
+                rows.append((veilgramLocalized(strings, "Veilgram.DetailsMessageId", strings.Veilgram_DetailsMessageId), "\(message.id.id)"))
+                rows.append((veilgramLocalized(strings, "Veilgram.DetailsChatId", strings.Veilgram_DetailsChatId), "\(veilgramBotApiId(message.id.peerId))"))
+                if let author = message.author {
+                    rows.append((veilgramLocalized(strings, "Veilgram.DetailsAuthorId", strings.Veilgram_DetailsAuthorId), "\(veilgramBotApiId(author.id))"))
+                }
+                rows.append((veilgramLocalized(strings, "Veilgram.DetailsSent", strings.Veilgram_DetailsSent), veilgramFormatFullDate(message.timestamp)))
+                if let edited = message.attributes.first(where: { $0 is EditedMessageAttribute }) as? EditedMessageAttribute {
+                    rows.append((veilgramLocalized(strings, "Veilgram.DetailsEdited", strings.Veilgram_DetailsEdited), veilgramFormatFullDate(edited.date)))
+                }
+                if let forwardInfo = message.forwardInfo {
+                    rows.append((veilgramLocalized(strings, "Veilgram.DetailsForwarded", strings.Veilgram_DetailsForwarded), veilgramFormatFullDate(forwardInfo.date)))
+                }
+                if let deleted = message.attributes.first(where: { $0 is DeletedRemotelyMessageAttribute }) as? DeletedRemotelyMessageAttribute {
+                    rows.append((veilgramLocalized(strings, "Veilgram.DetailsDeleted", strings.Veilgram_DetailsDeleted), veilgramFormatFullDate(deleted.date)))
+                }
+                controllerInteraction.navigationController()?.pushViewController(veilgramRowsController(context: context, title: veilgramLocalized(strings, "Veilgram.Details", strings.Veilgram_Details), rows: rows))
+            })))
+        }
+
         if !isPinnedMessages, !isReplyThreadHead, data.canSelect {
             var didAddSeparator = false
             if !selectAll || messages.count == 1 {
@@ -4061,5 +4100,26 @@ private final class ChatRateTranscriptionContextItemNode: ASDisplayNode, Context
     
     func actionNode(at point: CGPoint) -> ContextActionNodeProtocol {
         return self
+    }
+}
+
+/// A date with seconds, in the device's locale.
+private func veilgramFormatFullDate(_ timestamp: Int32) -> String {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .medium
+    formatter.timeStyle = .medium
+    return formatter.string(from: Date(timeIntervalSince1970: Double(timestamp)))
+}
+
+/// A peer id as the Bot API writes it: users as is, basic groups negative, channels with -100.
+private func veilgramBotApiId(_ peerId: EnginePeer.Id) -> Int64 {
+    let id = peerId.id._internalGetInt64Value()
+    switch peerId.namespace {
+    case Namespaces.Peer.CloudGroup:
+        return -id
+    case Namespaces.Peer.CloudChannel:
+        return -1000000000000 - id
+    default:
+        return id
     }
 }

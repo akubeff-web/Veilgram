@@ -26,6 +26,18 @@ private let veilgramRussianStrings: [String: String] = [
     "Veilgram.TabNews": "Новости",
     "Veilgram.LoginButton": "Кнопка «Открыть Telegram» при входе",
     "Veilgram.LoginButtonInfo": "Показывает на экране ввода кода кнопку, которая открывает официальный Telegram, куда приходит код.",
+    "Veilgram.EditHistory": "История изменений",
+    "Veilgram.EditHistorySetting": "Сохранять историю правок",
+    "Veilgram.EditHistoryCurrent": "Сейчас",
+    "Veilgram.Details": "Подробности",
+    "Veilgram.DetailsMessageId": "ID сообщения",
+    "Veilgram.DetailsChatId": "ID чата",
+    "Veilgram.DetailsAuthorId": "ID автора",
+    "Veilgram.DetailsSent": "Отправлено",
+    "Veilgram.DetailsEdited": "Изменено",
+    "Veilgram.DetailsForwarded": "Отправлено в оригинале",
+    "Veilgram.DetailsDeleted": "Удалено",
+    "Veilgram.Copied": "Скопировано",
 ]
 
 public func veilgramLocalized(_ strings: PresentationStrings, _ key: String, _ value: String) -> String {

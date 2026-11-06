@@ -15,6 +15,7 @@ public enum VeilgramSettings {
         case alwaysOnline
         case keepDeleted
         case deletedIcon
+        case editHistory
         case autoArchive
         case autoArchiveGroups
         case tabContacts
@@ -83,6 +84,10 @@ public enum VeilgramSettings {
 
     public static var keepDeleted: Bool {
         return value(.keepDeleted)
+    }
+
+    public static var editHistory: Bool {
+        return value(.editHistory)
     }
 
     public static var deletedIcon: Bool {
