@@ -6,6 +6,11 @@ import SwiftSignalKit
 func _internal_markMessageContentAsConsumedInteractively(postbox: Postbox, messageId: MessageId) -> Signal<Void, NoError> {
     return postbox.transaction { transaction -> Void in
         if let message = transaction.getMessage(messageId), message.flags.contains(.Incoming) {
+            if VeilgramSettings.keepViewOnce, messageId.peerId.namespace != Namespaces.Peer.SecretChat, message.attributes.contains(where: { $0 is AutoremoveTimeoutMessageAttribute || $0 is AutoclearTimeoutMessageAttribute }) {
+                // Veilgram: opening disappearing media neither starts its timer nor tells the
+                // sender, so it stays and can be opened again.
+                return
+            }
             var updateMessage = false
             var updatedAttributes = message.attributes
             

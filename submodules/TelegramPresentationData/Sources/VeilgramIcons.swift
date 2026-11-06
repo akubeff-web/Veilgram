@@ -8,6 +8,7 @@ public enum VeilgramIcon: String {
     case ghost
     case venetianMask
     case eye
+    case download
     case filter
     case history
     case info
@@ -56,6 +57,12 @@ public enum VeilgramIcon: String {
         case .filter:
             return [
                 .path("M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z")
+            ]
+        case .download:
+            return [
+                .path("M12 15V3"),
+                .path("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"),
+                .path("m7 10 5 5 5-5")
             ]
         case .eye:
             return [
@@ -490,6 +497,8 @@ public enum VeilgramSettingsIcons {
     public static let hideBlocked = generateVeilgramSettingsIcon(.eyeOff, backgroundColor: UIColor(rgb: 0xAF52DE))
     public static let keywordFilter = generateVeilgramSettingsIcon(.filter, backgroundColor: UIColor(rgb: 0xAF52DE))
     public static let hideStories = generateVeilgramSettingsIcon(.circleDashed, backgroundColor: UIColor(rgb: 0xFF9500))
+    public static let unlockProtected = generateVeilgramSettingsIcon(.download, backgroundColor: UIColor(rgb: 0x34C759))
+    public static let keepViewOnce = generateVeilgramSettingsIcon(.eye, backgroundColor: UIColor(rgb: 0x34C759))
     public static let autoArchive = generateVeilgramSettingsIcon(.archive, backgroundColor: UIColor(rgb: 0xFF9500))
     public static let autoArchiveGroups = generateVeilgramSettingsIcon(.users, backgroundColor: UIColor(rgb: 0xFF9500))
     public static let tabContacts = generateVeilgramSettingsIcon(.user, backgroundColor: UIColor(rgb: 0x007AFF))

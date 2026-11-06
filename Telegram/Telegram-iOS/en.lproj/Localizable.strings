@@ -17288,3 +17288,6 @@ Error: %8$@";
 "Veilgram.KeywordsPlaceholder" = "Words, one per line or separated by commas";
 "Veilgram.FilterInfo" = "Messages from people you blocked are hidden in groups and channels. Private chats with them stay as they are. Incoming messages containing any of the words are hidden in every chat.";
 "Veilgram.HideStories" = "Hide Stories Row";
+"Veilgram.UnlockProtected" = "Save from Protected Chats";
+"Veilgram.KeepViewOnce" = "Keep Disappearing Media";
+"Veilgram.ProtectedInfo" = "Copying, forwarding, saving and screenshots work in chats that forbid them. Opening a view-once or timed photo, video or voice message does not start its timer and is not reported to the sender, so it can be opened again. Secret chats are not affected.";

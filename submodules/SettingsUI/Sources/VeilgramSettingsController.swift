@@ -31,6 +31,7 @@ private enum VeilgramSettingsSection: Int32 {
     case archive
     case sending
     case filter
+    case protected
     case tabs
     case login
 }
@@ -64,6 +65,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case keywords(String)
     case filterFooter
 
+    case unlockProtected(Bool)
+    case keepViewOnce(Bool)
+    case protectedFooter
+
     case tabsHeader
     case tabContacts(Bool)
     case tabCalls(Bool)
@@ -87,6 +92,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.sending.rawValue
         case .hideBlocked, .keywordFilter, .keywords, .filterFooter:
             return VeilgramSettingsSection.filter.rawValue
+        case .unlockProtected, .keepViewOnce, .protectedFooter:
+            return VeilgramSettingsSection.protected.rawValue
         case .tabsHeader, .tabContacts, .tabCalls, .tabNews, .hideStories:
             return VeilgramSettingsSection.tabs.rawValue
         case .loginButton, .loginButtonFooter:
@@ -140,6 +147,12 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 32
         case .filterFooter:
             return 33
+        case .unlockProtected:
+            return 35
+        case .keepViewOnce:
+            return 36
+        case .protectedFooter:
+            return 37
         case .tabsHeader:
             return 40
         case .tabContacts:
@@ -221,6 +234,12 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             })
         case .filterFooter:
             return footerItem("Veilgram.FilterInfo", strings.Veilgram_FilterInfo)
+        case let .unlockProtected(value):
+            return switchItem(VeilgramSettingsIcons.unlockProtected, "Veilgram.UnlockProtected", strings.Veilgram_UnlockProtected, value, { arguments.update(.unlockProtected, $0) })
+        case let .keepViewOnce(value):
+            return switchItem(VeilgramSettingsIcons.keepViewOnce, "Veilgram.KeepViewOnce", strings.Veilgram_KeepViewOnce, value, { arguments.update(.keepViewOnce, $0) })
+        case .protectedFooter:
+            return footerItem("Veilgram.ProtectedInfo", strings.Veilgram_ProtectedInfo)
         case .tabsHeader:
             return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.Tabs", strings.Veilgram_Tabs).uppercased(), sectionId: self.section)
         case let .tabContacts(value):
@@ -278,6 +297,10 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
         entries.append(.keywords(VeilgramSettings.filterKeywordsText))
     }
     entries.append(.filterFooter)
+
+    entries.append(.unlockProtected(VeilgramSettings.value(.unlockProtected)))
+    entries.append(.keepViewOnce(VeilgramSettings.value(.keepViewOnce)))
+    entries.append(.protectedFooter)
 
     entries.append(.tabsHeader)
     entries.append(.tabContacts(VeilgramSettings.value(.tabContacts)))

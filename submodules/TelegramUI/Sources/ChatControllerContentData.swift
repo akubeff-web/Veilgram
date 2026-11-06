@@ -1088,7 +1088,7 @@ extension ChatControllerImpl {
                     strongSelf.state.canStopIncomingStreamingMessage = canStopIncomingStreamingMessage
                     strongSelf.state.autoremoveTimeout = autoremoveTimeout
                     strongSelf.state.currentSendAsPeerId = currentSendAsPeerId
-                    strongSelf.state.copyProtectionEnabled = copyProtectionEnabled
+                    strongSelf.state.copyProtectionEnabled = copyProtectionEnabled && !VeilgramSettings.unlockProtected
                     strongSelf.state.myCopyProtectionEnabled = myCopyProtectionEnabled
                     strongSelf.state.hasSearchTags = hasSearchTags
                     strongSelf.state.isPremiumRequiredForMessaging = isPremiumRequiredForMessaging
@@ -1803,7 +1803,7 @@ extension ChatControllerImpl {
                         strongSelf.state.explicitelyCanPinMessages = explicitelyCanPinMessages
                         strongSelf.state.hasScheduledMessages = hasScheduledMessages
                         strongSelf.state.currentSendAsPeerId = currentSendAsPeerId
-                        strongSelf.state.copyProtectionEnabled = copyProtectionEnabled
+                        strongSelf.state.copyProtectionEnabled = copyProtectionEnabled && !VeilgramSettings.unlockProtected
                         strongSelf.state.hasSearchTags = hasSearchTags
                         strongSelf.state.isPremiumRequiredForMessaging = isPremiumRequiredForMessaging
                         strongSelf.state.hasSavedChats = hasSavedChats

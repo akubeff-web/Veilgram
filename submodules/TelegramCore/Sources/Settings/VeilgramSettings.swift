@@ -25,10 +25,12 @@ public enum VeilgramSettings {
         case hideBlocked
         case keywordFilter
         case hideStories
+        case unlockProtected
+        case keepViewOnce
 
         public var defaultValue: Bool {
             switch self {
-            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories:
+            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce:
                 return false
             default:
                 return true
@@ -116,6 +118,14 @@ public enum VeilgramSettings {
 
     public static var tabNews: Bool {
         return value(.tabNews)
+    }
+
+    public static var unlockProtected: Bool {
+        return value(.unlockProtected)
+    }
+
+    public static var keepViewOnce: Bool {
+        return value(.keepViewOnce)
     }
 
     public static var hideStories: Bool {
