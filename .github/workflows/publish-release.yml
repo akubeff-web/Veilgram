@@ -37,16 +37,28 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ steps.build.outputs.run_id }}
+        # Fetched through the API rather than `gh run download`, which unpacks an unzipped
+        # artifact that is itself a zip (an .ipa) into a directory.
         run: |
-          mkdir -p download
-          gh run download "$RUN_ID" -R "$GITHUB_REPOSITORY" -D download
-          find download -type f
-          IPA=$(find download -type f -name '*.ipa' | head -n 1)
-          if [ -z "$IPA" ]; then
+          ARTIFACT=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/artifacts" -q '[.artifacts[] | select(.name | endswith(".ipa"))][0]')
+          if [ -z "$ARTIFACT" ] || [ "$ARTIFACT" = "null" ]; then
             echo "::error::The run has no .ipa artifact."
             exit 1
           fi
-          cp "$IPA" Veilgram.ipa
+          ARTIFACT_ID=$(echo "$ARTIFACT" | jq -r .id)
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" > download.bin
+          if unzip -l download.bin 'Payload/*' > /dev/null 2>&1; then
+            mv download.bin Veilgram.ipa
+          else
+            unzip -o download.bin -d download
+            IPA=$(find download -type f -name '*.ipa' | head -n 1)
+            if [ -z "$IPA" ]; then
+              echo "::error::The artifact holds no .ipa."
+              exit 1
+            fi
+            mv "$IPA" Veilgram.ipa
+          fi
+          unzip -l Veilgram.ipa 'Payload/*/Info.plist' | tail -n 3
           ls -la Veilgram.ipa
 
       - name: Create the release
