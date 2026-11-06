@@ -17277,3 +17277,6 @@ Error: %8$@";
 "Veilgram.DetailsForwarded" = "Originally Sent";
 "Veilgram.DetailsDeleted" = "Deleted";
 "Veilgram.Copied" = "Copied";
+"Veilgram.DeletedLog" = "Deleted Messages Log";
+"Veilgram.DeletedLogEmpty" = "No deleted messages yet.";
+"Veilgram.Media" = "Media";

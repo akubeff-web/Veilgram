@@ -62,5 +62,33 @@ func veilgramKeepRemotelyDeletedMessage(transaction: Transaction, accountPeerId:
         attributes.append(DeletedRemotelyMessageAttribute(date: timestamp))
         return .update(StoreMessage(id: currentMessage.id, customStableId: nil, globallyUniqueId: currentMessage.globallyUniqueId, groupingKey: currentMessage.groupingKey, threadId: currentMessage.threadId, timestamp: currentMessage.timestamp, flags: StoreMessageFlags(currentMessage.flags), tags: currentMessage.tags, globalTags: currentMessage.globalTags, localTags: currentMessage.localTags, forwardInfo: storeForwardInfo, authorId: currentMessage.author?.id, text: currentMessage.text, attributes: attributes, media: currentMessage.media))
     })
+    veilgramAppendDeletedMessageLog(accountPeerId: accountPeerId, id: id, date: timestamp)
     return true
+}
+
+private let veilgramDeletedLogLimit = 2000
+
+private func veilgramDeletedLogKey(_ accountPeerId: PeerId) -> String {
+    return "veilgram.deletedLog.\(accountPeerId.toInt64())"
+}
+
+/// Each entry is [peer id, message id, time deleted], oldest first.
+private func veilgramAppendDeletedMessageLog(accountPeerId: PeerId, id: MessageId, date: Int32) {
+    let key = veilgramDeletedLogKey(accountPeerId)
+    var entries = (UserDefaults.standard.array(forKey: key) as? [[Int64]]) ?? []
+    entries.append([id.peerId.toInt64(), Int64(id.id), Int64(date)])
+    if entries.count > veilgramDeletedLogLimit {
+        entries.removeFirst(entries.count - veilgramDeletedLogLimit)
+    }
+    UserDefaults.standard.set(entries, forKey: key)
+}
+
+/// Messages Veilgram kept after the server deleted them, newest first, with the time of deletion.
+public func veilgramDeletedMessagesLog(accountPeerId: EnginePeer.Id) -> [(id: EngineMessage.Id, date: Int32)] {
+    let entries = (UserDefaults.standard.array(forKey: veilgramDeletedLogKey(accountPeerId)) as? [[Int64]]) ?? []
+    var result: [(id: EngineMessage.Id, date: Int32)] = []
+    for entry in entries.reversed() where entry.count == 3 {
+        result.append((MessageId(peerId: PeerId(entry[0]), namespace: Namespaces.Message.Cloud, id: Int32(clamping: entry[1])), Int32(clamping: entry[2])))
+    }
+    return result
 }

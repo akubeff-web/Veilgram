@@ -8,14 +8,17 @@ import TelegramUIPreferences
 import ItemListUI
 import PresentationDataUtils
 import AccountContext
+import LocalizedPeerData
 
 private final class VeilgramSettingsControllerArguments {
     let update: (VeilgramSettings.Key, Bool) -> Void
     let updateShowCallsTab: (Bool) -> Void
+    let openDeletedLog: () -> Void
 
-    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void) {
+    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void) {
         self.update = update
         self.updateShowCallsTab = updateShowCallsTab
+        self.openDeletedLog = openDeletedLog
     }
 }
 
@@ -42,6 +45,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case keepDeleted(Bool)
     case deletedIcon(Bool)
     case editHistory(Bool)
+    case deletedLog
     case keepDeletedFooter
 
     case autoArchive(Bool)
@@ -62,7 +66,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.ghost.rawValue
         case .alwaysOnline, .alwaysOnlineFooter:
             return VeilgramSettingsSection.presence.rawValue
-        case .keepDeleted, .deletedIcon, .editHistory, .keepDeletedFooter:
+        case .keepDeleted, .deletedIcon, .editHistory, .deletedLog, .keepDeletedFooter:
             return VeilgramSettingsSection.deleted.rawValue
         case .autoArchive, .autoArchiveGroups, .autoArchiveFooter:
             return VeilgramSettingsSection.archive.rawValue
@@ -97,8 +101,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 11
         case .editHistory:
             return 12
-        case .keepDeletedFooter:
+        case .deletedLog:
             return 13
+        case .keepDeletedFooter:
+            return 14
         case .autoArchive:
             return 20
         case .autoArchiveGroups:
@@ -158,6 +164,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.deletedIcon, "Veilgram.DeletedIcon", strings.Veilgram_DeletedIcon, value, { arguments.update(.deletedIcon, $0) })
         case let .editHistory(value):
             return switchItem(VeilgramSettingsIcons.editHistory, "Veilgram.EditHistorySetting", strings.Veilgram_EditHistorySetting, value, { arguments.update(.editHistory, $0) })
+        case .deletedLog:
+            return ItemListDisclosureItem(presentationData: presentationData, systemStyle: .glass, icon: VeilgramSettingsIcons.deletedLog, title: veilgramLocalized(strings, "Veilgram.DeletedLog", strings.Veilgram_DeletedLog), label: "", sectionId: self.section, style: .blocks, action: {
+                arguments.openDeletedLog()
+            })
         case .keepDeletedFooter:
             return footerItem("Veilgram.KeepDeletedInfo", strings.Veilgram_KeepDeletedInfo)
         case let .autoArchive(value):
@@ -203,6 +213,7 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
         entries.append(.deletedIcon(VeilgramSettings.value(.deletedIcon)))
     }
     entries.append(.editHistory(VeilgramSettings.value(.editHistory)))
+    entries.append(.deletedLog)
     entries.append(.keepDeletedFooter)
 
     entries.append(.autoArchive(VeilgramSettings.value(.autoArchive)))
@@ -223,6 +234,7 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
 }
 
 public func veilgramSettingsController(context: AccountContext) -> ViewController {
+    var pushImpl: ((ViewController) -> Void)?
     let arguments = VeilgramSettingsControllerArguments(
         update: { key, value in
             VeilgramSettings.set(key, value)
@@ -231,6 +243,33 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
             let _ = updateCallListSettingsInteractively(accountManager: context.sharedContext.accountManager, {
                 $0.withUpdatedShowTab(value)
             }).start()
+        },
+        openDeletedLog: {
+            let log = veilgramDeletedMessagesLog(accountPeerId: context.account.peerId)
+            let _ = (context.engine.data.get(EngineDataMap(log.map { TelegramEngine.EngineData.Item.Messages.Message(id: $0.id) }))
+            |> deliverOnMainQueue).start(next: { messages in
+                let strings = context.sharedContext.currentPresentationData.with { $0 }.strings
+                let formatter = DateFormatter()
+                formatter.dateStyle = .short
+                formatter.timeStyle = .short
+                var rows: [(label: String, value: String)] = []
+                for entry in log {
+                    guard let maybeMessage = messages[entry.id], let message = maybeMessage else {
+                        continue
+                    }
+                    var title = message.enginePeers[message.id.peerId]?.compactDisplayTitle ?? ""
+                    if let author = message.author, author.id != message.id.peerId {
+                        title += " · " + author.compactDisplayTitle
+                    }
+                    let date = formatter.string(from: Date(timeIntervalSince1970: Double(entry.date)))
+                    let text = message.text.isEmpty ? veilgramLocalized(strings, "Veilgram.Media", strings.Veilgram_Media) : message.text
+                    rows.append(("\(title) · \(date)", text))
+                }
+                if rows.isEmpty {
+                    rows.append(("", veilgramLocalized(strings, "Veilgram.DeletedLogEmpty", strings.Veilgram_DeletedLogEmpty)))
+                }
+                pushImpl?(veilgramRowsController(context: context, title: veilgramLocalized(strings, "Veilgram.DeletedLog", strings.Veilgram_DeletedLog), rows: rows))
+            })
         }
     )
 
@@ -255,5 +294,9 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
         return (controllerState, (listState, arguments))
     }
 
-    return ItemListController(context: context, state: signal)
+    let controller = ItemListController(context: context, state: signal)
+    pushImpl = { [weak controller] c in
+        controller?.push(c)
+    }
+    return controller
 }

@@ -38,6 +38,9 @@ private let veilgramRussianStrings: [String: String] = [
     "Veilgram.DetailsForwarded": "Отправлено в оригинале",
     "Veilgram.DetailsDeleted": "Удалено",
     "Veilgram.Copied": "Скопировано",
+    "Veilgram.DeletedLog": "Журнал удалённых",
+    "Veilgram.DeletedLogEmpty": "Удалённых сообщений пока нет.",
+    "Veilgram.Media": "Медиа",
 ]
 
 public func veilgramLocalized(_ strings: PresentationStrings, _ key: String, _ value: String) -> String {
