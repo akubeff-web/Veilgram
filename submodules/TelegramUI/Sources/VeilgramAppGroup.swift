@@ -36,3 +36,21 @@ private func veilgramProvisionedAppGroups() -> [String] {
     }
     return groups
 }
+
+/// The app group's container, or, when the re-signed app was given no app group at all, a
+/// directory of the app's own. The app then runs without its extensions, which cannot reach it.
+func veilgramAppGroupContainerURL(appGroupName: String) -> URL? {
+    if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName) {
+        return url
+    }
+    guard let library = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first else {
+        return nil
+    }
+    let url = library.appendingPathComponent("veilgram-container", isDirectory: true)
+    do {
+        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+    } catch {
+        return nil
+    }
+    return url
+}

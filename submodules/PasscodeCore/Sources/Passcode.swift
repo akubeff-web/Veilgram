@@ -14,12 +14,16 @@ public struct PasscodeConfiguration: Equatable, Sendable {
     public let processRole: ProcessRole
     public let biometricKeychainService: String?
     public let keychainScope: String?
+    /// Keychain access group for the shared items when the app group cannot hold them
+    /// (an app re-signed without one); nil means the app group itself.
+    public let sharedKeychainAccessGroup: String?
 
-    public init(appGroupIdentifier: String, processRole: ProcessRole, biometricKeychainService: String? = nil, keychainScope: String? = nil) {
+    public init(appGroupIdentifier: String, processRole: ProcessRole, biometricKeychainService: String? = nil, keychainScope: String? = nil, sharedKeychainAccessGroup: String? = nil) {
         self.appGroupIdentifier = appGroupIdentifier
         self.processRole = processRole
         self.biometricKeychainService = biometricKeychainService
         self.keychainScope = keychainScope
+        self.sharedKeychainAccessGroup = sharedKeychainAccessGroup
     }
 }
 
@@ -73,7 +77,7 @@ public final class PasscodeEnvironment: @unchecked Sendable {
         self.mutex.lock()
         defer { self.mutex.unlock() }
         guard let configuration = self.configuration else { throw PasscodeError.unavailable }
-        return configuration.appGroupIdentifier
+        return configuration.sharedKeychainAccessGroup ?? configuration.appGroupIdentifier
     }
 
     func biometricKeychainService() throws -> String {
