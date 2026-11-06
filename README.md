@@ -17,13 +17,25 @@ Telegram; Veilgram does not claim them as its own.
 All of them can be switched in Settings → Veilgram, and take effect immediately.
 
 - **Ghost mode**: the app never sends the online status (`account.updateStatus`), typing activity,
-  read receipts (chats, voice and video messages) or story views. Sending a message still makes the
-  server show you online, as it always does.
+  read receipts (chats, voice and video messages) or story views. After you send a message (which
+  makes the server show you online) it sends offline right away. In a chat, a small pill with an eye
+  shows how many messages the server still counts as unread; tapping it sends the read receipt for
+  that chat only.
+- **Always Online**: keeps you online while the app runs, also when another session logs off.
 - **Deleted messages stay in the chat**: messages deleted on the server by the other side or an admin
-  keep their text and media, marked with a trash icon next to the time. Secret chats, scheduled
-  messages, quick replies and messages you delete yourself are deleted as usual.
+  keep their text and media, marked with a trash icon next to the time, and are listed in the
+  deleted messages log. Secret chats, scheduled messages, quick replies and messages you delete
+  yourself are deleted as usual.
+- **Edit history**: earlier versions of messages the other side edits are kept (long press → Edit
+  History). **Details** in the same menu shows message, chat and author ids and exact times.
+- **Confirm stickers and voice**: a sticker asks before sending; a voice or video message opens its
+  preview instead of sending on release.
+- **Filters**: messages from blocked users are hidden in groups and channels; incoming messages with
+  chosen words are hidden everywhere.
+- **Protected content**: copying, forwarding, saving and screenshots in chats that forbid them;
+  view-once and timed media do not start their timer when opened.
 - **Up to 10 accounts** without Premium.
-- **Tab bar**: Contacts, Calls and News tabs can be hidden.
+- **Tab bar and stories**: Contacts, Calls and News tabs and the stories row can be hidden.
 - **Auto-archive and mute new chats** without Premium (client-side): the first incoming message from a
   non-contact moves the chat to the archive and mutes it. If the app is closed, the push for that very
   first message still arrives with sound.
