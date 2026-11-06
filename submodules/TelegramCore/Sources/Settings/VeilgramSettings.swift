@@ -21,10 +21,11 @@ public enum VeilgramSettings {
         case tabContacts
         case tabNews
         case loginOpenTelegramButton
+        case confirmSend
 
         public var defaultValue: Bool {
             switch self {
-            case .autoArchiveGroups, .alwaysOnline:
+            case .autoArchiveGroups, .alwaysOnline, .confirmSend:
                 return false
             default:
                 return true
@@ -108,6 +109,10 @@ public enum VeilgramSettings {
 
     public static var tabNews: Bool {
         return value(.tabNews)
+    }
+
+    public static var confirmSend: Bool {
+        return value(.confirmSend)
     }
 
     public static var loginOpenTelegramButton: Bool {

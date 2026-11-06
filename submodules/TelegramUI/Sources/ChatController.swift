@@ -281,6 +281,7 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
     
     let navigationActionDisposable = MetaDisposable()
     let veilgramGhostReadDisposable = MetaDisposable()
+    var veilgramSendConfirmed = false
     let messageIndexDisposable = MetaDisposable()
     var networkStateDisposable: Disposable?
 
@@ -2407,6 +2408,20 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
                     strongSelf.interfaceInteraction?.openBoostToUnrestrict()
                     return false
                 }
+            }
+            
+            if VeilgramSettings.confirmSend, !strongSelf.veilgramSendConfirmed {
+                // Veilgram: ask first, then send through the same path once confirmed.
+                let strings = strongSelf.presentationData.strings
+                strongSelf.present(textAlertController(context: strongSelf.context, updatedPresentationData: strongSelf.updatedPresentationData, title: nil, text: veilgramLocalized(strings, "Veilgram.ConfirmSticker", strings.Veilgram_ConfirmSticker), actions: [TextAlertAction(type: .genericAction, title: strings.Common_Cancel, action: {}), TextAlertAction(type: .defaultAction, title: strings.ShareMenu_Send, action: { [weak strongSelf] in
+                    guard let strongSelf else {
+                        return
+                    }
+                    strongSelf.veilgramSendConfirmed = true
+                    let _ = strongSelf.controllerInteraction?.sendSticker(fileReference, silentPosting, schedule, query, clearInput, sourceView, sourceRect, sourceLayer, bubbleUpEmojiOrStickersets)
+                    strongSelf.veilgramSendConfirmed = false
+                })]), in: .window(.root))
+                return false
             }
             
             var attributes: [MessageAttribute] = []

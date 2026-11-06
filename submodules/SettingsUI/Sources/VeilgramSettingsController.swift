@@ -27,6 +27,7 @@ private enum VeilgramSettingsSection: Int32 {
     case presence
     case deleted
     case archive
+    case sending
     case tabs
     case login
 }
@@ -52,6 +53,9 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case autoArchiveGroups(Bool)
     case autoArchiveFooter
 
+    case confirmSend(Bool)
+    case confirmSendFooter
+
     case tabsHeader
     case tabContacts(Bool)
     case tabCalls(Bool)
@@ -70,6 +74,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.deleted.rawValue
         case .autoArchive, .autoArchiveGroups, .autoArchiveFooter:
             return VeilgramSettingsSection.archive.rawValue
+        case .confirmSend, .confirmSendFooter:
+            return VeilgramSettingsSection.sending.rawValue
         case .tabsHeader, .tabContacts, .tabCalls, .tabNews:
             return VeilgramSettingsSection.tabs.rawValue
         case .loginButton, .loginButtonFooter:
@@ -111,6 +117,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 21
         case .autoArchiveFooter:
             return 22
+        case .confirmSend:
+            return 25
+        case .confirmSendFooter:
+            return 26
         case .tabsHeader:
             return 30
         case .tabContacts:
@@ -176,6 +186,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.autoArchiveGroups, "Veilgram.AutoArchiveGroups", strings.Veilgram_AutoArchiveGroups, value, { arguments.update(.autoArchiveGroups, $0) })
         case .autoArchiveFooter:
             return footerItem("Veilgram.AutoArchiveInfo", strings.Veilgram_AutoArchiveInfo)
+        case let .confirmSend(value):
+            return switchItem(VeilgramSettingsIcons.confirmSend, "Veilgram.ConfirmSend", strings.Veilgram_ConfirmSend, value, { arguments.update(.confirmSend, $0) })
+        case .confirmSendFooter:
+            return footerItem("Veilgram.ConfirmSendInfo", strings.Veilgram_ConfirmSendInfo)
         case .tabsHeader:
             return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.Tabs", strings.Veilgram_Tabs).uppercased(), sectionId: self.section)
         case let .tabContacts(value):
@@ -221,6 +235,9 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
         entries.append(.autoArchiveGroups(VeilgramSettings.value(.autoArchiveGroups)))
     }
     entries.append(.autoArchiveFooter)
+
+    entries.append(.confirmSend(VeilgramSettings.value(.confirmSend)))
+    entries.append(.confirmSendFooter)
 
     entries.append(.tabsHeader)
     entries.append(.tabContacts(VeilgramSettings.value(.tabContacts)))

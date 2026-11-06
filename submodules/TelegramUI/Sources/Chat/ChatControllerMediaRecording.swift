@@ -257,6 +257,11 @@ extension ChatControllerImpl {
             updatedAction = .preview
         }
         
+        if VeilgramSettings.confirmSend, case .send = action {
+            // Veilgram: show the recording's preview, whose send button is the confirmation.
+            updatedAction = .preview
+        }
+        
         var sendImmediately = false
         if let _ = self.presentationInterfaceState.sendPaidMessageStars, case .send = action {
             updatedAction = .preview

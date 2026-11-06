@@ -481,6 +481,7 @@ public enum VeilgramSettingsIcons {
     public static let deletedIcon = generateVeilgramSettingsIcon(.trash, backgroundColor: UIColor(rgb: 0xFF3B30))
     public static let editHistory = generateVeilgramSettingsIcon(.history, backgroundColor: UIColor(rgb: 0xFF3B30))
     public static let deletedLog = generateVeilgramSettingsIcon(.trash, backgroundColor: UIColor(rgb: 0x8E8E93))
+    public static let confirmSend = generateVeilgramSettingsIcon(.send, backgroundColor: UIColor(rgb: 0x007AFF))
     public static let autoArchive = generateVeilgramSettingsIcon(.archive, backgroundColor: UIColor(rgb: 0xFF9500))
     public static let autoArchiveGroups = generateVeilgramSettingsIcon(.users, backgroundColor: UIColor(rgb: 0xFF9500))
     public static let tabContacts = generateVeilgramSettingsIcon(.user, backgroundColor: UIColor(rgb: 0x007AFF))
