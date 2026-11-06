@@ -41,6 +41,7 @@ private enum VeilgramSettingsSection: Int32 {
     case protected
     case screen
     case premium
+    case transfers
     case tabs
     case login
 }
@@ -95,6 +96,9 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case hidePremiumOffers(Bool)
     case hideGifts(Bool)
 
+    case fastTransfers(Bool)
+    case fastTransfersFooter
+
     case tabsHeader
     case tabContacts(Bool)
     case tabCalls(Bool)
@@ -128,6 +132,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.screen.rawValue
         case .premiumHeader, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts:
             return VeilgramSettingsSection.premium.rawValue
+        case .fastTransfers, .fastTransfersFooter:
+            return VeilgramSettingsSection.transfers.rawValue
         case .tabsHeader, .tabContacts, .tabCalls, .tabNews, .hideStories:
             return VeilgramSettingsSection.tabs.rawValue
         case .loginButton, .loginButtonFooter:
@@ -213,6 +219,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 44
         case .hideGifts:
             return 45
+        case .fastTransfers:
+            return 46
+        case .fastTransfersFooter:
+            return 47
         case .tabsHeader:
             return 50
         case .tabContacts:
@@ -330,6 +340,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.premiumItem, "Veilgram.HidePremiumOffers", strings.Veilgram_HidePremiumOffers, value, { arguments.update(.hidePremiumOffers, $0) })
         case let .hideGifts(value):
             return switchItem(VeilgramSettingsIcons.premiumItem, "Veilgram.HideGifts", strings.Veilgram_HideGifts, value, { arguments.update(.hideGifts, $0) })
+        case let .fastTransfers(value):
+            return switchItem(VeilgramSettingsIcons.fastTransfers, "Veilgram.FastTransfers", strings.Veilgram_FastTransfers, value, { arguments.update(.fastTransfers, $0) })
+        case .fastTransfersFooter:
+            return footerItem("Veilgram.FastTransfersInfo", strings.Veilgram_FastTransfersInfo)
         case .tabsHeader:
             return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.Tabs", strings.Veilgram_Tabs).uppercased(), sectionId: self.section)
         case let .tabContacts(value):
@@ -410,6 +424,9 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     entries.append(.hidePremiumBanners(VeilgramSettings.value(.hidePremiumBanners)))
     entries.append(.hidePremiumOffers(VeilgramSettings.value(.hidePremiumOffers)))
     entries.append(.hideGifts(VeilgramSettings.value(.hideGifts)))
+
+    entries.append(.fastTransfers(VeilgramSettings.value(.fastTransfers)))
+    entries.append(.fastTransfersFooter)
 
     entries.append(.tabsHeader)
     entries.append(.tabContacts(VeilgramSettings.value(.tabContacts)))

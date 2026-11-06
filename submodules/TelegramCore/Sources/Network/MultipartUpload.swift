@@ -153,7 +153,8 @@ final class MultipartUploadManager {
         if increaseParallelParts {
             self.parallelParts = 30
         } else {
-            self.parallelParts = 3
+            // Veilgram: more parts in flight when uploading.
+            self.parallelParts = VeilgramSettings.fastTransfers ? 12 : 3
         }
         
         self.forceNoBigParts = forceNoBigParts

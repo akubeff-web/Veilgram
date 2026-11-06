@@ -17311,3 +17311,5 @@ Error: %8$@";
 "Veilgram.HidePremiumBanners" = "Banners in the Chat List";
 "Veilgram.HidePremiumOffers" = "Premium, Stars and Business in Settings";
 "Veilgram.HideGifts" = "Gift Buttons";
+"Veilgram.FastTransfers" = "Faster Downloads and Uploads";
+"Veilgram.FastTransfersInfo" = "Large files are downloaded 16 parts at a time instead of 8, and uploaded 12 at a time instead of 3. On a slow connection this can make things worse.";

@@ -36,6 +36,7 @@ public enum VeilgramSettings {
         case hidePremiumBanners
         case hidePremiumOffers
         case hideGifts
+        case fastTransfers
 
         public var defaultValue: Bool {
             switch self {
@@ -177,6 +178,10 @@ public enum VeilgramSettings {
 
     public static var keepViewOnce: Bool {
         return value(.keepViewOnce)
+    }
+
+    public static var fastTransfers: Bool {
+        return value(.fastTransfers)
     }
 
     public static var hidePremiumBadges: Bool {

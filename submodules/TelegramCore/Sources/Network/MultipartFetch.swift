@@ -585,7 +585,8 @@ private final class MultipartFetchManager {
                 self.parallelParts = 4 * 4
             } else {
                 self.defaultPartSize = 512 * 1024
-                self.parallelParts = 8
+                // Veilgram: twice the parts in flight for large files.
+                self.parallelParts = VeilgramSettings.fastTransfers ? 16 : 8
             }
         } else {
             self.parallelParts = 1

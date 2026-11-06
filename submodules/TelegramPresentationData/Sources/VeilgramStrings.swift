@@ -38,6 +38,8 @@ private let veilgramRussianStrings: [String: String] = [
     "Veilgram.DetailsForwarded": "Отправлено в оригинале",
     "Veilgram.DetailsDeleted": "Удалено",
     "Veilgram.Copied": "Скопировано",
+    "Veilgram.FastTransfers": "Ускоренная загрузка и выгрузка",
+    "Veilgram.FastTransfersInfo": "Большие файлы скачиваются по 16 частей одновременно вместо 8, а загружаются по 12 вместо 3. На медленном интернете может стать только хуже.",
     "Veilgram.PremiumHeader": "Скрыть Premium",
     "Veilgram.HidePremiumBadges": "Звёздочки и эмодзи-статусы",
     "Veilgram.HidePremiumBanners": "Баннеры в списке чатов",
