@@ -6144,6 +6144,16 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
                         })))
                         
                         let veilgramStrings = strongSelf.presentationData.strings
+                        if VeilgramSettings.value(.ghost) {
+                            let isException = VeilgramSettings.isGhostException(peer.id)
+                            let title = isException ? veilgramLocalized(veilgramStrings, "Veilgram.GhostExceptionRemove", veilgramStrings.Veilgram_GhostExceptionRemove) : veilgramLocalized(veilgramStrings, "Veilgram.GhostExceptionAdd", veilgramStrings.Veilgram_GhostExceptionAdd)
+                            items.append(.action(ContextMenuActionItem(text: title, icon: { theme in
+                                return veilgramCachedIcon(isException ? .ghost : .eye, size: CGSize(width: 24.0, height: 24.0), color: theme.actionSheet.primaryTextColor)
+                            }, action: { _, f in
+                                f(.dismissWithoutContent)
+                                VeilgramSettings.setGhostException(peer.id, !isException)
+                            })))
+                        }
                         items.append(.action(ContextMenuActionItem(text: veilgramLocalized(veilgramStrings, "Veilgram.FirstMessage", veilgramStrings.Veilgram_FirstMessage), icon: { theme in
                             return veilgramCachedIcon(.arrowUpToLine, size: CGSize(width: 24.0, height: 24.0), color: theme.actionSheet.primaryTextColor)
                         }, action: { _, f in

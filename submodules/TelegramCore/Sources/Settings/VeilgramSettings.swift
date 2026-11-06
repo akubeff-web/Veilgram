@@ -1,5 +1,6 @@
 import Foundation
 import SwiftSignalKit
+import Postbox
 
 /// Veilgram feature switches. Values are kept in `UserDefaults.standard` and read at the moment a
 /// feature does its work, so a change applies immediately. A sub-option only takes effect while its
@@ -80,6 +81,48 @@ public enum VeilgramSettings {
 
     public static var alwaysOnline: Bool {
         return value(.alwaysOnline)
+    }
+
+    private static let ghostExceptionsKey = keyPrefix + "ghostExceptions"
+    private static let ghostExceptionsCache = Atomic<Set<Int64>?>(value: nil)
+
+    /// Chats where ghost mode is off: read receipts, typing and story views go out as usual there.
+    /// The online status belongs to the whole account and cannot differ per chat.
+    public static var ghostExceptions: Set<Int64> {
+        if let cached = ghostExceptionsCache.with({ $0 }) {
+            return cached
+        }
+        let value = Set((UserDefaults.standard.array(forKey: ghostExceptionsKey) as? [Int64]) ?? [])
+        let _ = ghostExceptionsCache.swap(value)
+        return value
+    }
+
+    public static func isGhostException(_ peerId: PeerId) -> Bool {
+        return ghostExceptions.contains(peerId.toInt64())
+    }
+
+    public static func setGhostException(_ peerId: PeerId, _ isException: Bool) {
+        var value = ghostExceptions
+        if isException {
+            value.insert(peerId.toInt64())
+        } else {
+            value.remove(peerId.toInt64())
+        }
+        UserDefaults.standard.set(Array(value), forKey: ghostExceptionsKey)
+        let _ = ghostExceptionsCache.swap(value)
+        self.notifyChanged()
+    }
+
+    public static func ghostRead(for peerId: PeerId) -> Bool {
+        return ghostRead && !isGhostException(peerId)
+    }
+
+    public static func ghostTyping(for peerId: PeerId) -> Bool {
+        return ghostTyping && !isGhostException(peerId)
+    }
+
+    public static func ghostStories(for peerId: PeerId) -> Bool {
+        return ghostStories && !isGhostException(peerId)
     }
 
     public static var ghostTyping: Bool {
