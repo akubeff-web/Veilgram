@@ -6,7 +6,7 @@ import TelegramPresentationData
 import GlassBackgroundComponent
 import ComponentFlow
 
-/// Ghost mode: an eye and the number of messages the server still counts as unread. Tapping it
+/// Ghost mode: a crossed-out eye and the number of messages the server still counts as unread. Tapping it
 /// sends the read receipt for this chat only.
 final class VeilgramGhostReadPillNode: ASDisplayNode {
     static let height: CGFloat = 32.0
@@ -55,7 +55,7 @@ final class VeilgramGhostReadPillNode: ASDisplayNode {
 
     private func updateColors() {
         let color = self.theme.chat.inputPanel.panelControlColor
-        self.iconView.image = veilgramCachedIcon(.eye, size: CGSize(width: 18.0, height: 18.0), color: color)
+        self.iconView.image = veilgramCachedIcon(.eyeOff, size: CGSize(width: 18.0, height: 18.0), color: color)
         self.label.textColor = color
     }
 
