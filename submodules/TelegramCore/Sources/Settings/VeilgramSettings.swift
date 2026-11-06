@@ -30,10 +30,12 @@ public enum VeilgramSettings {
         case keepViewOnce
         case hidePhone
         case streamerMode
+        case autoReply
+        case autoReplyContacts
 
         public var defaultValue: Bool {
             switch self {
-            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce, .hidePhone, .streamerMode:
+            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce, .hidePhone, .streamerMode, .autoReply, .autoReplyContacts:
                 return false
             default:
                 return true
@@ -171,6 +173,30 @@ public enum VeilgramSettings {
 
     public static var keepViewOnce: Bool {
         return value(.keepViewOnce)
+    }
+
+    public static var autoReply: Bool {
+        return value(.autoReply)
+    }
+
+    public static var autoReplyContacts: Bool {
+        return value(.autoReply) && value(.autoReplyContacts)
+    }
+
+    private static let autoReplyTextKey = keyPrefix + "autoReplyText"
+
+    /// The auto-reply as typed, trimmed.
+    public static var autoReplyText: String {
+        return (UserDefaults.standard.string(forKey: autoReplyTextKey) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    public static var autoReplyRawText: String {
+        return UserDefaults.standard.string(forKey: autoReplyTextKey) ?? ""
+    }
+
+    public static func setAutoReplyText(_ text: String) {
+        UserDefaults.standard.set(text, forKey: autoReplyTextKey)
+        self.notifyChanged()
     }
 
     public static var streamerMode: Bool {

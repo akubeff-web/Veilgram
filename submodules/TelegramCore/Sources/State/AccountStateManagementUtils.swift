@@ -4301,6 +4301,7 @@ func replayFinalState(
         }
     }
     let veilgramAutoArchivePeerIds = veilgramAutoArchiveCandidates(transaction: transaction, accountPeerId: accountPeerId, operations: finalState.state.operations, addedIncomingMessageIds: addedIncomingMessageIds)
+    let veilgramAutoReplyPeerIds = veilgramAutoReplyCandidates(transaction: transaction, accountPeerId: accountPeerId, operations: finalState.state.operations, addedIncomingMessageIds: addedIncomingMessageIds)
     
     var invalidateGroupStats = Set<PeerGroupId>()
     
@@ -6255,6 +6256,7 @@ func replayFinalState(
     }
     
     veilgramApplyAutoArchive(transaction: transaction, peerIds: veilgramAutoArchivePeerIds)
+    veilgramScheduleAutoReplies(accountPeerId: accountPeerId, peerIds: veilgramAutoReplyPeerIds)
     
     addedIncomingMessageIds.append(contentsOf: addedSecretMessageIds)
     

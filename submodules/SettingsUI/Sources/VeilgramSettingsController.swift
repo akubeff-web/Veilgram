@@ -17,9 +17,11 @@ private final class VeilgramSettingsControllerArguments {
     let openDeletedLog: () -> Void
     let updateKeywords: (String) -> Void
     let readAllChats: () -> Void
+    let updateAutoReplyText: (String) -> Void
 
-    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void, readAllChats: @escaping () -> Void) {
+    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void, readAllChats: @escaping () -> Void, updateAutoReplyText: @escaping (String) -> Void) {
         self.readAllChats = readAllChats
+        self.updateAutoReplyText = updateAutoReplyText
         self.update = update
         self.updateShowCallsTab = updateShowCallsTab
         self.openDeletedLog = openDeletedLog
@@ -34,6 +36,7 @@ private enum VeilgramSettingsSection: Int32 {
     case deleted
     case archive
     case sending
+    case autoReply
     case filter
     case protected
     case screen
@@ -66,6 +69,11 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
 
     case confirmSend(Bool)
     case confirmSendFooter
+
+    case autoReply(Bool)
+    case autoReplyText(String)
+    case autoReplyContacts(Bool)
+    case autoReplyFooter
 
     case hideBlocked(Bool)
     case keywordFilter(Bool)
@@ -103,6 +111,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.archive.rawValue
         case .confirmSend, .confirmSendFooter:
             return VeilgramSettingsSection.sending.rawValue
+        case .autoReply, .autoReplyText, .autoReplyContacts, .autoReplyFooter:
+            return VeilgramSettingsSection.autoReply.rawValue
         case .hideBlocked, .keywordFilter, .keywords, .filterFooter:
             return VeilgramSettingsSection.filter.rawValue
         case .unlockProtected, .keepViewOnce, .protectedFooter:
@@ -156,14 +166,22 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 25
         case .confirmSendFooter:
             return 26
-        case .hideBlocked:
+        case .autoReply:
+            return 27
+        case .autoReplyText:
+            return 28
+        case .autoReplyContacts:
+            return 29
+        case .autoReplyFooter:
             return 30
-        case .keywordFilter:
+        case .hideBlocked:
             return 31
-        case .keywords:
+        case .keywordFilter:
             return 32
-        case .filterFooter:
+        case .keywords:
             return 33
+        case .filterFooter:
+            return 34
         case .unlockProtected:
             return 35
         case .keepViewOnce:
@@ -251,6 +269,16 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.confirmSend, "Veilgram.ConfirmSend", strings.Veilgram_ConfirmSend, value, { arguments.update(.confirmSend, $0) })
         case .confirmSendFooter:
             return footerItem("Veilgram.ConfirmSendInfo", strings.Veilgram_ConfirmSendInfo)
+        case let .autoReply(value):
+            return switchItem(VeilgramSettingsIcons.autoReply, "Veilgram.AutoReply", strings.Veilgram_AutoReply, value, { arguments.update(.autoReply, $0) })
+        case let .autoReplyText(text):
+            return ItemListMultilineInputItem(presentationData: presentationData, systemStyle: .glass, text: text, placeholder: veilgramLocalized(strings, "Veilgram.AutoReplyPlaceholder", strings.Veilgram_AutoReplyPlaceholder), maxLength: ItemListMultilineInputItemTextLimit(value: 4096, display: false), sectionId: self.section, style: .blocks, textUpdated: { text in
+                arguments.updateAutoReplyText(text)
+            })
+        case let .autoReplyContacts(value):
+            return switchItem(VeilgramSettingsIcons.autoReplyContacts, "Veilgram.AutoReplyContacts", strings.Veilgram_AutoReplyContacts, value, { arguments.update(.autoReplyContacts, $0) })
+        case .autoReplyFooter:
+            return footerItem("Veilgram.AutoReplyInfo", strings.Veilgram_AutoReplyInfo)
         case let .hideBlocked(value):
             return switchItem(VeilgramSettingsIcons.hideBlocked, "Veilgram.HideBlocked", strings.Veilgram_HideBlocked, value, { arguments.update(.hideBlocked, $0) })
         case let .keywordFilter(value):
@@ -325,6 +353,13 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
 
     entries.append(.confirmSend(VeilgramSettings.value(.confirmSend)))
     entries.append(.confirmSendFooter)
+
+    entries.append(.autoReply(VeilgramSettings.value(.autoReply)))
+    if VeilgramSettings.value(.autoReply) {
+        entries.append(.autoReplyText(VeilgramSettings.autoReplyRawText))
+        entries.append(.autoReplyContacts(VeilgramSettings.value(.autoReplyContacts)))
+    }
+    entries.append(.autoReplyFooter)
 
     entries.append(.hideBlocked(VeilgramSettings.value(.hideBlocked)))
     entries.append(.keywordFilter(VeilgramSettings.value(.keywordFilter)))
@@ -410,6 +445,9 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
                     return false
                 }))
             })
+        },
+        updateAutoReplyText: { text in
+            VeilgramSettings.setAutoReplyText(text)
         }
     )
 

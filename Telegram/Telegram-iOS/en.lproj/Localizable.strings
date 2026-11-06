@@ -17302,3 +17302,7 @@ Error: %8$@";
 "Veilgram.ReadAllChatsDone" = "All chats are read.";
 "Veilgram.GhostExceptionAdd" = "Turn Off Ghost Here";
 "Veilgram.GhostExceptionRemove" = "Turn On Ghost Here";
+"Veilgram.AutoReply" = "Auto-Reply to New Chats";
+"Veilgram.AutoReplyPlaceholder" = "Reply text";
+"Veilgram.AutoReplyContacts" = "Also to Contacts";
+"Veilgram.AutoReplyInfo" = "When someone who is not a contact starts a chat with you, this message is sent to them once, however many messages they send. Bots are never answered. The reply goes out while Veilgram is running; if it was suspended, when you open it.";
