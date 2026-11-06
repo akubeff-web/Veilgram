@@ -280,6 +280,7 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
     var didSetCachedDataReady = false
     
     let navigationActionDisposable = MetaDisposable()
+    let veilgramGhostReadDisposable = MetaDisposable()
     let messageIndexDisposable = MetaDisposable()
     var networkStateDisposable: Disposable?
 
@@ -7094,6 +7095,7 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
         self.historyStateDisposable?.dispose()
         self.messageIndexDisposable.dispose()
         self.navigationActionDisposable.dispose()
+        self.veilgramGhostReadDisposable.dispose()
         self.galleryHiddenMesageAndMediaDisposable.dispose()
         self.temporaryHiddenGalleryMediaDisposable.dispose()
         self.messageContextDisposable.dispose()

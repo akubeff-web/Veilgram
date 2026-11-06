@@ -459,3 +459,26 @@ func synchronizePeerReadState(network: Network, postbox: Postbox, stateManager: 
         return signal
     }
 }
+
+/// Veilgram: how many messages of the chat the server still counts as unread, which ghost mode
+/// leaves behind the local read mark. Nil when it is unknown.
+public func veilgramServerUnreadCount(account: Account, peerId: PeerId) -> Signal<Int32?, NoError> {
+    return dialogReadState(network: account.network, postbox: account.postbox, peerId: peerId)
+    |> map { value -> Int32? in
+        return value?.0.count
+    }
+    |> `catch` { _ -> Signal<Int32?, NoError> in
+        return .single(nil)
+    }
+}
+
+/// Veilgram: sends the chat's local read mark to the server, which ghost mode otherwise keeps back.
+public func veilgramSendReadReceipt(account: Account, peerId: PeerId) -> Signal<Void, NoError> {
+    return pushPeerReadState(network: account.network, postbox: account.postbox, stateManager: account.stateManager, peerId: peerId, willValidate: false)
+    |> `catch` { _ -> Signal<Never, NoError> in
+        return .complete()
+    }
+    |> map { _ -> Void in
+    }
+    |> then(Signal<Void, NoError>.single(Void()))
+}

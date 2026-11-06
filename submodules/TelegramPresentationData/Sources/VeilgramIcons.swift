@@ -7,6 +7,7 @@ import Display
 public enum VeilgramIcon: String {
     case ghost
     case venetianMask
+    case eye
     case eyeOff
     case trash
     case archive
@@ -36,6 +37,11 @@ public enum VeilgramIcon: String {
                 .path("M18 11c-1.5 0-2.5.5-3 2"),
                 .path("M4 6a2 2 0 0 0-2 2v4a5 5 0 0 0 5 5 8 8 0 0 1 5 2 8 8 0 0 1 5-2 5 5 0 0 0 5-5V8a2 2 0 0 0-2-2h-3a8 8 0 0 0-5 2 8 8 0 0 0-5-2z"),
                 .path("M6 11c1.5 0 2.5.5 3 2")
+            ]
+        case .eye:
+            return [
+                .path("M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"),
+                .circle(cx: 12.0, cy: 12.0, r: 3.0)
             ]
         case .eyeOff:
             return [

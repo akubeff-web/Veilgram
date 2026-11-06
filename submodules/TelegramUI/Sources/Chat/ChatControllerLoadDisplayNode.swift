@@ -1400,6 +1400,47 @@ extension ChatControllerImpl {
             }
         }
         
+        if let peerId = self.chatLocation.peerId, self.chatLocation.threadId == nil, peerId.namespace == Namespaces.Peer.CloudUser || peerId.namespace == Namespaces.Peer.CloudGroup || peerId.namespace == Namespaces.Peer.CloudChannel {
+            // Veilgram: in ghost mode, show how many messages the server still counts as unread,
+            // refreshed when the chat opens and after each new message.
+            let account = self.context.account
+            let ghostRead = VeilgramSettings.updated
+            |> map { _ -> Bool in
+                return VeilgramSettings.ghostRead
+            }
+            |> distinctUntilChanged
+            let serverUnreadCount = combineLatest(ghostRead, self.context.engine.data.subscribe(TelegramEngine.EngineData.Item.Messages.ChatListIndex(id: peerId)))
+            |> mapToSignal { ghostRead, _ -> Signal<Int32, NoError> in
+                if !ghostRead {
+                    return .single(0)
+                }
+                return Signal<Int32, NoError>.complete()
+                |> delay(1.0, queue: Queue.mainQueue())
+                |> then(veilgramServerUnreadCount(account: account, peerId: peerId)
+                |> map { count -> Int32 in
+                    return count ?? 0
+                })
+            }
+            self.veilgramGhostReadDisposable.set((serverUnreadCount
+            |> deliverOnMainQueue).startStrict(next: { [weak self] count in
+                self?.chatDisplayNode.navigateButtons.ghostReadCount = count
+            }))
+            
+            self.chatDisplayNode.navigateButtons.ghostReadPressed = { [weak self] in
+                guard let self else {
+                    return
+                }
+                self.chatDisplayNode.navigateButtons.ghostReadCount = 0
+                self.veilgramGhostReadDisposable.set((veilgramSendReadReceipt(account: account, peerId: peerId)
+                |> mapToSignal { _ -> Signal<Int32, NoError> in
+                    return serverUnreadCount
+                }
+                |> deliverOnMainQueue).startStrict(next: { [weak self] count in
+                    self?.chatDisplayNode.navigateButtons.ghostReadCount = count
+                }))
+            }
+        }
+        
         self.chatDisplayNode.navigateButtons.mentionsPressed = { [weak self] in
             if let strongSelf = self, strongSelf.isNodeLoaded, let peerId = strongSelf.chatLocation.peerId {
                 let signal = strongSelf.context.engine.messages.earliestUnseenPersonalMentionMessage(peerId: peerId, threadId: strongSelf.chatLocation.threadId)

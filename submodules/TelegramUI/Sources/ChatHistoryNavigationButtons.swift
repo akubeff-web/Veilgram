@@ -35,6 +35,7 @@ final class ChatHistoryNavigationButtons: ASDisplayNode {
     let mentionsButton: ChatHistoryNavigationButtonNode
     let downButton: ChatHistoryNavigationButtonNode
     let upButton: ChatHistoryNavigationButtonNode
+    let ghostReadPill: VeilgramGhostReadPillNode
     
     var downPressed: (() -> Void)? {
         didSet {
@@ -51,6 +52,16 @@ final class ChatHistoryNavigationButtons: ASDisplayNode {
     var reactionsPressed: (() -> Void)?
     var pollVotesPressed: (() -> Void)?
     var mentionsPressed: (() -> Void)?
+    var ghostReadPressed: (() -> Void)?
+    
+    /// Veilgram: messages the server still counts as unread in ghost mode; 0 hides the pill.
+    var ghostReadCount: Int32 = 0 {
+        didSet {
+            if self.ghostReadCount != oldValue {
+                let _ = self.updateLayout(transition: .animated(duration: 0.3, curve: .spring))
+            }
+        }
+    }
     
     var directionButtonState: DirectionState = DirectionState(up: nil, down: nil) {
         didSet {
@@ -138,6 +149,10 @@ final class ChatHistoryNavigationButtons: ASDisplayNode {
         self.upButton.alpha = 0.0
         self.upButton.isHidden = true
         
+        self.ghostReadPill = VeilgramGhostReadPillNode(theme: theme, preferClearGlass: preferClearGlass)
+        self.ghostReadPill.alpha = 0.0
+        self.ghostReadPill.isHidden = true
+        
         super.init()
         
         self.addSubnode(self.reactionsButton)
@@ -145,6 +160,11 @@ final class ChatHistoryNavigationButtons: ASDisplayNode {
         self.addSubnode(self.mentionsButton)
         self.addSubnode(self.downButton)
         self.addSubnode(self.upButton)
+        self.addSubnode(self.ghostReadPill)
+        
+        self.ghostReadPill.tapped = { [weak self] in
+            self?.ghostReadPressed?()
+        }
         
         self.reactionsButton.tapped = { [weak self] in
             self?.reactionsPressed?()
@@ -176,6 +196,7 @@ final class ChatHistoryNavigationButtons: ASDisplayNode {
         self.mentionsButton.updateTheme(theme: theme, preferClearGlass: preferClearGlass, backgroundNode: backgroundNode)
         self.downButton.updateTheme(theme: theme, preferClearGlass: preferClearGlass, backgroundNode: backgroundNode)
         self.upButton.updateTheme(theme: theme, preferClearGlass: preferClearGlass, backgroundNode: backgroundNode)
+        self.ghostReadPill.updateTheme(theme: theme, preferClearGlass: preferClearGlass)
     }
     
     private var absoluteRect: (CGRect, CGSize)?
@@ -298,6 +319,35 @@ final class ChatHistoryNavigationButtons: ASDisplayNode {
                 strongSelf.pollVotesButton.isHidden = true
             })
             transition.updateTransformScale(node: self.pollVotesButton, scale: 0.2)
+        }
+        
+        // The pill takes the slot above the topmost visible button, right-aligned with the column.
+        var ghostReadOffset = mentionsOffset + reactionsOffset + pollVotesOffset
+        if self.pollVotesCount != 0 {
+            ghostReadOffset += buttonSize.height + 12.0
+        }
+        let ghostReadSize = self.ghostReadPill.update(count: self.ghostReadCount)
+        let ghostReadSlotY: CGFloat
+        if self.isChatRotated {
+            ghostReadSlotY = completeSize.height - buttonSize.height - ghostReadOffset
+        } else {
+            ghostReadSlotY = ghostReadOffset
+        }
+        let ghostReadFrame = CGRect(origin: CGPoint(x: buttonSize.width - ghostReadSize.width, y: ghostReadSlotY + floor((buttonSize.height - ghostReadSize.height) / 2.0)), size: ghostReadSize)
+        transition.updateBounds(node: self.ghostReadPill, bounds: CGRect(origin: CGPoint(), size: ghostReadSize))
+        transition.updatePosition(node: self.ghostReadPill, position: ghostReadFrame.center)
+        if self.ghostReadCount != 0 {
+            self.ghostReadPill.isHidden = false
+            transition.updateAlpha(node: self.ghostReadPill, alpha: 1.0)
+            transition.updateTransformScale(node: self.ghostReadPill, scale: 1.0)
+        } else {
+            transition.updateAlpha(node: self.ghostReadPill, alpha: 0.0, completion: { [weak self] completed in
+                guard let strongSelf = self, completed, strongSelf.ghostReadCount == 0 else {
+                    return
+                }
+                strongSelf.ghostReadPill.isHidden = true
+            })
+            transition.updateTransformScale(node: self.ghostReadPill, scale: 0.2)
         }
         
         if self.isChatRotated {
