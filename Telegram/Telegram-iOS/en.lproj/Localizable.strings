@@ -17295,3 +17295,6 @@ Error: %8$@";
 "Veilgram.HidePhone" = "Hide My Phone Number";
 "Veilgram.ScreenInfo" = "Streamer mode shows \"Veilgram\" instead of chat names and message previews in the chat list, chat titles and in-app notifications; avatars stay. Hiding the number only changes what the screen shows.";
 "Veilgram.Registered" = "Registered";
+"Veilgram.FirstMessage" = "First Message";
+"Veilgram.MessageCounter" = "Message Count";
+"Veilgram.MessageCounterEmpty" = "Nothing to count here.";

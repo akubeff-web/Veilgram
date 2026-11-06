@@ -8,6 +8,8 @@ public enum VeilgramIcon: String {
     case ghost
     case venetianMask
     case eye
+    case arrowUpToLine
+    case chartColumn
     case download
     case filter
     case history
@@ -63,6 +65,18 @@ public enum VeilgramIcon: String {
                 .path("M12 15V3"),
                 .path("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"),
                 .path("m7 10 5 5 5-5")
+            ]
+        case .arrowUpToLine:
+            return [
+                .path("M5 3h14"),
+                .path("m18 13-6-6-6 6"),
+                .path("M12 7v14")
+            ]
+        case .chartColumn:
+            return [
+                .path("M18 20V10"),
+                .path("M12 20V4"),
+                .path("M6 20v-6")
             ]
         case .eye:
             return [

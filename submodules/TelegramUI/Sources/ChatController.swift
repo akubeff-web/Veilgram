@@ -6142,6 +6142,20 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
                             f(.dismissWithoutContent)
                             self?.interfaceInteraction?.beginMessageSearch(.everything, "")
                         })))
+                        
+                        let veilgramStrings = strongSelf.presentationData.strings
+                        items.append(.action(ContextMenuActionItem(text: veilgramLocalized(veilgramStrings, "Veilgram.FirstMessage", veilgramStrings.Veilgram_FirstMessage), icon: { theme in
+                            return veilgramCachedIcon(.arrowUpToLine, size: CGSize(width: 24.0, height: 24.0), color: theme.actionSheet.primaryTextColor)
+                        }, action: { _, f in
+                            f(.dismissWithoutContent)
+                            self?.scrollToStartOfHistory()
+                        })))
+                        items.append(.action(ContextMenuActionItem(text: veilgramLocalized(veilgramStrings, "Veilgram.MessageCounter", veilgramStrings.Veilgram_MessageCounter), icon: { theme in
+                            return veilgramCachedIcon(.chartColumn, size: CGSize(width: 24.0, height: 24.0), color: theme.actionSheet.primaryTextColor)
+                        }, action: { _, f in
+                            f(.dismissWithoutContent)
+                            self?.veilgramOpenMessageCounter(peer: EnginePeer(peer))
+                        })))
                                                 
                         return items
                     }
