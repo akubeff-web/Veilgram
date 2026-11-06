@@ -1658,6 +1658,17 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                 }
             }
             
+            VeilgramBackgroundRefresh.register(wake: { [weak self] in
+                guard let self else {
+                    return
+                }
+                let _ = (self.sharedContextPromise.get()
+                |> take(1)
+                |> deliverOnMainQueue).start(next: { sharedApplicationContext in
+                    sharedApplicationContext.wakeupManager.allowBackgroundTimeExtension(timeout: 20.0, extendNow: true)
+                })
+            })
+            
             BGTaskScheduler.shared.getPendingTaskRequests(completionHandler: { tasks in
                 if tasks.contains(where: { $0.identifier == cleanupTaskId }) {
                     Logger.shared.log("App \(self.episodeId)", "Already have a cleanup task pending")
