@@ -34,7 +34,8 @@ All of them can be switched in Settings → Veilgram, and take effect immediatel
   chosen words are hidden everywhere.
 - **Protected content**: copying, forwarding, saving and screenshots in chats that forbid them;
   view-once and timed media do not start their timer when opened.
-- **Up to 10 accounts** without Premium.
+- **Unlimited accounts** without Premium. Every signed-in account stays connected, so many of them
+  cost memory and battery.
 - **Tab bar and stories**: Contacts, Calls and News tabs and the stories row can be hidden.
 - **Auto-archive and mute new chats** without Premium (client-side): the first incoming message from a
   non-contact moves the chat to the archive and mutes it. If the app is closed, the push for that very

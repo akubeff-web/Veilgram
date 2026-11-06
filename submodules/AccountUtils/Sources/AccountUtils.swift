@@ -4,8 +4,8 @@ import TelegramCore
 import TelegramUIPreferences
 import AccountContext
 
-// Veilgram: 10 accounts without Premium. Every account limit reads this constant.
-public let maximumNumberOfAccounts = 10
+// Veilgram: no limit on accounts. Every account limit reads this constant.
+public let maximumNumberOfAccounts = Int.max
 public let maximumPremiumNumberOfAccounts = maximumNumberOfAccounts
 
 public func activeAccountsAndPeers(context: AccountContext, includePrimary: Bool = false) -> Signal<((AccountContext, EnginePeer)?, [(AccountContext, EnginePeer, Int32)]), NoError> {
