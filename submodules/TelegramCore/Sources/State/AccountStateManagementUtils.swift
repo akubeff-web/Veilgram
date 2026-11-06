@@ -1515,7 +1515,12 @@ private func finalStateWithUpdatesAndServerTime(accountPeerId: PeerId, postbox: 
                     return previous.withUpdatedIsBlocked((updatePeerBlockedData.flags & (1 << 0)) != 0).withUpdatedFlags(userFlags)
                 })
             case let .updateUserStatus(updateUserStatusData):
-                updatedState.mergePeerPresences([PeerId(namespace: Namespaces.Peer.CloudUser, id: PeerId.Id._internalFromInt64Value(updateUserStatusData.userId)): updateUserStatusData.status], explicit: true)
+                let statusPeerId = PeerId(namespace: Namespaces.Peer.CloudUser, id: PeerId.Id._internalFromInt64Value(updateUserStatusData.userId))
+                if statusPeerId == accountPeerId, case .userStatusOffline = updateUserStatusData.status {
+                    // Another session went offline, which ends this one's online status too.
+                    veilgramRestoreOnlineStatus(network: network)
+                }
+                updatedState.mergePeerPresences([statusPeerId: updateUserStatusData.status], explicit: true)
             case let .updateUserName(updateUserNameData):
                 let (userId, usernames) = (updateUserNameData.userId, updateUserNameData.usernames)
                 //TODO add contact checking for apply first and last name

@@ -120,6 +120,25 @@ func veilgramHideOnlineAfterSending(network: Network) {
     |> then(network.request(Api.functions.account.updateStatus(offline: .boolTrue)))).start())
 }
 
+private let veilgramRestoreOnlineDisposables = Atomic<[ObjectIdentifier: MetaDisposable]>(value: [:])
+
+/// Veilgram: with Always Online, answer the account going offline (another session logging off)
+/// by going online again.
+func veilgramRestoreOnlineStatus(network: Network) {
+    guard VeilgramSettings.alwaysOnline else {
+        return
+    }
+    let key = ObjectIdentifier(network)
+    let disposable = veilgramRestoreOnlineDisposables.modify { current in
+        var current = current
+        if current[key] == nil {
+            current[key] = MetaDisposable()
+        }
+        return current
+    }[key]!
+    disposable.set(network.request(Api.functions.account.updateStatus(offline: .boolFalse)).start())
+}
+
 final class AccountPresenceManager {
     private let queue = Queue()
     private let impl: QueueLocalObject<AccountPresenceManagerImpl>
