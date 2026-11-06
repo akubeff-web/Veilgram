@@ -21,6 +21,7 @@ func _internal_requestUpdatePeerIsBlocked(account: Account, peerId: PeerId, isBl
                 |> mapToSignal { result -> Signal<Void, NoError> in
                     return account.postbox.transaction { transaction -> Void in
                         if result != nil {
+                            VeilgramBlockedPeers.update(accountPeerId: account.peerId, peerIds: [peerId], isBlocked: isBlocked)
                             transaction.updatePeerCachedData(peerIds: Set([peerId]), update: { _, current in
                                 let previous: CachedUserData
                                 if let current = current as? CachedUserData {

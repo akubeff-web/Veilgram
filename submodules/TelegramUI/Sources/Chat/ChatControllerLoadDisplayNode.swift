@@ -1400,6 +1400,10 @@ extension ChatControllerImpl {
             }
         }
         
+        if VeilgramSettings.hideBlocked {
+            VeilgramBlockedPeers.ensureLoaded(account: self.context.account)
+        }
+        
         if let peerId = self.chatLocation.peerId, self.chatLocation.threadId == nil, peerId.namespace == Namespaces.Peer.CloudUser || peerId.namespace == Namespaces.Peer.CloudGroup || peerId.namespace == Namespaces.Peer.CloudChannel {
             // Veilgram: in ghost mode, show how many messages the server still counts as unread,
             // refreshed when the chat opens and after each new message.

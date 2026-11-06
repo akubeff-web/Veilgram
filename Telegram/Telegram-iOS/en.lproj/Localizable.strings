@@ -17283,3 +17283,7 @@ Error: %8$@";
 "Veilgram.ConfirmSend" = "Confirm Stickers and Voice";
 "Veilgram.ConfirmSendInfo" = "A sticker asks before it is sent. A voice or video message opens its preview when you release instead of sending right away.";
 "Veilgram.ConfirmSticker" = "Send this sticker?";
+"Veilgram.HideBlocked" = "Hide Blocked Users in Groups";
+"Veilgram.KeywordFilter" = "Hide Messages with Words";
+"Veilgram.KeywordsPlaceholder" = "Words, one per line or separated by commas";
+"Veilgram.FilterInfo" = "Messages from people you blocked are hidden in groups and channels. Private chats with them stay as they are. Incoming messages containing any of the words are hidden in every chat.";

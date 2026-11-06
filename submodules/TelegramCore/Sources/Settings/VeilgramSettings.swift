@@ -22,10 +22,12 @@ public enum VeilgramSettings {
         case tabNews
         case loginOpenTelegramButton
         case confirmSend
+        case hideBlocked
+        case keywordFilter
 
         public var defaultValue: Bool {
             switch self {
-            case .autoArchiveGroups, .alwaysOnline, .confirmSend:
+            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter:
                 return false
             default:
                 return true
@@ -48,6 +50,10 @@ public enum VeilgramSettings {
 
     public static func set(_ key: Key, _ value: Bool) {
         UserDefaults.standard.set(value, forKey: keyPrefix + key.rawValue)
+        self.notifyChanged()
+    }
+
+    private static func notifyChanged() {
         versionLock.lock()
         currentVersion += 1
         let updatedVersion = currentVersion
@@ -109,6 +115,40 @@ public enum VeilgramSettings {
 
     public static var tabNews: Bool {
         return value(.tabNews)
+    }
+
+    public static var hideBlocked: Bool {
+        return value(.hideBlocked)
+    }
+
+    private static let filterKeywordsKey = keyPrefix + "filterKeywords"
+    private static let filterKeywordsCache = Atomic<[String]?>(value: nil)
+
+    /// The words of the message filter as typed: one per line or separated by commas.
+    public static var filterKeywordsText: String {
+        return UserDefaults.standard.string(forKey: filterKeywordsKey) ?? ""
+    }
+
+    public static func setFilterKeywordsText(_ text: String) {
+        UserDefaults.standard.set(text, forKey: filterKeywordsKey)
+        let _ = filterKeywordsCache.swap(nil)
+        self.notifyChanged()
+    }
+
+    /// The words of the message filter, lowercased; empty while the filter is off.
+    public static var filterKeywords: [String] {
+        if !value(.keywordFilter) {
+            return []
+        }
+        if let cached = filterKeywordsCache.with({ $0 }) {
+            return cached
+        }
+        let words = filterKeywordsText
+            .components(separatedBy: CharacterSet(charactersIn: ",\n"))
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
+            .filter { !$0.isEmpty }
+        let _ = filterKeywordsCache.swap(words)
+        return words
     }
 
     public static var confirmSend: Bool {

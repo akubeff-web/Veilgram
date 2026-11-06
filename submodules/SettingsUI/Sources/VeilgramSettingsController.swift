@@ -14,11 +14,13 @@ private final class VeilgramSettingsControllerArguments {
     let update: (VeilgramSettings.Key, Bool) -> Void
     let updateShowCallsTab: (Bool) -> Void
     let openDeletedLog: () -> Void
+    let updateKeywords: (String) -> Void
 
-    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void) {
+    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void) {
         self.update = update
         self.updateShowCallsTab = updateShowCallsTab
         self.openDeletedLog = openDeletedLog
+        self.updateKeywords = updateKeywords
     }
 }
 
@@ -28,6 +30,7 @@ private enum VeilgramSettingsSection: Int32 {
     case deleted
     case archive
     case sending
+    case filter
     case tabs
     case login
 }
@@ -56,6 +59,11 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case confirmSend(Bool)
     case confirmSendFooter
 
+    case hideBlocked(Bool)
+    case keywordFilter(Bool)
+    case keywords(String)
+    case filterFooter
+
     case tabsHeader
     case tabContacts(Bool)
     case tabCalls(Bool)
@@ -76,6 +84,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.archive.rawValue
         case .confirmSend, .confirmSendFooter:
             return VeilgramSettingsSection.sending.rawValue
+        case .hideBlocked, .keywordFilter, .keywords, .filterFooter:
+            return VeilgramSettingsSection.filter.rawValue
         case .tabsHeader, .tabContacts, .tabCalls, .tabNews:
             return VeilgramSettingsSection.tabs.rawValue
         case .loginButton, .loginButtonFooter:
@@ -121,18 +131,26 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 25
         case .confirmSendFooter:
             return 26
-        case .tabsHeader:
+        case .hideBlocked:
             return 30
-        case .tabContacts:
+        case .keywordFilter:
             return 31
-        case .tabCalls:
+        case .keywords:
             return 32
-        case .tabNews:
+        case .filterFooter:
             return 33
-        case .loginButton:
+        case .tabsHeader:
             return 40
-        case .loginButtonFooter:
+        case .tabContacts:
             return 41
+        case .tabCalls:
+            return 42
+        case .tabNews:
+            return 43
+        case .loginButton:
+            return 50
+        case .loginButtonFooter:
+            return 51
         }
     }
 
@@ -190,6 +208,16 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.confirmSend, "Veilgram.ConfirmSend", strings.Veilgram_ConfirmSend, value, { arguments.update(.confirmSend, $0) })
         case .confirmSendFooter:
             return footerItem("Veilgram.ConfirmSendInfo", strings.Veilgram_ConfirmSendInfo)
+        case let .hideBlocked(value):
+            return switchItem(VeilgramSettingsIcons.hideBlocked, "Veilgram.HideBlocked", strings.Veilgram_HideBlocked, value, { arguments.update(.hideBlocked, $0) })
+        case let .keywordFilter(value):
+            return switchItem(VeilgramSettingsIcons.keywordFilter, "Veilgram.KeywordFilter", strings.Veilgram_KeywordFilter, value, { arguments.update(.keywordFilter, $0) })
+        case let .keywords(text):
+            return ItemListMultilineInputItem(presentationData: presentationData, systemStyle: .glass, text: text, placeholder: veilgramLocalized(strings, "Veilgram.KeywordsPlaceholder", strings.Veilgram_KeywordsPlaceholder), maxLength: nil, sectionId: self.section, style: .blocks, capitalization: false, autocorrection: false, textUpdated: { text in
+                arguments.updateKeywords(text)
+            })
+        case .filterFooter:
+            return footerItem("Veilgram.FilterInfo", strings.Veilgram_FilterInfo)
         case .tabsHeader:
             return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.Tabs", strings.Veilgram_Tabs).uppercased(), sectionId: self.section)
         case let .tabContacts(value):
@@ -239,6 +267,13 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     entries.append(.confirmSend(VeilgramSettings.value(.confirmSend)))
     entries.append(.confirmSendFooter)
 
+    entries.append(.hideBlocked(VeilgramSettings.value(.hideBlocked)))
+    entries.append(.keywordFilter(VeilgramSettings.value(.keywordFilter)))
+    if VeilgramSettings.value(.keywordFilter) {
+        entries.append(.keywords(VeilgramSettings.filterKeywordsText))
+    }
+    entries.append(.filterFooter)
+
     entries.append(.tabsHeader)
     entries.append(.tabContacts(VeilgramSettings.value(.tabContacts)))
     entries.append(.tabCalls(showCallsTab))
@@ -287,6 +322,9 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
                 }
                 pushImpl?(veilgramRowsController(context: context, title: veilgramLocalized(strings, "Veilgram.DeletedLog", strings.Veilgram_DeletedLog), rows: rows))
             })
+        },
+        updateKeywords: { text in
+            VeilgramSettings.setFilterKeywordsText(text)
         }
     )
 

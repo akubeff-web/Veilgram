@@ -141,6 +141,8 @@ func chatHistoryEntriesForView(
     }
     
     var count = 0
+    let veilgramKeywords = VeilgramSettings.filterKeywords
+    let veilgramAccountPeerId = context.account.peerId
     loop: for entry in view.entries {
         var message = entry.message.withAppliedEphemeralReplacementMessage()
         var isRead = entry.isRead
@@ -151,6 +153,10 @@ func chatHistoryEntriesForView(
         }
         
         if pendingRemovedMessages.contains(message.id) {
+            continue
+        }
+        
+        if veilgramHidesMessage(message, accountPeerId: veilgramAccountPeerId, keywords: veilgramKeywords) {
             continue
         }
         
