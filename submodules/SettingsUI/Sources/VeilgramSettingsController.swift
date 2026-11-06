@@ -373,7 +373,7 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
                 let formatter = DateFormatter()
                 formatter.dateStyle = .short
                 formatter.timeStyle = .short
-                var rows: [(label: String, value: String)] = []
+                var rows: [(label: String, value: String, open: ((ViewController) -> Void)?)] = []
                 for entry in log {
                     guard let maybeMessage = messages[entry.id], let message = maybeMessage else {
                         continue
@@ -384,10 +384,17 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
                     }
                     let date = formatter.string(from: Date(timeIntervalSince1970: Double(entry.date)))
                     let text = message.text.isEmpty ? veilgramLocalized(strings, "Veilgram.Media", strings.Veilgram_Media) : message.text
-                    rows.append(("\(title) · \(date)", text))
+                    let messageId = message.id
+                    let chatPeer = message.enginePeers[message.id.peerId]
+                    rows.append(("\(title) · \(date)", text, { controller in
+                        guard let chatPeer, let navigationController = controller.navigationController as? NavigationController else {
+                            return
+                        }
+                        context.sharedContext.navigateToChatController(NavigateToChatControllerParams(navigationController: navigationController, context: context, chatLocation: .peer(chatPeer), subject: .message(id: .id(messageId), highlight: ChatControllerSubject.MessageHighlight(quote: nil), timecode: nil, setupReply: false), keepStack: .always, useExisting: true))
+                    }))
                 }
                 if rows.isEmpty {
-                    rows.append(("", veilgramLocalized(strings, "Veilgram.DeletedLogEmpty", strings.Veilgram_DeletedLogEmpty)))
+                    rows.append(("", veilgramLocalized(strings, "Veilgram.DeletedLogEmpty", strings.Veilgram_DeletedLogEmpty), nil))
                 }
                 pushImpl?(veilgramRowsController(context: context, title: veilgramLocalized(strings, "Veilgram.DeletedLog", strings.Veilgram_DeletedLog), rows: rows))
             })
