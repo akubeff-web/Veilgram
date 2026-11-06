@@ -80,10 +80,14 @@ jobs:
           path: ~/telegram-bazel-cache
           key: telegram-bazel-cache-${{ github.run_id }}
 
+      - name: Rename IPA
+        run: cp artifacts/Telegram.ipa artifacts/Veilgram.ipa
+
+      # A single unzipped file: the artifact downloads as Veilgram.ipa itself.
       - name: Upload IPA
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: Veilgram-ipa
-          path: artifacts/Telegram.ipa
+          path: artifacts/Veilgram.ipa
+          archive: false
           retention-days: 14
           if-no-files-found: error
