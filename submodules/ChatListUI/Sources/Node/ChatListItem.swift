@@ -3788,6 +3788,17 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                 }
             }
 
+            if VeilgramSettings.streamerMode {
+                // Veilgram streamer mode: avatars stay, names and message previews do not.
+                effectiveAuthorTitle = nil
+                if titleAttributedString != nil {
+                    titleAttributedString = NSAttributedString(string: "Veilgram", font: titleFont, textColor: theme.titleColor)
+                }
+                if textAttributedString != nil {
+                    textAttributedString = NSAttributedString(string: "Veilgram", font: textFont, textColor: theme.messageTextColor)
+                }
+            }
+
             let (authorLayout, authorApply) = authorLayout(item.context, rawContentWidth - badgeSize, item.presentationData.theme, effectiveAuthorTitle, forumThreads, authorTopicArrowColor)
             
             var textBottomRightCutout: CGFloat = 0.0

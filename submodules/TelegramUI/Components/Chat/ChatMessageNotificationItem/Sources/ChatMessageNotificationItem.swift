@@ -354,6 +354,14 @@ final class ChatMessageNotificationItemNode: NotificationItemNode {
             }
         }
                 
+        if VeilgramSettings.streamerMode {
+            title = "Veilgram"
+            messageText = "Veilgram"
+            messageEntities = nil
+            gramTransferAmountRanges = nil
+            updatedMedia = nil
+        }
+        
         let textFont = compact ? Font.regular(15.0) : Font.regular(16.0)
         let textColor = presentationData.theme.inAppNotification.primaryTextColor
         var attributedMessageText: NSAttributedString

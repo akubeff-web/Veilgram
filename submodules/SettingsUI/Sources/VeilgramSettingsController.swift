@@ -32,6 +32,7 @@ private enum VeilgramSettingsSection: Int32 {
     case sending
     case filter
     case protected
+    case screen
     case tabs
     case login
 }
@@ -69,6 +70,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case keepViewOnce(Bool)
     case protectedFooter
 
+    case streamerMode(Bool)
+    case hidePhone(Bool)
+    case screenFooter
+
     case tabsHeader
     case tabContacts(Bool)
     case tabCalls(Bool)
@@ -94,6 +99,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.filter.rawValue
         case .unlockProtected, .keepViewOnce, .protectedFooter:
             return VeilgramSettingsSection.protected.rawValue
+        case .streamerMode, .hidePhone, .screenFooter:
+            return VeilgramSettingsSection.screen.rawValue
         case .tabsHeader, .tabContacts, .tabCalls, .tabNews, .hideStories:
             return VeilgramSettingsSection.tabs.rawValue
         case .loginButton, .loginButtonFooter:
@@ -153,20 +160,26 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 36
         case .protectedFooter:
             return 37
-        case .tabsHeader:
+        case .streamerMode:
+            return 38
+        case .hidePhone:
+            return 39
+        case .screenFooter:
             return 40
-        case .tabContacts:
-            return 41
-        case .tabCalls:
-            return 42
-        case .tabNews:
-            return 43
-        case .hideStories:
-            return 44
-        case .loginButton:
+        case .tabsHeader:
             return 50
-        case .loginButtonFooter:
+        case .tabContacts:
             return 51
+        case .tabCalls:
+            return 52
+        case .tabNews:
+            return 53
+        case .hideStories:
+            return 54
+        case .loginButton:
+            return 60
+        case .loginButtonFooter:
+            return 61
         }
     }
 
@@ -240,6 +253,12 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.keepViewOnce, "Veilgram.KeepViewOnce", strings.Veilgram_KeepViewOnce, value, { arguments.update(.keepViewOnce, $0) })
         case .protectedFooter:
             return footerItem("Veilgram.ProtectedInfo", strings.Veilgram_ProtectedInfo)
+        case let .streamerMode(value):
+            return switchItem(VeilgramSettingsIcons.streamerMode, "Veilgram.StreamerMode", strings.Veilgram_StreamerMode, value, { arguments.update(.streamerMode, $0) })
+        case let .hidePhone(value):
+            return switchItem(VeilgramSettingsIcons.hidePhone, "Veilgram.HidePhone", strings.Veilgram_HidePhone, value, { arguments.update(.hidePhone, $0) })
+        case .screenFooter:
+            return footerItem("Veilgram.ScreenInfo", strings.Veilgram_ScreenInfo)
         case .tabsHeader:
             return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.Tabs", strings.Veilgram_Tabs).uppercased(), sectionId: self.section)
         case let .tabContacts(value):
@@ -301,6 +320,10 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     entries.append(.unlockProtected(VeilgramSettings.value(.unlockProtected)))
     entries.append(.keepViewOnce(VeilgramSettings.value(.keepViewOnce)))
     entries.append(.protectedFooter)
+
+    entries.append(.streamerMode(VeilgramSettings.value(.streamerMode)))
+    entries.append(.hidePhone(VeilgramSettings.value(.hidePhone)))
+    entries.append(.screenFooter)
 
     entries.append(.tabsHeader)
     entries.append(.tabContacts(VeilgramSettings.value(.tabContacts)))

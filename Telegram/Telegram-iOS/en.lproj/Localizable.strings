@@ -17291,3 +17291,6 @@ Error: %8$@";
 "Veilgram.UnlockProtected" = "Save from Protected Chats";
 "Veilgram.KeepViewOnce" = "Keep Disappearing Media";
 "Veilgram.ProtectedInfo" = "Copying, forwarding, saving and screenshots work in chats that forbid them. Opening a view-once or timed photo, video or voice message does not start its timer and is not reported to the sender, so it can be opened again. Secret chats are not affected.";
+"Veilgram.StreamerMode" = "Streamer Mode";
+"Veilgram.HidePhone" = "Hide My Phone Number";
+"Veilgram.ScreenInfo" = "Streamer mode shows \"Veilgram\" instead of chat names and message previews in the chat list, chat titles and in-app notifications; avatars stay. Hiding the number only changes what the screen shows.";

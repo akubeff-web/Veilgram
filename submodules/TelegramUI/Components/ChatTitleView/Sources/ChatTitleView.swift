@@ -301,6 +301,9 @@ public final class ChatTitleView: UIView, NavigationBarTitleView {
                                     } else {
                                         segments = [.text(0, NSAttributedString(string: EnginePeer(peer).displayTitle(strings: self.strings, displayOrder: self.nameDisplayOrder), font: titleFont, textColor: titleTheme.rootController.navigationBar.primaryTextColor))]
                                     }
+                                    if VeilgramSettings.streamerMode {
+                                        segments = [.text(0, NSAttributedString(string: "Veilgram", font: titleFont, textColor: titleTheme.rootController.navigationBar.primaryTextColor))]
+                                    }
                                 }
                                 if peer.id != self.context.account.peerId {
                                     let premiumConfiguration = PremiumConfiguration.with(appConfiguration: self.context.currentAppConfiguration.with { $0 })

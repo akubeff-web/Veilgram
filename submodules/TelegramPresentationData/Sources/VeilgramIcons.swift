@@ -499,6 +499,8 @@ public enum VeilgramSettingsIcons {
     public static let hideStories = generateVeilgramSettingsIcon(.circleDashed, backgroundColor: UIColor(rgb: 0xFF9500))
     public static let unlockProtected = generateVeilgramSettingsIcon(.download, backgroundColor: UIColor(rgb: 0x34C759))
     public static let keepViewOnce = generateVeilgramSettingsIcon(.eye, backgroundColor: UIColor(rgb: 0x34C759))
+    public static let streamerMode = generateVeilgramSettingsIcon(.venetianMask, backgroundColor: UIColor(rgb: 0xFF2D55))
+    public static let hidePhone = generateVeilgramSettingsIcon(.phone, backgroundColor: UIColor(rgb: 0xFF2D55))
     public static let autoArchive = generateVeilgramSettingsIcon(.archive, backgroundColor: UIColor(rgb: 0xFF9500))
     public static let autoArchiveGroups = generateVeilgramSettingsIcon(.users, backgroundColor: UIColor(rgb: 0xFF9500))
     public static let tabContacts = generateVeilgramSettingsIcon(.user, backgroundColor: UIColor(rgb: 0x007AFF))
