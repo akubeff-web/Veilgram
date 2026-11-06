@@ -12,6 +12,7 @@ public enum VeilgramSettings {
         case ghostTyping
         case ghostRead
         case ghostStories
+        case alwaysOnline
         case keepDeleted
         case deletedIcon
         case autoArchive
@@ -22,7 +23,7 @@ public enum VeilgramSettings {
 
         public var defaultValue: Bool {
             switch self {
-            case .autoArchiveGroups:
+            case .autoArchiveGroups, .alwaysOnline:
                 return false
             default:
                 return true
@@ -59,8 +60,13 @@ public enum VeilgramSettings {
         }
     }
 
+    /// Always Online wins over hiding the online status.
     public static var ghostOnline: Bool {
-        return value(.ghost) && value(.ghostOnline)
+        return value(.ghost) && value(.ghostOnline) && !value(.alwaysOnline)
+    }
+
+    public static var alwaysOnline: Bool {
+        return value(.alwaysOnline)
     }
 
     public static var ghostTyping: Bool {

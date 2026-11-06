@@ -17,20 +17,44 @@ private final class AccountPresenceManagerImpl {
     private var onlineTimer: SignalKitTimer?
     
     private var wasOnline: Bool = false
+    private var wasHidden: Bool = false
     
     init(queue: Queue, shouldKeepOnlinePresence: Signal<Bool, NoError>, network: Network) {
         self.queue = queue
         self.network = network
         
-        self.shouldKeepOnlinePresenceDisposable = (shouldKeepOnlinePresence
-        |> distinctUntilChanged
-        |> deliverOn(self.queue)).start(next: { [weak self] value in
+        // Veilgram: Always Online keeps the status while the app runs at all, and a hidden
+        // status sends nothing, so neither the 30 s refresh nor "offline" (which would move
+        // "last seen" to now) goes out.
+        let veilgramState = VeilgramSettings.updated
+        |> map { _ -> (alwaysOnline: Bool, hidden: Bool) in
+            return (VeilgramSettings.alwaysOnline, VeilgramSettings.ghostOnline)
+        }
+        self.shouldKeepOnlinePresenceDisposable = (combineLatest(shouldKeepOnlinePresence, veilgramState)
+        |> map { value, veilgram -> (Bool, Bool) in
+            return (value || veilgram.alwaysOnline, veilgram.hidden)
+        }
+        |> distinctUntilChanged(isEqual: { $0 == $1 })
+        |> deliverOn(self.queue)).start(next: { [weak self] value, hidden in
             guard let `self` = self else {
                 return
             }
-            if self.wasOnline != value {
+            if self.wasOnline != value || self.wasHidden != hidden {
+                let wasVisiblyOnline = self.wasOnline && !self.wasHidden
                 self.wasOnline = value
-                self.updatePresence(value)
+                self.wasHidden = hidden
+                if hidden {
+                    self.onlineTimer?.invalidate()
+                    self.onlineTimer = nil
+                    if wasVisiblyOnline {
+                        // Hiding while shown online: end the online status now.
+                        self.sendStatus(offline: true)
+                    } else {
+                        self.currentRequestDisposable.set(nil)
+                    }
+                } else {
+                    self.updatePresence(value)
+                }
             }
         })
     }
@@ -43,7 +67,6 @@ private final class AccountPresenceManagerImpl {
     }
     
     private func updatePresence(_ isOnline: Bool) {
-        let request: Signal<Api.Bool, MTRpcError>
         if isOnline {
             let timer = SignalKitTimer(timeout: 30.0, repeat: false, completion: { [weak self] in
                 guard let strongSelf = self else {
@@ -53,19 +76,15 @@ private final class AccountPresenceManagerImpl {
             }, queue: self.queue)
             self.onlineTimer = timer
             timer.start()
-            if VeilgramSettings.ghostOnline {
-                return
-            }
-            request = self.network.request(Api.functions.account.updateStatus(offline: .boolFalse))
         } else {
             self.onlineTimer?.invalidate()
             self.onlineTimer = nil
-            if VeilgramSettings.ghostOnline {
-                // offline: true would also move "last seen" to now.
-                return
-            }
-            request = self.network.request(Api.functions.account.updateStatus(offline: .boolTrue))
         }
+        self.sendStatus(offline: !isOnline)
+    }
+    
+    private func sendStatus(offline: Bool) {
+        let request = self.network.request(Api.functions.account.updateStatus(offline: offline ? .boolTrue : .boolFalse))
         self.isPerformingUpdate.set(true)
         self.currentRequestDisposable.set((request
         |> `catch` { _ -> Signal<Api.Bool, NoError> in
@@ -78,6 +97,27 @@ private final class AccountPresenceManagerImpl {
             strongSelf.isPerformingUpdate.set(false)
         }))
     }
+}
+
+/// Veilgram: the server shows the sender online after every sent message. With the online status
+/// hidden, end it right away. Several messages in a row send one request per account.
+private let veilgramHideOnlineDisposables = Atomic<[ObjectIdentifier: MetaDisposable]>(value: [:])
+
+func veilgramHideOnlineAfterSending(network: Network) {
+    guard VeilgramSettings.ghostOnline else {
+        return
+    }
+    let key = ObjectIdentifier(network)
+    let disposable = veilgramHideOnlineDisposables.modify { current in
+        var current = current
+        if current[key] == nil {
+            current[key] = MetaDisposable()
+        }
+        return current
+    }[key]!
+    disposable.set((Signal<Api.Bool, MTRpcError>.complete()
+    |> delay(1.0, queue: Queue.concurrentDefaultQueue())
+    |> then(network.request(Api.functions.account.updateStatus(offline: .boolTrue)))).start())
 }
 
 final class AccountPresenceManager {

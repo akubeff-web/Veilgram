@@ -2265,6 +2265,7 @@ public final class PendingMessageManager {
             }
         }
         
+        veilgramHideOnlineAfterSending(network: stateManager.network)
         let queue = self.queue
         return applyUpdateMessage(postbox: postbox, stateManager: stateManager, message: message, cacheReferenceKey: content.cacheReferenceKey, result: result, accountPeerId: self.accountPeerId, pendingMessageEvent: { [weak self] pendingMessageDelivered in
             queue.async {
@@ -2313,6 +2314,7 @@ public final class PendingMessageManager {
                 }
             }
         }
+        veilgramHideOnlineAfterSending(network: stateManager.network)
         let queue = self.queue
         
         return applyUpdateGroupMessages(postbox: postbox, stateManager: stateManager, messages: messages, result: result, pendingMessageEvents: { [weak self] pendingMessagesDelivered in

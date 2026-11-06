@@ -13,6 +13,7 @@ public enum VeilgramIcon: String {
     case bellOff
     case panelBottom
     case send
+    case wifi
     case wifiOff
     case penOff
     case checkCheck
@@ -73,6 +74,13 @@ public enum VeilgramIcon: String {
             return [
                 .path("M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"),
                 .path("m21.854 2.147-10.94 10.939")
+            ]
+        case .wifi:
+            return [
+                .path("M12 20h.01"),
+                .path("M2 8.82a15 15 0 0 1 20 0"),
+                .path("M5 12.859a10 10 0 0 1 14 0"),
+                .path("M8.5 16.429a5 5 0 0 1 7 0")
             ]
         case .wifiOff:
             return [
@@ -445,6 +453,7 @@ public enum VeilgramSettingsIcons {
     public static let main = generateVeilgramSettingsIcon(.venetianMask, backgroundColor: UIColor(rgb: 0x3A3A3C))
     public static let ghost = generateVeilgramSettingsIcon(.ghost, backgroundColor: UIColor(rgb: 0x5856D6))
     public static let ghostOnline = generateVeilgramSettingsIcon(.wifiOff, backgroundColor: UIColor(rgb: 0x5856D6))
+    public static let alwaysOnline = generateVeilgramSettingsIcon(.wifi, backgroundColor: UIColor(rgb: 0x34C759))
     public static let ghostTyping = generateVeilgramSettingsIcon(.penOff, backgroundColor: UIColor(rgb: 0x5856D6))
     public static let ghostRead = generateVeilgramSettingsIcon(.checkCheck, backgroundColor: UIColor(rgb: 0x5856D6))
     public static let ghostStories = generateVeilgramSettingsIcon(.circleDashed, backgroundColor: UIColor(rgb: 0x5856D6))

@@ -21,6 +21,7 @@ private final class VeilgramSettingsControllerArguments {
 
 private enum VeilgramSettingsSection: Int32 {
     case ghost
+    case presence
     case deleted
     case archive
     case tabs
@@ -34,6 +35,9 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case ghostRead(Bool)
     case ghostStories(Bool)
     case ghostFooter
+
+    case alwaysOnline(Bool)
+    case alwaysOnlineFooter
 
     case keepDeleted(Bool)
     case deletedIcon(Bool)
@@ -55,6 +59,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
         switch self {
         case .ghost, .ghostOnline, .ghostTyping, .ghostRead, .ghostStories, .ghostFooter:
             return VeilgramSettingsSection.ghost.rawValue
+        case .alwaysOnline, .alwaysOnlineFooter:
+            return VeilgramSettingsSection.presence.rawValue
         case .keepDeleted, .deletedIcon, .keepDeletedFooter:
             return VeilgramSettingsSection.deleted.rawValue
         case .autoArchive, .autoArchiveGroups, .autoArchiveFooter:
@@ -80,6 +86,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 4
         case .ghostFooter:
             return 5
+        case .alwaysOnline:
+            return 6
+        case .alwaysOnlineFooter:
+            return 7
         case .keepDeleted:
             return 10
         case .deletedIcon:
@@ -135,6 +145,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.ghostStories, "Veilgram.GhostStories", strings.Veilgram_GhostStories, value, { arguments.update(.ghostStories, $0) })
         case .ghostFooter:
             return footerItem("Veilgram.GhostInfo", strings.Veilgram_GhostInfo)
+        case let .alwaysOnline(value):
+            return switchItem(VeilgramSettingsIcons.alwaysOnline, "Veilgram.AlwaysOnline", strings.Veilgram_AlwaysOnline, value, { arguments.update(.alwaysOnline, $0) })
+        case .alwaysOnlineFooter:
+            return footerItem("Veilgram.AlwaysOnlineInfo", strings.Veilgram_AlwaysOnlineInfo)
         case let .keepDeleted(value):
             return switchItem(VeilgramSettingsIcons.keepDeleted, "Veilgram.KeepDeleted", strings.Veilgram_KeepDeleted, value, { arguments.update(.keepDeleted, $0) })
         case let .deletedIcon(value):
@@ -175,6 +189,9 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
         entries.append(.ghostStories(VeilgramSettings.value(.ghostStories)))
     }
     entries.append(.ghostFooter)
+
+    entries.append(.alwaysOnline(VeilgramSettings.value(.alwaysOnline)))
+    entries.append(.alwaysOnlineFooter)
 
     entries.append(.keepDeleted(VeilgramSettings.value(.keepDeleted)))
     if VeilgramSettings.value(.keepDeleted) {
