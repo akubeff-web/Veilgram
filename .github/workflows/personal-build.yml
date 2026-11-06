@@ -43,6 +43,10 @@ jobs:
               configuration = json.load(f)
           configuration['api_id'] = os.environ['TG_API_ID'].strip()
           configuration['api_hash'] = os.environ['TG_API_HASH'].strip()
+          # A free Apple ID cannot sign iCloud or Siri: the re-signed app loses those
+          # entitlements, and CloudKit then terminates the app at launch.
+          configuration['enable_icloud'] = False
+          configuration['enable_siri'] = False
           with open('build-system/personal-configuration.json', 'w') as f:
               json.dump(configuration, f, indent=4)
           EOF
