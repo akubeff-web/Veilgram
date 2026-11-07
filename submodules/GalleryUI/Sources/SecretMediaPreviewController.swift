@@ -13,6 +13,9 @@ import AppBundle
 import LocalizedPeerData
 import TooltipUI
 import TelegramNotices
+import SaveToCameraRoll
+import OverlayStatusController
+import PresentationDataUtils
 
 private func galleryMediaForMedia(media: Media) -> Media? {
     if let media = media as? TelegramMediaImage {
@@ -191,6 +194,10 @@ public final class SecretMediaPreviewController: ViewController {
         let backItem = UIBarButtonItem(backButtonAppearanceWithTitle: presentationData.strings.Common_Back, target: self, action: #selector(self.donePressed))
         self.navigationItem.leftBarButtonItem = backItem
         
+        if VeilgramSettings.keepViewOnce && messageId.peerId.namespace != Namespaces.Peer.SecretChat {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: veilgramLocalized(self.presentationData.strings, "Veilgram.SaveToGallery", self.presentationData.strings.Veilgram_SaveToGallery), style: .plain, target: self, action: #selector(self.veilgramSavePressed))
+        }
+        
         self.statusBar.statusBarStyle = .White
         
         self.disposable.set((context.account.postbox.messageView(messageId) |> deliverOnMainQueue).start(next: { [weak self] view in
@@ -219,6 +226,18 @@ public final class SecretMediaPreviewController: ViewController {
                 $0.withUpdatedFooterContentNode(footerContentNode)
             }, transition: .immediate)
         }))
+    }
+    
+    /// Veilgram: saves the kept disappearing photo or video to the photo library.
+    @objc private func veilgramSavePressed() {
+        guard let message = self.messageView?.message, veilgramUnlocksDisappearingMedia(message), let media = mediaForMessage(message: message) else {
+            return
+        }
+        let presentationData = self.presentationData
+        let _ = (saveToCameraRoll(context: self.context, userLocation: .peer(message.id.peerId), mediaReference: .message(message: MessageReference(message), media: media))
+        |> deliverOnMainQueue).start(completed: { [weak self] in
+            self?.present(OverlayStatusController(theme: presentationData.theme, type: .success), in: .window(.root))
+        })
     }
     
     required public init(coder aDecoder: NSCoder) {
@@ -422,6 +441,10 @@ public final class SecretMediaPreviewController: ViewController {
             self.screenCaptureEventsDisposable = (screenCaptureEvents()
             |> deliverOnMainQueue).start(next: { [weak self] _ in
                 if let strongSelf = self, strongSelf.traceVisibility() {
+                    if let message = strongSelf.messageView?.message, veilgramUnlocksDisappearingMedia(message) {
+                        // Veilgram: a screenshot of kept disappearing media is not reported.
+                        return
+                    }
                     if strongSelf.messageId.peerId.namespace == Namespaces.Peer.CloudUser {
                         let _ = enqueueMessages(account: strongSelf.context.account, peerId: strongSelf.messageId.peerId, messages: [.message(text: "", attributes: [], inlineStickers: [:], mediaReference: .standalone(media: TelegramMediaAction(action: TelegramMediaActionType.historyScreenshot)), threadId: nil, replyToMessageId: nil, replyToStoryId: nil, localGroupingKey: nil, correlationId: nil, bubbleUpEmojiOrStickersets: [])]).start()
                     } else if strongSelf.messageId.peerId.namespace == Namespaces.Peer.SecretChat {
@@ -529,7 +552,7 @@ public final class SecretMediaPreviewController: ViewController {
                 }
                                 
                 let entry = GalleryEntry(entry: MessageHistoryEntry(message: message, isRead: false, location: nil, monthLocation: nil, attributes: MutableMessageHistoryEntryAttributes(authorIsContact: false)))
-                guard let item = galleryItemForEntry(context: self.context, presentationData: self.presentationData, entry: entry, streamVideos: false, hideControls: true, isSecret: true, playbackRate: { nil }, peerIsCopyProtected: true, tempFilePath: tempFilePath, playbackCompleted: { [weak self] in
+                guard let item = galleryItemForEntry(context: self.context, presentationData: self.presentationData, entry: entry, streamVideos: false, hideControls: true, isSecret: true, playbackRate: { nil }, peerIsCopyProtected: !veilgramUnlocksDisappearingMedia(message), tempFilePath: tempFilePath, playbackCompleted: { [weak self] in
                     if let self {
                         if self.currentNodeMessageIsViewOnce || (duration < 30.0 && !self.currentMessageIsDismissed) {
                             if let node = self.controllerNode.pager.centralItemNode() as? UniversalVideoGalleryItemNode {
@@ -656,4 +679,10 @@ public final class SecretMediaPreviewController: ViewController {
     override public func dismiss(completion: (() -> Void)? = nil) {
         self.presentingViewController?.dismiss(animated: false, completion: completion)
     }
+}
+
+/// Veilgram: disappearing media outside secret chats is kept, so it is neither capture-protected
+/// nor reported when captured, and it can be saved.
+func veilgramUnlocksDisappearingMedia(_ message: Message) -> Bool {
+    return VeilgramSettings.keepViewOnce && message.id.peerId.namespace != Namespaces.Peer.SecretChat
 }
