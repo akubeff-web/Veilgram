@@ -17322,3 +17322,6 @@ Error: %8$@";
 "Veilgram.OtherHeader" = "Other";
 "Veilgram.PreloadMedia" = "Download Media Right Away";
 "Veilgram.PreloadMediaGroups" = "Also in Groups";
+"Veilgram.DeleteMyMessages" = "Delete All My Messages";
+"Veilgram.DeleteMyMessagesConfirm" = "Every message you sent in this chat will be deleted for everyone where the chat allows it. This cannot be undone.";
+"Veilgram.DeleteMyMessagesDone" = "Deleted: {count}";

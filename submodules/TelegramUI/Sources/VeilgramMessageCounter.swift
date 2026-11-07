@@ -7,6 +7,7 @@ import TelegramPresentationData
 import OverlayStatusController
 import PresentationDataUtils
 import SettingsUI
+import UndoUI
 
 /// How many messages each participant of a chat sent, most first. Counted by the server one
 /// participant at a time: both sides of a private chat, the members of a basic group, or the 100
@@ -112,5 +113,36 @@ extension ChatControllerImpl {
             }
             self.push(veilgramRowsController(context: self.context, title: veilgramLocalized(strings, "Veilgram.MessageCounter", strings.Veilgram_MessageCounter), rows: rows))
         }))
+    }
+}
+
+extension ChatControllerImpl {
+    func veilgramDeleteAllOwnMessages(peerId: EnginePeer.Id) {
+        let presentationData = self.presentationData
+        let strings = presentationData.strings
+        self.present(textAlertController(context: self.context, updatedPresentationData: self.updatedPresentationData, title: veilgramLocalized(strings, "Veilgram.DeleteMyMessages", strings.Veilgram_DeleteMyMessages), text: veilgramLocalized(strings, "Veilgram.DeleteMyMessagesConfirm", strings.Veilgram_DeleteMyMessagesConfirm), actions: [TextAlertAction(type: .genericAction, title: strings.Common_Cancel, action: {}), TextAlertAction(type: .destructiveAction, title: strings.Common_Delete, action: { [weak self] in
+            guard let self else {
+                return
+            }
+            let disposable = MetaDisposable()
+            let progress = OverlayStatusController(theme: presentationData.theme, type: .loading(cancelled: {
+                disposable.dispose()
+            }))
+            self.present(progress, in: .window(.root))
+            var deletedCount = 0
+            disposable.set((veilgramDeleteAllOwnMessages(account: self.context.account, peerId: peerId)
+            |> deliverOnMainQueue).start(next: { count in
+                deletedCount = count
+            }, completed: { [weak self, weak progress] in
+                progress?.dismiss()
+                guard let self else {
+                    return
+                }
+                let text = veilgramLocalized(strings, "Veilgram.DeleteMyMessagesDone", strings.Veilgram_DeleteMyMessagesDone).replacingOccurrences(of: "{count}", with: "\(deletedCount)")
+                self.present(UndoOverlayController(presentationData: presentationData, content: .succeed(text: text, timeout: nil, customUndoText: nil), elevatedLayout: false, action: { _ in
+                    return false
+                }), in: .current)
+            }))
+        })]), in: .window(.root))
     }
 }
