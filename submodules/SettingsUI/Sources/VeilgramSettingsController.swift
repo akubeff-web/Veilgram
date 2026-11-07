@@ -57,6 +57,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case keepDeleted(Bool)
     case deletedIcon(Bool)
     case editHistory(Bool)
+    case preloadMedia(Bool)
+    case preloadMediaGroups(Bool)
     case deletedLog
     case keepDeletedFooter
 
@@ -114,7 +116,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.ghost.rawValue
         case .alwaysOnline, .alwaysOnlineFooter:
             return VeilgramSettingsSection.presence.rawValue
-        case .deletedHeader, .keepDeleted, .deletedIcon, .editHistory, .deletedLog, .keepDeletedFooter:
+        case .deletedHeader, .keepDeleted, .deletedIcon, .editHistory, .preloadMedia, .preloadMediaGroups, .deletedLog, .keepDeletedFooter:
             return VeilgramSettingsSection.deleted.rawValue
         case .protectedHeader, .unlockProtected, .keepViewOnce, .protectedFooter:
             return VeilgramSettingsSection.protected.rawValue
@@ -165,86 +167,90 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 10
         case .editHistory:
             return 11
-        case .deletedLog:
+        case .preloadMedia:
             return 12
-        case .keepDeletedFooter:
+        case .preloadMediaGroups:
             return 13
-        case .protectedHeader:
+        case .deletedLog:
             return 14
-        case .unlockProtected:
+        case .keepDeletedFooter:
             return 15
-        case .keepViewOnce:
+        case .protectedHeader:
             return 16
-        case .protectedFooter:
+        case .unlockProtected:
             return 17
-        case .filterHeader:
+        case .keepViewOnce:
             return 18
-        case .hideBlocked:
+        case .protectedFooter:
             return 19
-        case .keywordFilter:
+        case .filterHeader:
             return 20
-        case .keywords:
+        case .hideBlocked:
             return 21
-        case .filterFooter:
+        case .keywordFilter:
             return 22
-        case .newChatsHeader:
+        case .keywords:
             return 23
-        case .autoArchive:
+        case .filterFooter:
             return 24
-        case .autoArchiveGroups:
+        case .newChatsHeader:
             return 25
-        case .autoArchiveFooter:
+        case .autoArchive:
             return 26
-        case .autoReply:
+        case .autoArchiveGroups:
             return 27
-        case .autoReplyText:
+        case .autoArchiveFooter:
             return 28
-        case .autoReplyContacts:
+        case .autoReply:
             return 29
-        case .autoReplyFooter:
+        case .autoReplyText:
             return 30
-        case .confirmSend:
+        case .autoReplyContacts:
             return 31
-        case .confirmSendFooter:
+        case .autoReplyFooter:
             return 32
-        case .screenHeader:
+        case .confirmSend:
             return 33
-        case .streamerMode:
+        case .confirmSendFooter:
             return 34
-        case .hidePhone:
+        case .screenHeader:
             return 35
-        case .screenFooter:
+        case .streamerMode:
             return 36
-        case .premiumHeader:
+        case .hidePhone:
             return 37
-        case .hidePremiumBadges:
+        case .screenFooter:
             return 38
-        case .hidePremiumBanners:
+        case .premiumHeader:
             return 39
-        case .hidePremiumOffers:
+        case .hidePremiumBadges:
             return 40
-        case .hideGifts:
+        case .hidePremiumBanners:
             return 41
-        case .tabsHeader:
+        case .hidePremiumOffers:
             return 42
-        case .tabContacts:
+        case .hideGifts:
             return 43
-        case .tabCalls:
+        case .tabsHeader:
             return 44
-        case .tabNews:
+        case .tabContacts:
             return 45
-        case .hideStories:
+        case .tabCalls:
             return 46
-        case .otherHeader:
+        case .tabNews:
             return 47
-        case .fastTransfers:
+        case .hideStories:
             return 48
-        case .fastTransfersFooter:
+        case .otherHeader:
             return 49
-        case .loginButton:
+        case .fastTransfers:
             return 50
-        case .loginButtonFooter:
+        case .fastTransfersFooter:
             return 51
+        case .loginButton:
+            return 52
+        case .loginButtonFooter:
+            return 53
         }
     }
 
@@ -296,6 +302,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.keepDeleted, "Veilgram.KeepDeleted", strings.Veilgram_KeepDeleted, value, { arguments.update(.keepDeleted, $0) })
         case let .deletedIcon(value):
             return switchItem(VeilgramSettingsIcons.deletedIcon, "Veilgram.DeletedIcon", strings.Veilgram_DeletedIcon, value, { arguments.update(.deletedIcon, $0) })
+        case let .preloadMedia(value):
+            return switchItem(VeilgramSettingsIcons.preloadMedia, "Veilgram.PreloadMedia", strings.Veilgram_PreloadMedia, value, { arguments.update(.preloadMedia, $0) })
+        case let .preloadMediaGroups(value):
+            return switchItem(VeilgramSettingsIcons.preloadMediaGroups, "Veilgram.PreloadMediaGroups", strings.Veilgram_PreloadMediaGroups, value, { arguments.update(.preloadMediaGroups, $0) })
         case let .editHistory(value):
             return switchItem(VeilgramSettingsIcons.editHistory, "Veilgram.EditHistorySetting", strings.Veilgram_EditHistorySetting, value, { arguments.update(.editHistory, $0) })
         case .deletedLog:
@@ -400,6 +410,10 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
         entries.append(.deletedIcon(VeilgramSettings.value(.deletedIcon)))
     }
     entries.append(.editHistory(VeilgramSettings.value(.editHistory)))
+    entries.append(.preloadMedia(VeilgramSettings.value(.preloadMedia)))
+    if VeilgramSettings.value(.preloadMedia) {
+        entries.append(.preloadMediaGroups(VeilgramSettings.value(.preloadMediaGroups)))
+    }
     entries.append(.deletedLog)
     entries.append(.keepDeletedFooter)
 

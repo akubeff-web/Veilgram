@@ -37,10 +37,12 @@ public enum VeilgramSettings {
         case hidePremiumOffers
         case hideGifts
         case fastTransfers
+        case preloadMedia
+        case preloadMediaGroups
 
         public var defaultValue: Bool {
             switch self {
-            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce, .hidePhone, .streamerMode, .autoReply, .autoReplyContacts, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts:
+            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce, .hidePhone, .streamerMode, .autoReply, .autoReplyContacts, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts, .fastTransfers, .preloadMedia, .preloadMediaGroups:
                 return false
             default:
                 return true
@@ -178,6 +180,14 @@ public enum VeilgramSettings {
 
     public static var keepViewOnce: Bool {
         return value(.keepViewOnce)
+    }
+
+    public static var preloadMedia: Bool {
+        return value(.preloadMedia)
+    }
+
+    public static var preloadMediaGroups: Bool {
+        return value(.preloadMedia) && value(.preloadMediaGroups)
     }
 
     public static var fastTransfers: Bool {

@@ -6257,6 +6257,7 @@ func replayFinalState(
     
     veilgramApplyAutoArchive(transaction: transaction, peerIds: veilgramAutoArchivePeerIds)
     veilgramScheduleAutoReplies(accountPeerId: accountPeerId, peerIds: veilgramAutoReplyPeerIds)
+    veilgramSchedulePreload(accountPeerId: accountPeerId, addedIncomingMessageIds: addedIncomingMessageIds)
     
     addedIncomingMessageIds.append(contentsOf: addedSecretMessageIds)
     
