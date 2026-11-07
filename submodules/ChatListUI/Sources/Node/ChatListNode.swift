@@ -2186,13 +2186,22 @@ public final class ChatListNode: ListViewImpl {
         
         let previousAccountIsPremium = Atomic<Bool?>(value: nil)
         
-        let accountIsPremium = context.engine.data.subscribe(
+        // Veilgram: also re-run when chats are hidden, shown or revealed.
+        let veilgramHiddenChats = VeilgramSettings.updated
+        |> map { _ -> VeilgramSettings.HiddenChatsState in
+            return VeilgramSettings.hiddenChatsState
+        }
+        |> distinctUntilChanged
+        let accountIsPremium = combineLatest(context.engine.data.subscribe(
             TelegramEngine.EngineData.Item.Peer.Peer(id: context.account.peerId)
         )
         |> map { peer -> Bool in
             return peer?.isPremium ?? false
         }
-        |> distinctUntilChanged
+        |> distinctUntilChanged, veilgramHiddenChats)
+        |> map { isPremium, _ -> Bool in
+            return isPremium
+        }
         
         let chatListNodeViewTransition = combineLatest(queue: viewProcessingQueue,
             hideArchivedFolderByDefault,

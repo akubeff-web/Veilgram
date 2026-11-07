@@ -298,3 +298,26 @@ public struct LocalAuth {
         #endif
     }
 }
+
+public extension LocalAuth {
+    /// Veilgram: Face ID or Touch ID, falling back to the device passcode. Succeeds without asking
+    /// when the device has no passcode at all.
+    static func veilgramAuthenticate(reason: String) -> Signal<Bool, NoError> {
+        return Signal { subscriber in
+            let context = LAContext()
+            var error: NSError?
+            if context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) {
+                context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason, reply: { result, _ in
+                    subscriber.putNext(result)
+                    subscriber.putCompletion()
+                })
+            } else {
+                subscriber.putNext(true)
+                subscriber.putCompletion()
+            }
+            return ActionDisposable {
+                context.invalidate()
+            }
+        }
+    }
+}

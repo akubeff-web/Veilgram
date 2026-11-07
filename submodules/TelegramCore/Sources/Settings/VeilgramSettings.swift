@@ -123,6 +123,58 @@ public enum VeilgramSettings {
         self.notifyChanged()
     }
 
+    private static let hiddenChatsKey = keyPrefix + "hiddenChats"
+    private static let hiddenChatsCache = Atomic<Set<Int64>?>(value: nil)
+    private static let hiddenChatsRevealedValue = Atomic<Bool>(value: false)
+
+    public struct HiddenChatsState: Equatable {
+        public let hidden: Set<Int64>
+        public let isRevealed: Bool
+    }
+
+    /// Chats left out of the chat list until revealed (for this launch) from the Chats tab menu.
+    public static var hiddenChats: Set<Int64> {
+        if let cached = hiddenChatsCache.with({ $0 }) {
+            return cached
+        }
+        let value = Set((UserDefaults.standard.array(forKey: hiddenChatsKey) as? [Int64]) ?? [])
+        let _ = hiddenChatsCache.swap(value)
+        return value
+    }
+
+    public static var hiddenChatsState: HiddenChatsState {
+        return HiddenChatsState(hidden: hiddenChats, isRevealed: hiddenChatsRevealed)
+    }
+
+    public static var hiddenChatsRevealed: Bool {
+        return hiddenChatsRevealedValue.with { $0 }
+    }
+
+    public static func setHiddenChatsRevealed(_ value: Bool) {
+        let _ = hiddenChatsRevealedValue.swap(value)
+        self.notifyChanged()
+    }
+
+    public static func isChatHidden(_ peerId: PeerId) -> Bool {
+        return !hiddenChatsRevealed && hiddenChats.contains(peerId.toInt64())
+    }
+
+    public static func isChatInHiddenList(_ peerId: PeerId) -> Bool {
+        return hiddenChats.contains(peerId.toInt64())
+    }
+
+    public static func setChatHidden(_ peerId: PeerId, _ isHidden: Bool) {
+        var value = hiddenChats
+        if isHidden {
+            value.insert(peerId.toInt64())
+        } else {
+            value.remove(peerId.toInt64())
+        }
+        UserDefaults.standard.set(Array(value), forKey: hiddenChatsKey)
+        let _ = hiddenChatsCache.swap(value)
+        self.notifyChanged()
+    }
+
     public static func ghostRead(for peerId: PeerId) -> Bool {
         return ghostRead && !isGhostException(peerId)
     }

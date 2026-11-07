@@ -6144,6 +6144,13 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
                         })))
                         
                         let veilgramStrings = strongSelf.presentationData.strings
+                        let isHidden = VeilgramSettings.isChatInHiddenList(peer.id)
+                        items.append(.action(ContextMenuActionItem(text: isHidden ? veilgramLocalized(veilgramStrings, "Veilgram.UnhideChat", veilgramStrings.Veilgram_UnhideChat) : veilgramLocalized(veilgramStrings, "Veilgram.HideChat", veilgramStrings.Veilgram_HideChat), icon: { theme in
+                            return veilgramCachedIcon(isHidden ? .eye : .eyeOff, size: CGSize(width: 24.0, height: 24.0), color: theme.actionSheet.primaryTextColor)
+                        }, action: { _, f in
+                            f(.dismissWithoutContent)
+                            VeilgramSettings.setChatHidden(peer.id, !isHidden)
+                        })))
                         if VeilgramSettings.value(.ghost) {
                             let isException = VeilgramSettings.isGhostException(peer.id)
                             let title = isException ? veilgramLocalized(veilgramStrings, "Veilgram.GhostExceptionRemove", veilgramStrings.Veilgram_GhostExceptionRemove) : veilgramLocalized(veilgramStrings, "Veilgram.GhostExceptionAdd", veilgramStrings.Veilgram_GhostExceptionAdd)

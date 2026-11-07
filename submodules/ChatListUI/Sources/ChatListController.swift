@@ -5,6 +5,7 @@ import SwiftSignalKit
 import AsyncDisplayKit
 import Display
 import TelegramCore
+import LocalAuth
 import TelegramPresentationData
 import TelegramUIPreferences
 import TelegramBaseController
@@ -6360,6 +6361,28 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
                 }
                 let _ = veilgramReadAllChats(account: strongSelf.context.account).startStandalone()
             })))
+            
+            // Veilgram: hidden chats are revealed for this launch after Face ID or the passcode.
+            if !VeilgramSettings.hiddenChats.isEmpty {
+                let isRevealed = VeilgramSettings.hiddenChatsRevealed
+                let veilgramStrings = strongSelf.presentationData.strings
+                let title = isRevealed ? veilgramLocalized(veilgramStrings, "Veilgram.HideHiddenChats", veilgramStrings.Veilgram_HideHiddenChats) : veilgramLocalized(veilgramStrings, "Veilgram.ShowHiddenChats", veilgramStrings.Veilgram_ShowHiddenChats)
+                items.append(.action(ContextMenuActionItem(text: title, icon: { theme in
+                    return veilgramCachedIcon(isRevealed ? .eyeOff : .eye, size: CGSize(width: 24.0, height: 24.0), color: theme.contextMenu.primaryColor)
+                }, action: { _, f in
+                    f(.dismissWithoutContent)
+                    if isRevealed {
+                        VeilgramSettings.setHiddenChatsRevealed(false)
+                    } else {
+                        let _ = (LocalAuth.veilgramAuthenticate(reason: title)
+                        |> deliverOnMainQueue).startStandalone(next: { success in
+                            if success {
+                                VeilgramSettings.setHiddenChatsRevealed(true)
+                            }
+                        })
+                    }
+                })))
+            }
             
             if strongSelf.chatListDisplayNode.effectiveContainerNode.currentItemNode.chatListFilter != nil {
                 items.append(.separator)

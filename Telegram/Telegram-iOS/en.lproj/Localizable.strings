@@ -17335,3 +17335,7 @@ Error: %8$@";
 "Veilgram.ExportFile" = "File";
 "Veilgram.ExportOther" = "Media";
 "Veilgram.LocalTranscription" = "Transcribe Voice on Device";
+"Veilgram.HideChat" = "Hide Chat";
+"Veilgram.UnhideChat" = "Stop Hiding Chat";
+"Veilgram.ShowHiddenChats" = "Show Hidden Chats";
+"Veilgram.HideHiddenChats" = "Hide Hidden Chats";

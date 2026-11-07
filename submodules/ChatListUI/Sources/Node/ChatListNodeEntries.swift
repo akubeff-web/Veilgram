@@ -683,6 +683,10 @@ func chatListNodeEntriesForView(view: EngineChatList, state: ChatListNodeState, 
         if let savedMessagesPeer = savedMessagesPeer, let peerId = peerId, savedMessagesPeer.id == peerId || foundPeerIds.contains(peerId) {
             continue loop
         }
+        if threadId == nil, let peerId, VeilgramSettings.isChatHidden(peerId) {
+            // Veilgram: hidden chats stay out of the list until they are revealed.
+            continue loop
+        }
         if let peerId = peerId, state.pendingRemovalItemIds.contains(ChatListNodeState.ItemId(peerId: peerId, threadId: threadId)) {
             continue loop
         }
