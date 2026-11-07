@@ -1,8 +1,8 @@
 import Foundation
 
 // Veilgram strings. English comes from Localizable.strings (the generated `Veilgram_*` getters).
-// Telegram's server language packs do not have these keys, so Russian is kept here and used when the
-// app language is Russian and the language pack does not translate the key itself.
+// Telegram's server language packs do not have these keys, so Russian is kept here and shown in
+// every app language unless the language pack translates the key itself.
 private let veilgramRussianStrings: [String: String] = [
     "Veilgram.Title": "Veilgram",
     "Veilgram.OpenTelegram": "Открыть Telegram",
@@ -78,7 +78,9 @@ private let veilgramRussianStrings: [String: String] = [
 ]
 
 public func veilgramLocalized(_ strings: PresentationStrings, _ key: String, _ value: String) -> String {
-    if strings.primaryComponent.dict[key] == nil, strings.primaryComponent.languageCode.lowercased().hasPrefix("ru"), let russian = veilgramRussianStrings[key] {
+    // Veilgram's own options read in Russian whatever the app language, unless a language pack
+    // translates the key itself.
+    if strings.primaryComponent.dict[key] == nil, let russian = veilgramRussianStrings[key] {
         return russian
     }
     return value

@@ -6350,6 +6350,17 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
                 })
             })))
             
+            // Veilgram: read every chat from the Chats tab; in ghost mode the receipts are sent too.
+            items.append(.action(ContextMenuActionItem(text: strongSelf.presentationData.strings.ChatList_ReadAll, icon: { theme in
+                return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/ReadAll"), color: theme.contextMenu.primaryColor)
+            }, action: { _, f in
+                f(.dismissWithoutContent)
+                guard let strongSelf = self else {
+                    return
+                }
+                let _ = veilgramReadAllChats(account: strongSelf.context.account).startStandalone()
+            })))
+            
             if strongSelf.chatListDisplayNode.effectiveContainerNode.currentItemNode.chatListFilter != nil {
                 items.append(.separator)
                 

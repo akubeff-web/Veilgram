@@ -48,6 +48,26 @@ func veilgramMessageCounts(context: AccountContext, peer: EnginePeer) -> Signal<
         participants = .single([])
     }
 
+    if case .user = peer, peer.id != context.account.peerId {
+        // A private chat: the server answers a search by the other side's id unreliably, so their
+        // count is the chat's total less the account's own.
+        let total = context.engine.messages.getSearchMessageCount(location: .peer(peerId: peer.id, fromId: nil, tags: nil, reactions: nil, threadId: nil, minDate: nil, maxDate: nil), query: "")
+        let own = context.engine.messages.getSearchMessageCount(location: .peer(peerId: peer.id, fromId: context.account.peerId, tags: nil, reactions: nil, threadId: nil, minDate: nil, maxDate: nil), query: "")
+        return combineLatest(participants, total, own)
+        |> map { peers, total, own -> [(peer: EnginePeer, count: Int)] in
+            var result: [(peer: EnginePeer, count: Int)] = []
+            let ownCount = own ?? 0
+            let otherCount = max(0, (total ?? 0) - ownCount)
+            for participant in peers {
+                let count = participant.id == context.account.peerId ? ownCount : otherCount
+                if count > 0 {
+                    result.append((participant, count))
+                }
+            }
+            return result.sorted(by: { $0.count > $1.count })
+        }
+    }
+
     return participants
     |> mapToSignal { peers -> Signal<[(peer: EnginePeer, count: Int)], NoError> in
         // One request after another: a burst of searches gets flood-limited.
