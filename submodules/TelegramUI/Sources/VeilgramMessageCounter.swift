@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 import SwiftSignalKit
 import TelegramCore
 import AccountContext
@@ -144,5 +145,74 @@ extension ChatControllerImpl {
                 }), in: .current)
             }))
         })]), in: .window(.root))
+    }
+}
+
+extension ChatControllerImpl {
+    /// Saves the chat's history as a text file and offers it through the share sheet.
+    func veilgramExportChat(peer: EnginePeer) {
+        let presentationData = self.presentationData
+        let strings = presentationData.strings
+        let disposable = MetaDisposable()
+        let progress = OverlayStatusController(theme: presentationData.theme, type: .loading(cancelled: {
+            disposable.dispose()
+        }))
+        self.present(progress, in: .window(.root))
+        let title = peer.compactDisplayTitle
+        disposable.set((veilgramExportChat(account: self.context.account, peerId: peer.id)
+        |> deliverOnMainQueue).start(next: { [weak self, weak progress] _, messages in
+            guard let messages else {
+                return
+            }
+            progress?.dismiss()
+            guard let self else {
+                return
+            }
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd.MM.yyyy HH:mm:ss"
+            func mediaLabel(_ media: VeilgramExportedMessage.Media) -> String? {
+                let key: String
+                switch media {
+                case .none:
+                    return nil
+                case .photo:
+                    key = "Veilgram.ExportPhoto"
+                case .video:
+                    key = "Veilgram.ExportVideo"
+                case .videoMessage:
+                    key = "Veilgram.ExportVideoMessage"
+                case .voice:
+                    key = "Veilgram.ExportVoice"
+                case .audio:
+                    key = "Veilgram.ExportAudio"
+                case .sticker:
+                    key = "Veilgram.ExportSticker"
+                case .file:
+                    key = "Veilgram.ExportFile"
+                case .other:
+                    key = "Veilgram.ExportOther"
+                }
+                return "[" + veilgramLocalized(strings, key, key) + "]"
+            }
+            var text = "\(title)\n\(messages.count)\n\n"
+            for message in messages {
+                var body = message.text
+                if let label = mediaLabel(message.media) {
+                    body = body.isEmpty ? label : "\(label) \(body)"
+                }
+                text += "[\(formatter.string(from: Date(timeIntervalSince1970: Double(message.date))))] \(message.author): \(body)\n"
+            }
+            let safeTitle = title.components(separatedBy: CharacterSet(charactersIn: "/\\:?%*|\"<>")).joined(separator: "_")
+            let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(safeTitle.isEmpty ? "chat" : safeTitle).txt")
+            do {
+                try text.write(to: url, atomically: true, encoding: .utf8)
+            } catch {
+                return
+            }
+            let activityController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+            activityController.popoverPresentationController?.sourceView = self.view
+            activityController.popoverPresentationController?.sourceRect = CGRect(origin: CGPoint(x: self.view.bounds.midX, y: self.view.bounds.midY), size: CGSize())
+            self.view.window?.rootViewController?.present(activityController, animated: true, completion: nil)
+        }))
     }
 }

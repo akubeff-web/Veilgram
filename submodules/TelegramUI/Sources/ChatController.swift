@@ -6166,6 +6166,12 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
                             f(.dismissWithoutContent)
                             self?.veilgramOpenMessageCounter(peer: EnginePeer(peer))
                         })))
+                        items.append(.action(ContextMenuActionItem(text: veilgramLocalized(veilgramStrings, "Veilgram.ExportChat", veilgramStrings.Veilgram_ExportChat), icon: { theme in
+                            return veilgramCachedIcon(.download, size: CGSize(width: 24.0, height: 24.0), color: theme.actionSheet.primaryTextColor)
+                        }, action: { _, f in
+                            f(.dismissWithoutContent)
+                            self?.veilgramExportChat(peer: EnginePeer(peer))
+                        })))
                         items.append(.action(ContextMenuActionItem(text: veilgramLocalized(veilgramStrings, "Veilgram.DeleteMyMessages", veilgramStrings.Veilgram_DeleteMyMessages), textColor: .destructive, icon: { theme in
                             return veilgramCachedIcon(.trash, size: CGSize(width: 24.0, height: 24.0), color: theme.contextMenu.destructiveColor)
                         }, action: { _, f in
