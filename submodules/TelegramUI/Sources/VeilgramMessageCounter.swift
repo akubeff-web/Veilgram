@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import Display
 import SwiftSignalKit
 import TelegramCore
 import AccountContext
@@ -131,7 +132,7 @@ extension ChatControllerImpl {
             }))
             self.present(progress, in: .window(.root))
             var deletedCount = 0
-            disposable.set((veilgramDeleteAllOwnMessages(account: self.context.account, peerId: peerId)
+            disposable.set((TelegramCore.veilgramDeleteAllOwnMessages(account: self.context.account, peerId: peerId)
             |> deliverOnMainQueue).start(next: { count in
                 deletedCount = count
             }, completed: { [weak self, weak progress] in
@@ -159,7 +160,7 @@ extension ChatControllerImpl {
         }))
         self.present(progress, in: .window(.root))
         let title = peer.compactDisplayTitle
-        disposable.set((veilgramExportChat(account: self.context.account, peerId: peer.id)
+        disposable.set((TelegramCore.veilgramExportChat(account: self.context.account, peerId: peer.id)
         |> deliverOnMainQueue).start(next: { [weak self, weak progress] _, messages in
             guard let messages else {
                 return
