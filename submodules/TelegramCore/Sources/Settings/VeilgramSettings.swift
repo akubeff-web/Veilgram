@@ -39,6 +39,7 @@ public enum VeilgramSettings {
         case fastTransfers
         case preloadMedia
         case preloadMediaGroups
+        case localTranscription
 
         public var defaultValue: Bool {
             switch self {
@@ -180,6 +181,10 @@ public enum VeilgramSettings {
 
     public static var keepViewOnce: Bool {
         return value(.keepViewOnce)
+    }
+
+    public static var localTranscription: Bool {
+        return value(.localTranscription)
     }
 
     public static var preloadMedia: Bool {

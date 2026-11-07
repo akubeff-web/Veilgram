@@ -110,6 +110,10 @@ public func transcribeAudio(path: String, appLocale: String) -> Signal<LocallyTr
     if !locales.contains(Locale.current.identifier) {
         locales.append(Locale.current.identifier)
     }
+    // Veilgram: Russian is also tried, and the more confident result is kept.
+    if !Locale.current.identifier.hasPrefix("ru") {
+        locales.append("ru-RU")
+    }
     if locales.isEmpty {
         locales.append("en-US")
     }

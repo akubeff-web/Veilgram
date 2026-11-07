@@ -98,6 +98,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case hideGifts(Bool)
 
     case otherHeader
+    case localTranscription(Bool)
     case fastTransfers(Bool)
     case fastTransfersFooter
 
@@ -134,7 +135,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.premium.rawValue
         case .tabsHeader, .tabContacts, .tabCalls, .tabNews, .hideStories:
             return VeilgramSettingsSection.tabs.rawValue
-        case .otherHeader, .fastTransfers, .fastTransfersFooter:
+        case .otherHeader, .localTranscription, .fastTransfers, .fastTransfersFooter:
             return VeilgramSettingsSection.transfers.rawValue
         case .loginButton, .loginButtonFooter:
             return VeilgramSettingsSection.login.rawValue
@@ -243,14 +244,16 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 48
         case .otherHeader:
             return 49
-        case .fastTransfers:
+        case .localTranscription:
             return 50
-        case .fastTransfersFooter:
+        case .fastTransfers:
             return 51
-        case .loginButton:
+        case .fastTransfersFooter:
             return 52
-        case .loginButtonFooter:
+        case .loginButton:
             return 53
+        case .loginButtonFooter:
+            return 54
         }
     }
 
@@ -366,6 +369,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.premiumItem, "Veilgram.HidePremiumOffers", strings.Veilgram_HidePremiumOffers, value, { arguments.update(.hidePremiumOffers, $0) })
         case let .hideGifts(value):
             return switchItem(VeilgramSettingsIcons.premiumItem, "Veilgram.HideGifts", strings.Veilgram_HideGifts, value, { arguments.update(.hideGifts, $0) })
+        case let .localTranscription(value):
+            return switchItem(VeilgramSettingsIcons.localTranscription, "Veilgram.LocalTranscription", strings.Veilgram_LocalTranscription, value, { arguments.update(.localTranscription, $0) })
         case let .fastTransfers(value):
             return switchItem(VeilgramSettingsIcons.fastTransfers, "Veilgram.FastTransfers", strings.Veilgram_FastTransfers, value, { arguments.update(.fastTransfers, $0) })
         case .fastTransfersFooter:
@@ -465,6 +470,7 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     entries.append(.hideStories(VeilgramSettings.value(.hideStories)))
 
     entries.append(.otherHeader)
+    entries.append(.localTranscription(VeilgramSettings.value(.localTranscription)))
     entries.append(.fastTransfers(VeilgramSettings.value(.fastTransfers)))
     entries.append(.fastTransfersFooter)
 
