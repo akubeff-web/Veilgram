@@ -9,18 +9,15 @@ import ItemListUI
 import PresentationDataUtils
 import AccountContext
 import LocalizedPeerData
-import UndoUI
 
 private final class VeilgramSettingsControllerArguments {
     let update: (VeilgramSettings.Key, Bool) -> Void
     let updateShowCallsTab: (Bool) -> Void
     let openDeletedLog: () -> Void
     let updateKeywords: (String) -> Void
-    let readAllChats: () -> Void
     let updateAutoReplyText: (String) -> Void
 
-    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void, readAllChats: @escaping () -> Void, updateAutoReplyText: @escaping (String) -> Void) {
-        self.readAllChats = readAllChats
+    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void, updateAutoReplyText: @escaping (String) -> Void) {
         self.updateAutoReplyText = updateAutoReplyText
         self.update = update
         self.updateShowCallsTab = updateShowCallsTab
@@ -31,18 +28,17 @@ private final class VeilgramSettingsControllerArguments {
 
 private enum VeilgramSettingsSection: Int32 {
     case ghost
-    case readAll
     case presence
     case deleted
-    case archive
-    case sending
-    case autoReply
-    case filter
     case protected
+    case filter
+    case archive
+    case autoReply
+    case sending
     case screen
     case premium
-    case transfers
     case tabs
+    case transfers
     case login
 }
 
@@ -54,17 +50,17 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case ghostStories(Bool)
     case ghostFooter
 
-    case readAllChats
-
     case alwaysOnline(Bool)
     case alwaysOnlineFooter
 
+    case deletedHeader
     case keepDeleted(Bool)
     case deletedIcon(Bool)
     case editHistory(Bool)
     case deletedLog
     case keepDeletedFooter
 
+    case newChatsHeader
     case autoArchive(Bool)
     case autoArchiveGroups(Bool)
     case autoArchiveFooter
@@ -77,15 +73,18 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case autoReplyContacts(Bool)
     case autoReplyFooter
 
+    case filterHeader
     case hideBlocked(Bool)
     case keywordFilter(Bool)
     case keywords(String)
     case filterFooter
 
+    case protectedHeader
     case unlockProtected(Bool)
     case keepViewOnce(Bool)
     case protectedFooter
 
+    case screenHeader
     case streamerMode(Bool)
     case hidePhone(Bool)
     case screenFooter
@@ -96,6 +95,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case hidePremiumOffers(Bool)
     case hideGifts(Bool)
 
+    case otherHeader
     case fastTransfers(Bool)
     case fastTransfersFooter
 
@@ -112,30 +112,28 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
         switch self {
         case .ghost, .ghostOnline, .ghostTyping, .ghostRead, .ghostStories, .ghostFooter:
             return VeilgramSettingsSection.ghost.rawValue
-        case .readAllChats:
-            return VeilgramSettingsSection.readAll.rawValue
         case .alwaysOnline, .alwaysOnlineFooter:
             return VeilgramSettingsSection.presence.rawValue
-        case .keepDeleted, .deletedIcon, .editHistory, .deletedLog, .keepDeletedFooter:
+        case .deletedHeader, .keepDeleted, .deletedIcon, .editHistory, .deletedLog, .keepDeletedFooter:
             return VeilgramSettingsSection.deleted.rawValue
-        case .autoArchive, .autoArchiveGroups, .autoArchiveFooter:
+        case .protectedHeader, .unlockProtected, .keepViewOnce, .protectedFooter:
+            return VeilgramSettingsSection.protected.rawValue
+        case .filterHeader, .hideBlocked, .keywordFilter, .keywords, .filterFooter:
+            return VeilgramSettingsSection.filter.rawValue
+        case .newChatsHeader, .autoArchive, .autoArchiveGroups, .autoArchiveFooter:
             return VeilgramSettingsSection.archive.rawValue
-        case .confirmSend, .confirmSendFooter:
-            return VeilgramSettingsSection.sending.rawValue
         case .autoReply, .autoReplyText, .autoReplyContacts, .autoReplyFooter:
             return VeilgramSettingsSection.autoReply.rawValue
-        case .hideBlocked, .keywordFilter, .keywords, .filterFooter:
-            return VeilgramSettingsSection.filter.rawValue
-        case .unlockProtected, .keepViewOnce, .protectedFooter:
-            return VeilgramSettingsSection.protected.rawValue
-        case .streamerMode, .hidePhone, .screenFooter:
+        case .confirmSend, .confirmSendFooter:
+            return VeilgramSettingsSection.sending.rawValue
+        case .screenHeader, .streamerMode, .hidePhone, .screenFooter:
             return VeilgramSettingsSection.screen.rawValue
         case .premiumHeader, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts:
             return VeilgramSettingsSection.premium.rawValue
-        case .fastTransfers, .fastTransfersFooter:
-            return VeilgramSettingsSection.transfers.rawValue
         case .tabsHeader, .tabContacts, .tabCalls, .tabNews, .hideStories:
             return VeilgramSettingsSection.tabs.rawValue
+        case .otherHeader, .fastTransfers, .fastTransfersFooter:
+            return VeilgramSettingsSection.transfers.rawValue
         case .loginButton, .loginButtonFooter:
             return VeilgramSettingsSection.login.rawValue
         }
@@ -155,31 +153,47 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 4
         case .ghostFooter:
             return 5
-        case .readAllChats:
-            return 6
         case .alwaysOnline:
-            return 7
+            return 6
         case .alwaysOnlineFooter:
+            return 7
+        case .deletedHeader:
             return 8
         case .keepDeleted:
-            return 10
+            return 9
         case .deletedIcon:
-            return 11
+            return 10
         case .editHistory:
-            return 12
+            return 11
         case .deletedLog:
-            return 13
+            return 12
         case .keepDeletedFooter:
+            return 13
+        case .protectedHeader:
             return 14
-        case .autoArchive:
+        case .unlockProtected:
+            return 15
+        case .keepViewOnce:
+            return 16
+        case .protectedFooter:
+            return 17
+        case .filterHeader:
+            return 18
+        case .hideBlocked:
+            return 19
+        case .keywordFilter:
             return 20
-        case .autoArchiveGroups:
+        case .keywords:
             return 21
-        case .autoArchiveFooter:
+        case .filterFooter:
             return 22
-        case .confirmSend:
+        case .newChatsHeader:
+            return 23
+        case .autoArchive:
+            return 24
+        case .autoArchiveGroups:
             return 25
-        case .confirmSendFooter:
+        case .autoArchiveFooter:
             return 26
         case .autoReply:
             return 27
@@ -189,54 +203,48 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 29
         case .autoReplyFooter:
             return 30
-        case .hideBlocked:
+        case .confirmSend:
             return 31
-        case .keywordFilter:
+        case .confirmSendFooter:
             return 32
-        case .keywords:
+        case .screenHeader:
             return 33
-        case .filterFooter:
-            return 34
-        case .unlockProtected:
-            return 35
-        case .keepViewOnce:
-            return 36
-        case .protectedFooter:
-            return 37
         case .streamerMode:
-            return 38
+            return 34
         case .hidePhone:
-            return 39
+            return 35
         case .screenFooter:
-            return 40
+            return 36
         case .premiumHeader:
-            return 41
+            return 37
         case .hidePremiumBadges:
-            return 42
+            return 38
         case .hidePremiumBanners:
-            return 43
+            return 39
         case .hidePremiumOffers:
-            return 44
+            return 40
         case .hideGifts:
-            return 45
-        case .fastTransfers:
-            return 46
-        case .fastTransfersFooter:
-            return 47
+            return 41
         case .tabsHeader:
-            return 50
+            return 42
         case .tabContacts:
-            return 51
+            return 43
         case .tabCalls:
-            return 52
+            return 44
         case .tabNews:
-            return 53
+            return 45
         case .hideStories:
-            return 54
+            return 46
+        case .otherHeader:
+            return 47
+        case .fastTransfers:
+            return 48
+        case .fastTransfersFooter:
+            return 49
         case .loginButton:
-            return 60
+            return 50
         case .loginButtonFooter:
-            return 61
+            return 51
         }
     }
 
@@ -268,10 +276,18 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.ghostStories, "Veilgram.GhostStories", strings.Veilgram_GhostStories, value, { arguments.update(.ghostStories, $0) })
         case .ghostFooter:
             return footerItem("Veilgram.GhostInfo", strings.Veilgram_GhostInfo)
-        case .readAllChats:
-            return ItemListActionItem(presentationData: presentationData, systemStyle: .glass, title: veilgramLocalized(strings, "Veilgram.ReadAllChats", strings.Veilgram_ReadAllChats), kind: .generic, alignment: .natural, sectionId: self.section, style: .blocks, action: {
-                arguments.readAllChats()
-            })
+        case .deletedHeader:
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.DeletedHeader", strings.Veilgram_DeletedHeader).uppercased(), sectionId: self.section)
+        case .protectedHeader:
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.ProtectedHeader", strings.Veilgram_ProtectedHeader).uppercased(), sectionId: self.section)
+        case .filterHeader:
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.FilterHeader", strings.Veilgram_FilterHeader).uppercased(), sectionId: self.section)
+        case .newChatsHeader:
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.NewChatsHeader", strings.Veilgram_NewChatsHeader).uppercased(), sectionId: self.section)
+        case .screenHeader:
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.ScreenHeader", strings.Veilgram_ScreenHeader).uppercased(), sectionId: self.section)
+        case .otherHeader:
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.OtherHeader", strings.Veilgram_OtherHeader).uppercased(), sectionId: self.section)
         case let .alwaysOnline(value):
             return switchItem(VeilgramSettingsIcons.alwaysOnline, "Veilgram.AlwaysOnline", strings.Veilgram_AlwaysOnline, value, { arguments.update(.alwaysOnline, $0) })
         case .alwaysOnlineFooter:
@@ -375,11 +391,10 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     }
     entries.append(.ghostFooter)
 
-    entries.append(.readAllChats)
-
     entries.append(.alwaysOnline(VeilgramSettings.value(.alwaysOnline)))
     entries.append(.alwaysOnlineFooter)
 
+    entries.append(.deletedHeader)
     entries.append(.keepDeleted(VeilgramSettings.value(.keepDeleted)))
     if VeilgramSettings.value(.keepDeleted) {
         entries.append(.deletedIcon(VeilgramSettings.value(.deletedIcon)))
@@ -388,14 +403,25 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     entries.append(.deletedLog)
     entries.append(.keepDeletedFooter)
 
+    entries.append(.protectedHeader)
+    entries.append(.unlockProtected(VeilgramSettings.value(.unlockProtected)))
+    entries.append(.keepViewOnce(VeilgramSettings.value(.keepViewOnce)))
+    entries.append(.protectedFooter)
+
+    entries.append(.filterHeader)
+    entries.append(.hideBlocked(VeilgramSettings.value(.hideBlocked)))
+    entries.append(.keywordFilter(VeilgramSettings.value(.keywordFilter)))
+    if VeilgramSettings.value(.keywordFilter) {
+        entries.append(.keywords(VeilgramSettings.filterKeywordsText))
+    }
+    entries.append(.filterFooter)
+
+    entries.append(.newChatsHeader)
     entries.append(.autoArchive(VeilgramSettings.value(.autoArchive)))
     if VeilgramSettings.value(.autoArchive) {
         entries.append(.autoArchiveGroups(VeilgramSettings.value(.autoArchiveGroups)))
     }
     entries.append(.autoArchiveFooter)
-
-    entries.append(.confirmSend(VeilgramSettings.value(.confirmSend)))
-    entries.append(.confirmSendFooter)
 
     entries.append(.autoReply(VeilgramSettings.value(.autoReply)))
     if VeilgramSettings.value(.autoReply) {
@@ -404,17 +430,10 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     }
     entries.append(.autoReplyFooter)
 
-    entries.append(.hideBlocked(VeilgramSettings.value(.hideBlocked)))
-    entries.append(.keywordFilter(VeilgramSettings.value(.keywordFilter)))
-    if VeilgramSettings.value(.keywordFilter) {
-        entries.append(.keywords(VeilgramSettings.filterKeywordsText))
-    }
-    entries.append(.filterFooter)
+    entries.append(.confirmSend(VeilgramSettings.value(.confirmSend)))
+    entries.append(.confirmSendFooter)
 
-    entries.append(.unlockProtected(VeilgramSettings.value(.unlockProtected)))
-    entries.append(.keepViewOnce(VeilgramSettings.value(.keepViewOnce)))
-    entries.append(.protectedFooter)
-
+    entries.append(.screenHeader)
     entries.append(.streamerMode(VeilgramSettings.value(.streamerMode)))
     entries.append(.hidePhone(VeilgramSettings.value(.hidePhone)))
     entries.append(.screenFooter)
@@ -425,14 +444,15 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     entries.append(.hidePremiumOffers(VeilgramSettings.value(.hidePremiumOffers)))
     entries.append(.hideGifts(VeilgramSettings.value(.hideGifts)))
 
-    entries.append(.fastTransfers(VeilgramSettings.value(.fastTransfers)))
-    entries.append(.fastTransfersFooter)
-
     entries.append(.tabsHeader)
     entries.append(.tabContacts(VeilgramSettings.value(.tabContacts)))
     entries.append(.tabCalls(showCallsTab))
     entries.append(.tabNews(VeilgramSettings.value(.tabNews)))
     entries.append(.hideStories(VeilgramSettings.value(.hideStories)))
+
+    entries.append(.otherHeader)
+    entries.append(.fastTransfers(VeilgramSettings.value(.fastTransfers)))
+    entries.append(.fastTransfersFooter)
 
     entries.append(.loginButton(VeilgramSettings.value(.loginOpenTelegramButton)))
     entries.append(.loginButtonFooter)
@@ -442,7 +462,6 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
 
 public func veilgramSettingsController(context: AccountContext) -> ViewController {
     var pushImpl: ((ViewController) -> Void)?
-    var presentImpl: ((ViewController) -> Void)?
     let arguments = VeilgramSettingsControllerArguments(
         update: { key, value in
             VeilgramSettings.set(key, value)
@@ -489,15 +508,6 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
         updateKeywords: { text in
             VeilgramSettings.setFilterKeywordsText(text)
         },
-        readAllChats: {
-            let _ = (veilgramReadAllChats(account: context.account)
-            |> deliverOnMainQueue).start(completed: {
-                let presentationData = context.sharedContext.currentPresentationData.with { $0 }
-                presentImpl?(UndoOverlayController(presentationData: presentationData, content: .succeed(text: veilgramLocalized(presentationData.strings, "Veilgram.ReadAllChatsDone", presentationData.strings.Veilgram_ReadAllChatsDone), timeout: nil, customUndoText: nil), elevatedLayout: false, action: { _ in
-                    return false
-                }))
-            })
-        },
         updateAutoReplyText: { text in
             VeilgramSettings.setAutoReplyText(text)
         }
@@ -527,9 +537,6 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
     let controller = ItemListController(context: context, state: signal)
     pushImpl = { [weak controller] c in
         controller?.push(c)
-    }
-    presentImpl = { [weak controller] c in
-        controller?.present(c, in: .current)
     }
     return controller
 }
