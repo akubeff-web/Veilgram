@@ -61,12 +61,14 @@ jobs:
 
       # GitHub's release downloads time out now and then (504). Fetch the archive Bazel needs first,
       # with retries, and let Bazel take it from a local directory.
+      # The list is every registry module's source archive (MODULE.bazel.lock's source.json files);
+      # a file that still fails is left for Bazel to try itself.
       - name: Prefetch dependencies
         run: |
           mkdir -p "$HOME/bazel-distdir"
-          curl -fL --retry 10 --retry-all-errors --retry-delay 20 \
-            -o "$HOME/bazel-distdir/rules_rust-0.74.0.tar.gz" \
-            https://github.com/bazelbuild/rules_rust/releases/download/0.74.0/rules_rust-0.74.0.tar.gz
+          cd "$HOME/bazel-distdir"
+          xargs -P 8 -n 1 sh -c 'curl -fsSL --retry 10 --retry-all-errors --retry-delay 15 -o "$(basename "$0")" "$0" || echo "Prefetch failed: $0"' < "$GITHUB_WORKSPACE/build-system/veilgram/prefetch-urls.txt"
+          ls -la
           echo "common --distdir=$HOME/bazel-distdir" >> "$HOME/.bazelrc"
 
       - name: Build
