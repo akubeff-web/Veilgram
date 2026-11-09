@@ -17368,5 +17368,6 @@ Error: %8$@";
 "Veilgram.ReadOnReply" = "Read Chat When Replying";
 "Veilgram.GhostOfflineSend" = "Send Without Going Online";
 "Veilgram.DeletedMark" = "Deleted Mark";
+"Veilgram.KeepKickedChats" = "Keep Chats After a Ban";
 "Veilgram.EditedMark" = "Edited Mark";
 "Veilgram.MarkPlaceholderIcon" = "trash icon";

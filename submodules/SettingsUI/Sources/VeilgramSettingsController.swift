@@ -73,6 +73,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case deletedMark(String)
     case editHistory(Bool)
     case editedMark(String)
+    case keepKickedChats(Bool)
     case preloadMedia(Bool)
     case preloadMediaGroups(Bool)
     case deletedLog
@@ -147,7 +148,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.ghost.rawValue
         case .alwaysOnline, .alwaysOnlineFooter:
             return VeilgramSettingsSection.presence.rawValue
-        case .deletedHeader, .keepDeleted, .deletedIcon, .deletedMark, .editHistory, .editedMark, .preloadMedia, .preloadMediaGroups, .deletedLog, .keepDeletedFooter:
+        case .deletedHeader, .keepDeleted, .deletedIcon, .deletedMark, .editHistory, .editedMark, .keepKickedChats, .preloadMedia, .preloadMediaGroups, .deletedLog, .keepDeletedFooter:
             return VeilgramSettingsSection.deleted.rawValue
         case .protectedHeader, .unlockProtected, .keepViewOnce, .protectedFooter:
             return VeilgramSettingsSection.protected.rawValue
@@ -210,118 +211,120 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 15
         case .editedMark:
             return 16
-        case .preloadMedia:
+        case .keepKickedChats:
             return 17
-        case .preloadMediaGroups:
+        case .preloadMedia:
             return 18
-        case .deletedLog:
+        case .preloadMediaGroups:
             return 19
-        case .keepDeletedFooter:
+        case .deletedLog:
             return 20
-        case .protectedHeader:
+        case .keepDeletedFooter:
             return 21
-        case .unlockProtected:
+        case .protectedHeader:
             return 22
-        case .keepViewOnce:
+        case .unlockProtected:
             return 23
-        case .protectedFooter:
+        case .keepViewOnce:
             return 24
-        case .filterHeader:
+        case .protectedFooter:
             return 25
-        case .hideBlocked:
+        case .filterHeader:
             return 26
-        case .keywordFilter:
+        case .hideBlocked:
             return 27
-        case .keywords:
+        case .keywordFilter:
             return 28
-        case .hideSponsored:
+        case .keywords:
             return 29
-        case .filterFooter:
+        case .hideSponsored:
             return 30
-        case .newChatsHeader:
+        case .filterFooter:
             return 31
-        case .autoArchive:
+        case .newChatsHeader:
             return 32
-        case .autoArchiveGroups:
+        case .autoArchive:
             return 33
-        case .autoArchiveFooter:
+        case .autoArchiveGroups:
             return 34
-        case .autoReply:
+        case .autoArchiveFooter:
             return 35
-        case .autoReplyText:
+        case .autoReply:
             return 36
-        case .autoReplyContacts:
+        case .autoReplyText:
             return 37
-        case .autoReplyFooter:
+        case .autoReplyContacts:
             return 38
-        case .confirmSend:
+        case .autoReplyFooter:
             return 39
-        case .confirmLinks:
+        case .confirmSend:
             return 40
-        case .confirmSendFooter:
+        case .confirmLinks:
             return 41
-        case .screenHeader:
+        case .confirmSendFooter:
             return 42
-        case .streamerMode:
+        case .screenHeader:
             return 43
-        case .hidePhone:
+        case .streamerMode:
             return 44
-        case .hideUsername:
+        case .hidePhone:
             return 45
-        case .hideChatListTime:
+        case .hideUsername:
             return 46
-        case .hideChatListPreviews:
+        case .hideChatListTime:
             return 47
-        case .screenFooter:
+        case .hideChatListPreviews:
             return 48
-        case .bannerHeader:
+        case .screenFooter:
             return 49
-        case .bannerColor:
+        case .bannerHeader:
             return 50
-        case .bannerPhoto:
+        case .bannerColor:
             return 51
-        case .bannerVideo:
+        case .bannerPhoto:
             return 52
-        case .bannerRemove:
+        case .bannerVideo:
             return 53
-        case .bannerFooter:
+        case .bannerRemove:
             return 54
-        case .premiumHeader:
+        case .bannerFooter:
             return 55
-        case .hidePremiumBadges:
+        case .premiumHeader:
             return 56
-        case .hidePremiumBanners:
+        case .hidePremiumBadges:
             return 57
-        case .hidePremiumOffers:
+        case .hidePremiumBanners:
             return 58
-        case .hideGifts:
+        case .hidePremiumOffers:
             return 59
-        case .tabsHeader:
+        case .hideGifts:
             return 60
-        case .tabContacts:
+        case .tabsHeader:
             return 61
-        case .tabCalls:
+        case .tabContacts:
             return 62
-        case .tabNews:
+        case .tabCalls:
             return 63
-        case .hideStories:
+        case .tabNews:
             return 64
-        case .otherHeader:
+        case .hideStories:
             return 65
-        case .localTranscription:
+        case .otherHeader:
             return 66
-        case .localTranslation:
+        case .localTranscription:
             return 67
-        case .quietHours:
+        case .localTranslation:
             return 68
-        case .fastTransfers:
+        case .quietHours:
             return 69
-        case .fastTransfersFooter:
+        case .fastTransfers:
             return 70
-        case .loginButton:
+        case .fastTransfersFooter:
             return 71
-        case .loginButtonFooter:
+        case .loginButton:
             return 72
+        case .loginButtonFooter:
+            return 73
         }
     }
 
@@ -387,6 +390,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return ItemListSingleLineInputItem(presentationData: presentationData, systemStyle: .glass, title: NSAttributedString(string: veilgramLocalized(strings, "Veilgram.EditedMark", strings.Veilgram_EditedMark)), text: text, placeholder: strings.Conversation_MessageEditedLabel, type: .regular(capitalization: false, autocorrection: false), maxLength: 16, sectionId: self.section, textUpdated: { text in
                 arguments.updateEditedMark(text)
             }, action: {})
+        case let .keepKickedChats(value):
+            return switchItem(VeilgramSettingsIcons.keepDeleted, "Veilgram.KeepKickedChats", strings.Veilgram_KeepKickedChats, value, { arguments.update(.keepKickedChats, $0) })
         case let .preloadMedia(value):
             return switchItem(VeilgramSettingsIcons.preloadMedia, "Veilgram.PreloadMedia", strings.Veilgram_PreloadMedia, value, { arguments.update(.preloadMedia, $0) })
         case let .preloadMediaGroups(value):
@@ -542,6 +547,7 @@ private func veilgramSettingsEntries(showCallsTab: Bool, accountPeerId: EnginePe
     }
     entries.append(.editHistory(VeilgramSettings.value(.editHistory)))
     entries.append(.editedMark(VeilgramSettings.editedMarkText))
+    entries.append(.keepKickedChats(VeilgramSettings.value(.keepKickedChats)))
     entries.append(.preloadMedia(VeilgramSettings.value(.preloadMedia)))
     if VeilgramSettings.value(.preloadMedia) {
         entries.append(.preloadMediaGroups(VeilgramSettings.value(.preloadMediaGroups)))

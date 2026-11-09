@@ -49,6 +49,7 @@ public enum VeilgramSettings {
         case hideSponsored
         case readOnReply
         case ghostOfflineSend
+        case keepKickedChats
 
         public var defaultValue: Bool {
             switch self {
@@ -327,6 +328,10 @@ public enum VeilgramSettings {
         }
         UserDefaults.standard.set(Int(color), forKey: profileBannerColorKey)
         self.notifyChanged()
+    }
+
+    public static var keepKickedChats: Bool {
+        return value(.keepKickedChats)
     }
 
     public static var hideSponsored: Bool {

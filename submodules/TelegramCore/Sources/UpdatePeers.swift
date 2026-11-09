@@ -394,6 +394,9 @@ public func updatePeersCustom(transaction: Transaction, peers: [Peer], update: (
                         switch group.membership {
                             case .Member:
                                 updatePeerChatInclusionWithMinTimestamp(transaction: transaction, id: peerId, minTimestamp: group.creationDate, forceRootGroupIfNotExists: false, peer: group)
+                            case .Removed where VeilgramSettings.keepKickedChats:
+                                // Veilgram: a group the account was removed from stays in the list.
+                                break
                             default:
                                 transaction.updatePeerChatListInclusion(peerId, inclusion: .notIncluded)
                         }
@@ -411,6 +414,10 @@ public func updatePeersCustom(transaction: Transaction, peers: [Peer], update: (
                             transaction.updatePeerChatListInclusion(peerId, inclusion: .notIncluded)
                         case .kicked where channel.creationDate == 0:
                             transaction.updatePeerChatListInclusion(peerId, inclusion: .notIncluded)
+                        case .kicked where VeilgramSettings.keepKickedChats:
+                            // Veilgram: a channel or supergroup the account was banned from stays in
+                            // the list with the messages already stored.
+                            break
                         default:
                             transaction.updatePeerChatListInclusion(peerId, inclusion: .notIncluded)
                         }
