@@ -112,6 +112,9 @@ public func openUserGeneratedUrl(
         if case .proxy = parsedUrl {
             concealed = true
         }
+    } else if VeilgramSettings.confirmLinks {
+        // Veilgram: every link that leaves Telegram shows its full address and asks first.
+        concealed = true
     }
 
     if concealed && !skipConcealedAlert {

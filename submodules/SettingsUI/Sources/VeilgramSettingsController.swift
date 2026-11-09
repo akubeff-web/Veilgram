@@ -73,6 +73,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case autoArchiveFooter
 
     case confirmSend(Bool)
+    case confirmLinks(Bool)
     case confirmSendFooter
 
     case autoReply(Bool)
@@ -143,7 +144,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.archive.rawValue
         case .autoReply, .autoReplyText, .autoReplyContacts, .autoReplyFooter:
             return VeilgramSettingsSection.autoReply.rawValue
-        case .confirmSend, .confirmSendFooter:
+        case .confirmSend, .confirmLinks, .confirmSendFooter:
             return VeilgramSettingsSection.sending.rawValue
         case .screenHeader, .streamerMode, .hidePhone, .hideUsername, .hideChatListTime, .hideChatListPreviews, .screenFooter:
             return VeilgramSettingsSection.screen.rawValue
@@ -230,68 +231,70 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 32
         case .confirmSend:
             return 33
-        case .confirmSendFooter:
+        case .confirmLinks:
             return 34
-        case .screenHeader:
+        case .confirmSendFooter:
             return 35
-        case .streamerMode:
+        case .screenHeader:
             return 36
-        case .hidePhone:
+        case .streamerMode:
             return 37
-        case .hideUsername:
+        case .hidePhone:
             return 38
-        case .hideChatListTime:
+        case .hideUsername:
             return 39
-        case .hideChatListPreviews:
+        case .hideChatListTime:
             return 40
-        case .screenFooter:
+        case .hideChatListPreviews:
             return 41
-        case .bannerHeader:
+        case .screenFooter:
             return 42
-        case .bannerColor:
+        case .bannerHeader:
             return 43
-        case .bannerPhoto:
+        case .bannerColor:
             return 44
-        case .bannerVideo:
+        case .bannerPhoto:
             return 45
-        case .bannerRemove:
+        case .bannerVideo:
             return 46
-        case .bannerFooter:
+        case .bannerRemove:
             return 47
-        case .premiumHeader:
+        case .bannerFooter:
             return 48
-        case .hidePremiumBadges:
+        case .premiumHeader:
             return 49
-        case .hidePremiumBanners:
+        case .hidePremiumBadges:
             return 50
-        case .hidePremiumOffers:
+        case .hidePremiumBanners:
             return 51
-        case .hideGifts:
+        case .hidePremiumOffers:
             return 52
-        case .tabsHeader:
+        case .hideGifts:
             return 53
-        case .tabContacts:
+        case .tabsHeader:
             return 54
-        case .tabCalls:
+        case .tabContacts:
             return 55
-        case .tabNews:
+        case .tabCalls:
             return 56
-        case .hideStories:
+        case .tabNews:
             return 57
-        case .otherHeader:
+        case .hideStories:
             return 58
-        case .localTranscription:
+        case .otherHeader:
             return 59
-        case .localTranslation:
+        case .localTranscription:
             return 60
-        case .fastTransfers:
+        case .localTranslation:
             return 61
-        case .fastTransfersFooter:
+        case .fastTransfers:
             return 62
-        case .loginButton:
+        case .fastTransfersFooter:
             return 63
-        case .loginButtonFooter:
+        case .loginButton:
             return 64
+        case .loginButtonFooter:
+            return 65
         }
     }
 
@@ -363,6 +366,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return footerItem("Veilgram.AutoArchiveInfo", strings.Veilgram_AutoArchiveInfo)
         case let .confirmSend(value):
             return switchItem(VeilgramSettingsIcons.confirmSend, "Veilgram.ConfirmSend", strings.Veilgram_ConfirmSend, value, { arguments.update(.confirmSend, $0) })
+        case let .confirmLinks(value):
+            return switchItem(VeilgramSettingsIcons.confirmSend, "Veilgram.ConfirmLinks", strings.Veilgram_ConfirmLinks, value, { arguments.update(.confirmLinks, $0) })
         case .confirmSendFooter:
             return footerItem("Veilgram.ConfirmSendInfo", strings.Veilgram_ConfirmSendInfo)
         case let .autoReply(value):
@@ -516,6 +521,7 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     entries.append(.autoReplyFooter)
 
     entries.append(.confirmSend(VeilgramSettings.value(.confirmSend)))
+    entries.append(.confirmLinks(VeilgramSettings.value(.confirmLinks)))
     entries.append(.confirmSendFooter)
 
     entries.append(.screenHeader)

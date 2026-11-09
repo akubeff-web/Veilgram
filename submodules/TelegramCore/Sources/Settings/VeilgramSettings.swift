@@ -44,10 +44,11 @@ public enum VeilgramSettings {
         case localTranslation
         case hideChatListTime
         case hideChatListPreviews
+        case confirmLinks
 
         public var defaultValue: Bool {
             switch self {
-            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce, .hidePhone, .streamerMode, .autoReply, .autoReplyContacts, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts, .fastTransfers, .preloadMedia, .preloadMediaGroups, .hideUsername, .hideChatListTime, .hideChatListPreviews:
+            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce, .hidePhone, .streamerMode, .autoReply, .autoReplyContacts, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts, .fastTransfers, .preloadMedia, .preloadMediaGroups, .hideUsername, .hideChatListTime, .hideChatListPreviews, .confirmLinks:
                 return false
             default:
                 return true
@@ -283,6 +284,10 @@ public enum VeilgramSettings {
         }
         UserDefaults.standard.set(Int(color), forKey: profileBannerColorKey)
         self.notifyChanged()
+    }
+
+    public static var confirmLinks: Bool {
+        return value(.confirmLinks)
     }
 
     public static var hideChatListTime: Bool {
