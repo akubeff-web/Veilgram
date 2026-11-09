@@ -29,7 +29,7 @@ final class VeilgramBannerPicker: NSObject, UIImagePickerControllerDelegate, UIN
             controller.mediaTypes = ["public.movie"]
             controller.allowsEditing = true
             controller.videoMaximumDuration = 30.0
-            controller.videoExportPreset = AVAssetExportPresetPassthroughValue
+            controller.videoExportPreset = AVAssetExportPresetPassthrough
         } else {
             controller.mediaTypes = ["public.image"]
         }
