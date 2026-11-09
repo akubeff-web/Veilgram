@@ -41,6 +41,7 @@ public enum VeilgramSettings {
         case preloadMediaGroups
         case localTranscription
         case hideUsername
+        case localTranslation
 
         public var defaultValue: Bool {
             switch self {
@@ -234,6 +235,10 @@ public enum VeilgramSettings {
 
     public static var keepViewOnce: Bool {
         return value(.keepViewOnce)
+    }
+
+    public static var localTranslation: Bool {
+        return value(.localTranslation)
     }
 
     public static var hideUsername: Bool {

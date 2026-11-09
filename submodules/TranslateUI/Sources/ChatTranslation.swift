@@ -192,7 +192,8 @@ public func translateMessageIds(context: AccountContext, messageIds: [EngineMess
         }
         
         let translationConfiguration = TranslationConfiguration.with(appConfiguration: context.currentAppConfiguration.with { $0 })
-        var enableLocalIfPossible = false
+        // Veilgram: translate on the device (the iOS translator) instead of on Telegram's server.
+        var enableLocalIfPossible = VeilgramSettings.localTranslation
         switch translationConfiguration.auto {
         case .system:
             if #available(iOS 18.0, *) {

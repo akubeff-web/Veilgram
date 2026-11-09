@@ -2234,7 +2234,7 @@ extension ChatControllerImpl {
                         if counterAndTimestamp.0 >= 3 {
                             maybeSuggestPremium = true
                         }
-                        if (isPremium || maybeSuggestPremium || hasAutoTranslate) && !isHidden {
+                        if (isPremium || maybeSuggestPremium || hasAutoTranslate || VeilgramSettings.localTranslation) && !isHidden {
                             return chatTranslationState(context: context, peerId: peerId, threadId: chatLocation.threadId)
                             |> map { translationState -> ChatPresentationTranslationState? in
                                 if let translationState, !translationState.fromLang.isEmpty && (translationState.fromLang != baseLanguageCode || translationState.isEnabled) {

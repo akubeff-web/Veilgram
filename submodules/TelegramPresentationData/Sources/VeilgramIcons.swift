@@ -522,6 +522,7 @@ public enum VeilgramSettingsIcons {
     public static let preloadMedia = generateVeilgramSettingsIcon(.download, backgroundColor: UIColor(rgb: 0xFF3B30))
     public static let preloadMediaGroups = generateVeilgramSettingsIcon(.users, backgroundColor: UIColor(rgb: 0xFF3B30))
     public static let localTranscription = generateVeilgramSettingsIcon(.penOff, backgroundColor: UIColor(rgb: 0x007AFF))
+    public static let localTranslation = generateVeilgramSettingsIcon(.newspaper, backgroundColor: UIColor(rgb: 0x007AFF))
     public static let autoArchive = generateVeilgramSettingsIcon(.archive, backgroundColor: UIColor(rgb: 0xFF9500))
     public static let autoArchiveGroups = generateVeilgramSettingsIcon(.users, backgroundColor: UIColor(rgb: 0xFF9500))
     public static let tabContacts = generateVeilgramSettingsIcon(.user, backgroundColor: UIColor(rgb: 0x007AFF))
