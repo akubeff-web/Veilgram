@@ -17340,3 +17340,6 @@ Error: %8$@";
 "Veilgram.ShowHiddenChats" = "Show Hidden Chats";
 "Veilgram.HideHiddenChats" = "Hide Hidden Chats";
 "Veilgram.HideUsername" = "Hide My Username";
+"Veilgram.HideAllGifts" = "Hide All Gifts";
+"Veilgram.ShowAllGifts" = "Show All Gifts";
+"Veilgram.PickGiftsToShow" = "Choose Gifts to Show";

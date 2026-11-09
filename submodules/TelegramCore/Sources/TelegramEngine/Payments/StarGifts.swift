@@ -4750,3 +4750,61 @@ func _internal_getStarGiftUpgradeAttributes(account: Account, giftId: Int64) -> 
     }
     |> switchToLatest
 }
+
+/// Veilgram: shows every gift on the account's profile, or hides every one. Collects the gifts that
+/// need the change (all pages) and then saves or unsaves them one after another; emits how many.
+public func veilgramSetAllProfileGiftsVisible(account: Account, visible: Bool) -> Signal<Int, NoError> {
+    let network = account.network
+    let postbox = account.postbox
+    let accountPeerId = account.peerId
+    // Only the gifts that differ: hidden ones to show, displayed ones to hide.
+    let flags: Int32 = visible ? (1 << 1) : (1 << 0)
+    return postbox.transaction { transaction -> Api.InputPeer? in
+        return transaction.getPeer(accountPeerId).flatMap(apiInputPeer)
+    }
+    |> mapToSignal { inputPeer -> Signal<Int, NoError> in
+        guard let inputPeer else {
+            return .single(0)
+        }
+        func collect(offset: String, references: [StarGiftReference]) -> Signal<[StarGiftReference], NoError> {
+            return network.request(Api.functions.payments.getSavedStarGifts(flags: flags, peer: inputPeer, collectionId: nil, offset: offset, limit: 100))
+            |> map(Optional.init)
+            |> `catch` { _ -> Signal<Api.payments.SavedStarGifts?, NoError> in
+                return .single(nil)
+            }
+            |> mapToSignal { result -> Signal<[StarGiftReference], NoError> in
+                guard let result else {
+                    return .single(references)
+                }
+                return postbox.transaction { transaction -> ([StarGiftReference], String?) in
+                    switch result {
+                    case let .savedStarGifts(savedStarGiftsData):
+                        let parsedPeers = AccumulatedPeers(transaction: transaction, chats: savedStarGiftsData.chats, users: savedStarGiftsData.users)
+                        updatePeers(transaction: transaction, accountPeerId: accountPeerId, peers: parsedPeers)
+                        let page = savedStarGiftsData.gifts.compactMap { ProfileGiftsContext.State.StarGift(apiSavedStarGift: $0, peerId: accountPeerId, transaction: transaction)?.reference }
+                        return (page, savedStarGiftsData.nextOffset)
+                    }
+                }
+                |> mapToSignal { page, nextOffset -> Signal<[StarGiftReference], NoError> in
+                    let updated = references + page
+                    if let nextOffset, !nextOffset.isEmpty, !page.isEmpty, updated.count < 10_000 {
+                        return collect(offset: nextOffset, references: updated)
+                    }
+                    return .single(updated)
+                }
+            }
+        }
+        return collect(offset: "", references: [])
+        |> mapToSignal { references -> Signal<Int, NoError> in
+            var signal: Signal<Int, NoError> = .complete()
+            for reference in references {
+                signal = signal |> then(_internal_updateStarGiftAddedToProfile(account: account, reference: reference, added: visible)
+                |> map { _ -> Int in
+                    return 0
+                })
+            }
+            return signal
+            |> then(Signal<Int, NoError>.single(references.count))
+        }
+    }
+}

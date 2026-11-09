@@ -4,6 +4,7 @@ import Display
 import AccountContext
 import SwiftSignalKit
 import TelegramCore
+import TelegramPresentationData
 import ContextUI
 import PeerInfoVisualMediaPaneNode
 
@@ -98,6 +99,39 @@ extension PeerInfoScreenNode {
                         if let pane {
                             pane.deleteCollection(id: id)
                         }
+                    })))
+                }
+                
+                // Veilgram: hide or show every gift on the own profile at once, or list the
+                // hidden ones to pick from.
+                if let self, data.peer?.id == self.context.account.peerId, let pane, case .all = pane.currentCollection {
+                    let context = self.context
+                    let setAll: (Bool) -> Void = { [weak giftsContext] visible in
+                        let _ = (veilgramSetAllProfileGiftsVisible(account: context.account, visible: visible)
+                        |> deliverOnMainQueue).startStandalone(completed: {
+                            giftsContext?.reload()
+                        })
+                    }
+                    items.append(.action(ContextMenuActionItem(text: veilgramLocalized(strings, "Veilgram.HideAllGifts", strings.Veilgram_HideAllGifts), icon: { theme in
+                        return veilgramCachedIcon(.eyeOff, size: CGSize(width: 24.0, height: 24.0), color: theme.contextMenu.primaryColor)
+                    }, action: { _, f in
+                        f(.default)
+                        setAll(false)
+                    })))
+                    items.append(.action(ContextMenuActionItem(text: veilgramLocalized(strings, "Veilgram.ShowAllGifts", strings.Veilgram_ShowAllGifts), icon: { theme in
+                        return veilgramCachedIcon(.eye, size: CGSize(width: 24.0, height: 24.0), color: theme.contextMenu.primaryColor)
+                    }, action: { _, f in
+                        f(.default)
+                        setAll(true)
+                    })))
+                    items.append(.action(ContextMenuActionItem(text: veilgramLocalized(strings, "Veilgram.PickGiftsToShow", strings.Veilgram_PickGiftsToShow), icon: { theme in
+                        return veilgramCachedIcon(.checkCheck, size: CGSize(width: 24.0, height: 24.0), color: theme.contextMenu.primaryColor)
+                    }, action: { [weak giftsContext] _, f in
+                        f(.default)
+                        var updatedFilter = filter
+                        updatedFilter.remove(.displayed)
+                        updatedFilter.insert(.hidden)
+                        giftsContext?.updateFilter(updatedFilter)
                     })))
                 }
             }
