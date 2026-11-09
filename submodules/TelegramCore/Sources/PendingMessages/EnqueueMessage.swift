@@ -727,7 +727,9 @@ private func opportunisticallyTransformOutgoingMedia(network: Network, postbox: 
     return combineLatest(signals)
 }
 
-public func enqueueMessages(account: Account, peerId: PeerId, messages: [EnqueueMessage]) -> Signal<[MessageId?], NoError> {
+/// `veilgramReadsChat`: in ghost mode with "read on reply" on, sending also reads the chat. Messages
+/// the account sends without the user (the auto-reply) pass false.
+public func enqueueMessages(account: Account, peerId: PeerId, messages: [EnqueueMessage], veilgramReadsChat: Bool = true) -> Signal<[MessageId?], NoError> {
     let signal: Signal<[(Bool, EnqueueMessage)], NoError>
     if let transformOutgoingMessageMedia = account.transformOutgoingMessageMedia {
         signal = opportunisticallyTransformOutgoingMedia(network: account.network, postbox: account.postbox, transformOutgoingMessageMedia: transformOutgoingMessageMedia, messages: messages, userInteractive: true)
@@ -767,6 +769,9 @@ public func enqueueMessages(account: Account, peerId: PeerId, messages: [Enqueue
         |> map { resultIds, ephemeralMessageIds -> [MessageId?] in
             for messageId in ephemeralMessageIds {
                 let _ = _internal_sendEphemeralOutgoingMessage(account: account, messageId: messageId).startStandalone()
+            }
+            if veilgramReadsChat, resultIds.contains(where: { $0 != nil }) {
+                veilgramReadAfterSending(account: account, peerId: peerId)
             }
             return resultIds
         }

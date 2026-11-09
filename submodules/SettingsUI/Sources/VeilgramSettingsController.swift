@@ -56,6 +56,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case ghostTyping(Bool)
     case ghostRead(Bool)
     case ghostStories(Bool)
+    case readOnReply(Bool)
+    case ghostOfflineSend(Bool)
     case ghostFooter
 
     case alwaysOnline(Bool)
@@ -135,7 +137,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
 
     var section: ItemListSectionId {
         switch self {
-        case .ghost, .ghostThisAccount, .ghostOnline, .ghostTyping, .ghostRead, .ghostStories, .ghostFooter:
+        case .ghost, .ghostThisAccount, .ghostOnline, .ghostTyping, .ghostRead, .ghostStories, .readOnReply, .ghostOfflineSend, .ghostFooter:
             return VeilgramSettingsSection.ghost.rawValue
         case .alwaysOnline, .alwaysOnlineFooter:
             return VeilgramSettingsSection.presence.rawValue
@@ -180,132 +182,136 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 4
         case .ghostStories:
             return 5
-        case .ghostFooter:
+        case .readOnReply:
             return 6
-        case .alwaysOnline:
+        case .ghostOfflineSend:
             return 7
-        case .alwaysOnlineFooter:
+        case .ghostFooter:
             return 8
-        case .deletedHeader:
+        case .alwaysOnline:
             return 9
-        case .keepDeleted:
+        case .alwaysOnlineFooter:
             return 10
-        case .deletedIcon:
+        case .deletedHeader:
             return 11
-        case .editHistory:
+        case .keepDeleted:
             return 12
-        case .preloadMedia:
+        case .deletedIcon:
             return 13
-        case .preloadMediaGroups:
+        case .editHistory:
             return 14
-        case .deletedLog:
+        case .preloadMedia:
             return 15
-        case .keepDeletedFooter:
+        case .preloadMediaGroups:
             return 16
-        case .protectedHeader:
+        case .deletedLog:
             return 17
-        case .unlockProtected:
+        case .keepDeletedFooter:
             return 18
-        case .keepViewOnce:
+        case .protectedHeader:
             return 19
-        case .protectedFooter:
+        case .unlockProtected:
             return 20
-        case .filterHeader:
+        case .keepViewOnce:
             return 21
-        case .hideBlocked:
+        case .protectedFooter:
             return 22
-        case .keywordFilter:
+        case .filterHeader:
             return 23
-        case .keywords:
+        case .hideBlocked:
             return 24
-        case .hideSponsored:
+        case .keywordFilter:
             return 25
-        case .filterFooter:
+        case .keywords:
             return 26
-        case .newChatsHeader:
+        case .hideSponsored:
             return 27
-        case .autoArchive:
+        case .filterFooter:
             return 28
-        case .autoArchiveGroups:
+        case .newChatsHeader:
             return 29
-        case .autoArchiveFooter:
+        case .autoArchive:
             return 30
-        case .autoReply:
+        case .autoArchiveGroups:
             return 31
-        case .autoReplyText:
+        case .autoArchiveFooter:
             return 32
-        case .autoReplyContacts:
+        case .autoReply:
             return 33
-        case .autoReplyFooter:
+        case .autoReplyText:
             return 34
-        case .confirmSend:
+        case .autoReplyContacts:
             return 35
-        case .confirmLinks:
+        case .autoReplyFooter:
             return 36
-        case .confirmSendFooter:
+        case .confirmSend:
             return 37
-        case .screenHeader:
+        case .confirmLinks:
             return 38
-        case .streamerMode:
+        case .confirmSendFooter:
             return 39
-        case .hidePhone:
+        case .screenHeader:
             return 40
-        case .hideUsername:
+        case .streamerMode:
             return 41
-        case .hideChatListTime:
+        case .hidePhone:
             return 42
-        case .hideChatListPreviews:
+        case .hideUsername:
             return 43
-        case .screenFooter:
+        case .hideChatListTime:
             return 44
-        case .bannerHeader:
+        case .hideChatListPreviews:
             return 45
-        case .bannerColor:
+        case .screenFooter:
             return 46
-        case .bannerPhoto:
+        case .bannerHeader:
             return 47
-        case .bannerVideo:
+        case .bannerColor:
             return 48
-        case .bannerRemove:
+        case .bannerPhoto:
             return 49
-        case .bannerFooter:
+        case .bannerVideo:
             return 50
-        case .premiumHeader:
+        case .bannerRemove:
             return 51
-        case .hidePremiumBadges:
+        case .bannerFooter:
             return 52
-        case .hidePremiumBanners:
+        case .premiumHeader:
             return 53
-        case .hidePremiumOffers:
+        case .hidePremiumBadges:
             return 54
-        case .hideGifts:
+        case .hidePremiumBanners:
             return 55
-        case .tabsHeader:
+        case .hidePremiumOffers:
             return 56
-        case .tabContacts:
+        case .hideGifts:
             return 57
-        case .tabCalls:
+        case .tabsHeader:
             return 58
-        case .tabNews:
+        case .tabContacts:
             return 59
-        case .hideStories:
+        case .tabCalls:
             return 60
-        case .otherHeader:
+        case .tabNews:
             return 61
-        case .localTranscription:
+        case .hideStories:
             return 62
-        case .localTranslation:
+        case .otherHeader:
             return 63
-        case .quietHours:
+        case .localTranscription:
             return 64
-        case .fastTransfers:
+        case .localTranslation:
             return 65
-        case .fastTransfersFooter:
+        case .quietHours:
             return 66
-        case .loginButton:
+        case .fastTransfers:
             return 67
-        case .loginButtonFooter:
+        case .fastTransfersFooter:
             return 68
+        case .loginButton:
+            return 69
+        case .loginButtonFooter:
+            return 70
         }
     }
 
@@ -337,6 +343,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.ghostRead, "Veilgram.GhostRead", strings.Veilgram_GhostRead, value, { arguments.update(.ghostRead, $0) })
         case let .ghostStories(value):
             return switchItem(VeilgramSettingsIcons.ghostStories, "Veilgram.GhostStories", strings.Veilgram_GhostStories, value, { arguments.update(.ghostStories, $0) })
+        case let .readOnReply(value):
+            return switchItem(VeilgramSettingsIcons.ghostRead, "Veilgram.ReadOnReply", strings.Veilgram_ReadOnReply, value, { arguments.update(.readOnReply, $0) })
+        case let .ghostOfflineSend(value):
+            return switchItem(VeilgramSettingsIcons.ghostOnline, "Veilgram.GhostOfflineSend", strings.Veilgram_GhostOfflineSend, value, { arguments.update(.ghostOfflineSend, $0) })
         case .ghostFooter:
             return footerItem("Veilgram.GhostInfo", strings.Veilgram_GhostInfo)
         case .deletedHeader:
@@ -492,6 +502,12 @@ private func veilgramSettingsEntries(showCallsTab: Bool, accountPeerId: EnginePe
         entries.append(.ghostTyping(VeilgramSettings.value(.ghostTyping)))
         entries.append(.ghostRead(VeilgramSettings.value(.ghostRead)))
         entries.append(.ghostStories(VeilgramSettings.value(.ghostStories)))
+        if VeilgramSettings.value(.ghostRead) {
+            entries.append(.readOnReply(VeilgramSettings.value(.readOnReply)))
+        }
+        if VeilgramSettings.value(.ghostOnline) {
+            entries.append(.ghostOfflineSend(VeilgramSettings.value(.ghostOfflineSend)))
+        }
     }
     entries.append(.ghostFooter)
 

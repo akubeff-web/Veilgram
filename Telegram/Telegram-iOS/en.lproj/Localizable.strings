@@ -17365,3 +17365,5 @@ Error: %8$@";
 "Veilgram.QuietHours" = "Quiet at Night (23–8)";
 "Veilgram.HideSponsored" = "Hide Ads in Channels";
 "Veilgram.GhostThisAccount" = "In This Account";
+"Veilgram.ReadOnReply" = "Read Chat When Replying";
+"Veilgram.GhostOfflineSend" = "Send Without Going Online";

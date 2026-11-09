@@ -9177,6 +9177,11 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
                 }
             }
             
+            // Veilgram: a file needs time to upload before the scheduled moment.
+            var veilgramOfflineSendDelay: Int32 = 12
+            if case let .message(_, _, _, mediaReference, _, _, _, _, _, _) = message, mediaReference != nil {
+                veilgramOfflineSendDelay = 30
+            }
             return message.withUpdatedAttributes { attributes in
                 var attributes = attributes
                 
@@ -9235,6 +9240,11 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
                             state: nil
                         ))
                     }
+                }
+                // Veilgram: send as a message scheduled a few seconds ahead (12 s for text, AyuGram's delay), so the server
+                // does not show the account online for it.
+                if scheduleTime == nil, VeilgramSettings.ghostOfflineSend(account: self.context.account.peerId), self.presentationInterfaceState.sendPaidMessageStars == nil, self.presentationInterfaceState.interfaceState.postSuggestionState == nil, self.presentationInterfaceState.subject != .scheduledMessages, let peerId = self.chatLocation.peerId, peerId != self.context.account.peerId, peerId.namespace == Namespaces.Peer.CloudUser || peerId.namespace == Namespaces.Peer.CloudGroup || peerId.namespace == Namespaces.Peer.CloudChannel, !attributes.contains(where: { $0 is OutgoingScheduleInfoMessageAttribute }) {
+                    attributes.append(OutgoingScheduleInfoMessageAttribute(scheduleTime: Int32(Date().timeIntervalSince1970) + veilgramOfflineSendDelay, repeatPeriod: nil))
                 }
                 return attributes
             }

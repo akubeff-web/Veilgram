@@ -483,6 +483,28 @@ public func veilgramSendReadReceipt(account: Account, peerId: PeerId) -> Signal<
     |> then(Signal<Void, NoError>.single(Void()))
 }
 
+/// Veilgram: in ghost mode with "read on reply" on, answering a chat reads it up to its newest message,
+/// as AyuGram's "mark read after action" does, so the sender does not see a reply to unread messages.
+func veilgramReadAfterSending(account: Account, peerId: PeerId) {
+    switch peerId.namespace {
+    case Namespaces.Peer.CloudUser, Namespaces.Peer.CloudGroup, Namespaces.Peer.CloudChannel:
+        break
+    default:
+        return
+    }
+    guard peerId != account.peerId, VeilgramSettings.readOnReply(for: peerId, account: account.peerId) else {
+        return
+    }
+    let _ = (account.postbox.transaction { transaction -> Void in
+        if let index = transaction.getTopPeerMessageIndex(peerId: peerId, namespace: Namespaces.Message.Cloud) {
+            let _ = transaction.applyInteractiveReadMaxIndex(index)
+        }
+    }
+    |> mapToSignal { _ -> Signal<Void, NoError> in
+        return veilgramSendReadReceipt(account: account, peerId: peerId)
+    }).startStandalone()
+}
+
 /// Veilgram: marks every chat of the main list and the archive read. In ghost mode, where the read
 /// marks would stay local, the read receipts are sent as well, one chat after another.
 public func veilgramReadAllChats(account: Account) -> Signal<Never, NoError> {

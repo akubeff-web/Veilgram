@@ -47,10 +47,12 @@ public enum VeilgramSettings {
         case confirmLinks
         case quietHours
         case hideSponsored
+        case readOnReply
+        case ghostOfflineSend
 
         public var defaultValue: Bool {
             switch self {
-            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce, .hidePhone, .streamerMode, .autoReply, .autoReplyContacts, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts, .fastTransfers, .preloadMedia, .preloadMediaGroups, .hideUsername, .hideChatListTime, .hideChatListPreviews, .confirmLinks, .quietHours:
+            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce, .hidePhone, .streamerMode, .autoReply, .autoReplyContacts, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts, .fastTransfers, .preloadMedia, .preloadMediaGroups, .hideUsername, .hideChatListTime, .hideChatListPreviews, .confirmLinks, .quietHours, .ghostOfflineSend:
                 return false
             default:
                 return true
@@ -228,6 +230,17 @@ public enum VeilgramSettings {
 
     public static func ghostStories(for peerId: PeerId, account: PeerId?) -> Bool {
         return ghostEnabled(account: account) && value(.ghostStories) && !isGhostException(peerId)
+    }
+
+    /// Sending a message reads the chat, which ghost mode would otherwise leave unread for the sender.
+    public static func readOnReply(for peerId: PeerId, account: PeerId?) -> Bool {
+        return ghostRead(for: peerId, account: account) && value(.readOnReply)
+    }
+
+    /// Messages go out as scheduled ones a few seconds ahead, which the server does not show as the
+    /// sender going online (AyuGram's "use scheduled messages").
+    public static func ghostOfflineSend(account: PeerId?) -> Bool {
+        return ghostOnline(account: account) && value(.ghostOfflineSend)
     }
 
     public static func ghostRead(account: PeerId?) -> Bool {

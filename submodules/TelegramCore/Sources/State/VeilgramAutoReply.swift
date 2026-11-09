@@ -79,7 +79,7 @@ func managedVeilgramAutoReply(account: Account) -> Signal<Never, NoError> {
         guard let account, !text.isEmpty else {
             return .complete()
         }
-        return enqueueMessages(account: account, peerId: item.peerId, messages: [.message(text: text, attributes: [], inlineStickers: [:], mediaReference: nil, threadId: nil, replyToMessageId: nil, replyToStoryId: nil, localGroupingKey: nil, correlationId: nil, bubbleUpEmojiOrStickersets: [])])
+        return enqueueMessages(account: account, peerId: item.peerId, messages: [.message(text: text, attributes: [], inlineStickers: [:], mediaReference: nil, threadId: nil, replyToMessageId: nil, replyToStoryId: nil, localGroupingKey: nil, correlationId: nil, bubbleUpEmojiOrStickersets: [])], veilgramReadsChat: false)
         |> ignoreValues
     }
 }
