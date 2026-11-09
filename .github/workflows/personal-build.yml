@@ -59,24 +59,46 @@ jobs:
           restore-keys: |
             telegram-bazel-cache-
 
+      # GitHub's release downloads time out now and then (504). Fetch the archive Bazel needs first,
+      # with retries, and let Bazel take it from a local directory.
+      - name: Prefetch dependencies
+        run: |
+          mkdir -p "$HOME/bazel-distdir"
+          curl -fL --retry 10 --retry-all-errors --retry-delay 20 \
+            -o "$HOME/bazel-distdir/rules_rust-0.74.0.tar.gz" \
+            https://github.com/bazelbuild/rules_rust/releases/download/0.74.0/rules_rust-0.74.0.tar.gz
+          echo "common --distdir=$HOME/bazel-distdir" >> "$HOME/.bazelrc"
+
       - name: Build
         run: |
+          set -o pipefail
           BUILD_NUMBER_OFFSET="$(cat build_number_offset)"
           COMMIT_COUNT="$(git rev-list --count HEAD)"
           BUILD_NUMBER="$(($COMMIT_COUNT + $BUILD_NUMBER_OFFSET))"
           echo "Build number: $BUILD_NUMBER"
 
           python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
-          python3 -u build-system/Make/Make.py \
-            --overrideXcodeVersion \
-            --cacheDir "$HOME/telegram-bazel-cache" \
-            build \
-            --continueOnError \
-            --configurationPath=build-system/personal-configuration.json \
-            --codesigningInformationPath=build-system/fake-codesigning \
-            --configuration=release_arm64 \
-            --buildNumber="$BUILD_NUMBER" \
-            --outputBuildArtifactsPath="$GITHUB_WORKSPACE/artifacts"
+          # A failed download fails the build before anything compiles; try up to three times.
+          for attempt in 1 2 3; do
+            if python3 -u build-system/Make/Make.py \
+              --overrideXcodeVersion \
+              --cacheDir "$HOME/telegram-bazel-cache" \
+              build \
+              --continueOnError \
+              --configurationPath=build-system/personal-configuration.json \
+              --codesigningInformationPath=build-system/fake-codesigning \
+              --configuration=release_arm64 \
+              --buildNumber="$BUILD_NUMBER" \
+              --outputBuildArtifactsPath="$GITHUB_WORKSPACE/artifacts" 2>&1 | tee "$RUNNER_TEMP/build.log"; then
+              exit 0
+            fi
+            if ! grep -q "Error downloading\|GET returned 50" "$RUNNER_TEMP/build.log"; then
+              exit 1
+            fi
+            echo "Download failed, retrying ($attempt)"
+            sleep 30
+          done
+          exit 1
 
       - name: Save Bazel cache
         if: always()
