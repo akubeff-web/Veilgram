@@ -381,6 +381,16 @@ final class AuthorizedApplicationContext {
                             guard !locked else {
                                 return
                             }
+                            // Veilgram: no banner or sound for hidden chats, or at night with quiet hours on.
+                            if VeilgramSettings.isChatHidden(firstMessage.id.peerId) {
+                                return
+                            }
+                            if VeilgramSettings.quietHours {
+                                let hour = Calendar.current.component(.hour, from: Date())
+                                if hour >= 23 || hour < 8 {
+                                    return
+                                }
+                            }
                             let isMuted = firstMessage.attributes.contains(where: { attribute in
                                 if let attribute = attribute as? NotificationInfoMessageAttribute {
                                     return attribute.flags.contains(.muted)
