@@ -932,6 +932,9 @@ public final class Network: NSObject {
     private var livenessMonitor: NetworkLivenessMonitor?
     public let useBetaFeatures: Bool
     public let useExperimentalFeatures: Bool
+    /// Veilgram: the account this network serves, for switches that differ per account. Set once by
+    /// `Account.init`; nil for a network that serves no account (login).
+    var veilgramAccountPeerId: PeerId?
     
     private let appDataDisposable: Disposable
     

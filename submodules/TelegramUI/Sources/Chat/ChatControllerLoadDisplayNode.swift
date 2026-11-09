@@ -1410,7 +1410,7 @@ extension ChatControllerImpl {
             let account = self.context.account
             let ghostRead = VeilgramSettings.updated
             |> map { _ -> Bool in
-                return VeilgramSettings.ghostRead(for: peerId)
+                return VeilgramSettings.ghostRead(for: peerId, account: account.peerId)
             }
             |> distinctUntilChanged
             let serverUnreadCount = combineLatest(ghostRead, self.context.engine.data.subscribe(TelegramEngine.EngineData.Item.Messages.ChatListIndex(id: peerId)))

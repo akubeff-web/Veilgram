@@ -17364,3 +17364,4 @@ Error: %8$@";
 "Veilgram.ConfirmLinks" = "Ask Before Opening Links";
 "Veilgram.QuietHours" = "Quiet at Night (23–8)";
 "Veilgram.HideSponsored" = "Hide Ads in Channels";
+"Veilgram.GhostThisAccount" = "In This Account";

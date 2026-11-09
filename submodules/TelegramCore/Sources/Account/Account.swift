@@ -1328,6 +1328,7 @@ public class Account {
         self.network = network
         self.networkArguments = networkArguments
         self.peerId = peerId
+        network.veilgramAccountPeerId = peerId
         
         self.auxiliaryMethods = auxiliaryMethods
         self.supplementary = supplementary

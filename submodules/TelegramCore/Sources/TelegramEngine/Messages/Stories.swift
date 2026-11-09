@@ -2079,7 +2079,7 @@ func _internal_markStoryAsSeen(account: Account, peerId: PeerId, id: Int32, asPi
             guard let inputPeer = inputPeer else {
                 return .complete()
             }
-            if VeilgramSettings.ghostStories(for: peerId) {
+            if VeilgramSettings.ghostStories(for: peerId, account: account.peerId) {
                 return .complete()
             }
             

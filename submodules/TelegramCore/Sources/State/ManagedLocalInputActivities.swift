@@ -147,7 +147,7 @@ private func requestActivity(postbox: Postbox, network: Network, accountPeerId: 
             if peerId == accountPeerId {
                 return .complete()
             }
-            if VeilgramSettings.ghostTyping(for: peerId) {
+            if VeilgramSettings.ghostTyping(for: peerId, account: accountPeerId) {
                 switch activity {
                 case .speakingInGroupCall?:
                     break

@@ -441,7 +441,7 @@ func synchronizePeerReadState(network: Network, postbox: Postbox, stateManager: 
             return confirmSynchronized(postbox: postbox, peerId: peerId)
             |> ignoreValues
         }
-        if VeilgramSettings.ghostRead(for: peerId) {
+        if VeilgramSettings.ghostRead(for: peerId, account: stateManager.accountPeerId) {
             // Ghost mode: the read mark stays local. Validation would see it ahead of the
             // server (localReadMarkIsAheadOfServer) and retry forever, so skip both and confirm.
             return confirmSynchronized(postbox: postbox, peerId: peerId)
@@ -497,7 +497,7 @@ public func veilgramReadAllChats(account: Account) -> Signal<Never, NoError> {
         return peerIds
     }
     |> mapToSignal { peerIds -> Signal<Never, NoError> in
-        if !VeilgramSettings.ghostRead {
+        if !VeilgramSettings.ghostRead(account: account.peerId) {
             return .complete()
         }
         let cloudPeerIds = peerIds.filter { peerId in

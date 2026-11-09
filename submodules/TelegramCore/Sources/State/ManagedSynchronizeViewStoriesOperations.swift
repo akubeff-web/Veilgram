@@ -119,7 +119,7 @@ func managedSynchronizeViewStoriesOperations(postbox: Postbox, network: Network,
 }
 
 private func pushStoriesAreSeen(postbox: Postbox, network: Network, stateManager: AccountStateManager, peer: Peer, operation: SynchronizeViewStoriesOperation) -> Signal<Void, NoError> {
-    if VeilgramSettings.ghostStories(for: peer.id) {
+    if VeilgramSettings.ghostStories(for: peer.id, account: stateManager.accountPeerId) {
         return .complete()
     }
     guard let inputPeer = apiInputPeer(peer) else {

@@ -28,7 +28,7 @@ private final class AccountPresenceManagerImpl {
         // "last seen" to now) goes out.
         let veilgramState = VeilgramSettings.updated
         |> map { _ -> (alwaysOnline: Bool, hidden: Bool) in
-            return (VeilgramSettings.alwaysOnline, VeilgramSettings.ghostOnline)
+            return (VeilgramSettings.alwaysOnline, VeilgramSettings.ghostOnline(account: network.veilgramAccountPeerId))
         }
         self.shouldKeepOnlinePresenceDisposable = (combineLatest(shouldKeepOnlinePresence, veilgramState)
         |> map { value, veilgram -> (Bool, Bool) in
@@ -104,7 +104,7 @@ private final class AccountPresenceManagerImpl {
 private let veilgramHideOnlineDisposables = Atomic<[ObjectIdentifier: MetaDisposable]>(value: [:])
 
 func veilgramHideOnlineAfterSending(network: Network) {
-    guard VeilgramSettings.ghostOnline else {
+    guard VeilgramSettings.ghostOnline(account: network.veilgramAccountPeerId) else {
         return
     }
     let key = ObjectIdentifier(network)

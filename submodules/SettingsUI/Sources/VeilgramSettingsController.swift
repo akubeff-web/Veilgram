@@ -12,6 +12,7 @@ import LocalizedPeerData
 
 private final class VeilgramSettingsControllerArguments {
     let update: (VeilgramSettings.Key, Bool) -> Void
+    let updateGhostThisAccount: (Bool) -> Void
     let updateShowCallsTab: (Bool) -> Void
     let openDeletedLog: () -> Void
     let updateKeywords: (String) -> Void
@@ -19,11 +20,12 @@ private final class VeilgramSettingsControllerArguments {
     let chooseBanner: (VeilgramSettings.ProfileBannerKind) -> Void
     let removeBanner: () -> Void
 
-    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void, updateAutoReplyText: @escaping (String) -> Void, chooseBanner: @escaping (VeilgramSettings.ProfileBannerKind) -> Void, removeBanner: @escaping () -> Void) {
+    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateGhostThisAccount: @escaping (Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void, updateAutoReplyText: @escaping (String) -> Void, chooseBanner: @escaping (VeilgramSettings.ProfileBannerKind) -> Void, removeBanner: @escaping () -> Void) {
         self.chooseBanner = chooseBanner
         self.removeBanner = removeBanner
         self.updateAutoReplyText = updateAutoReplyText
         self.update = update
+        self.updateGhostThisAccount = updateGhostThisAccount
         self.updateShowCallsTab = updateShowCallsTab
         self.openDeletedLog = openDeletedLog
         self.updateKeywords = updateKeywords
@@ -49,6 +51,7 @@ private enum VeilgramSettingsSection: Int32 {
 
 private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case ghost(Bool)
+    case ghostThisAccount(Bool)
     case ghostOnline(Bool)
     case ghostTyping(Bool)
     case ghostRead(Bool)
@@ -132,7 +135,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
 
     var section: ItemListSectionId {
         switch self {
-        case .ghost, .ghostOnline, .ghostTyping, .ghostRead, .ghostStories, .ghostFooter:
+        case .ghost, .ghostThisAccount, .ghostOnline, .ghostTyping, .ghostRead, .ghostStories, .ghostFooter:
             return VeilgramSettingsSection.ghost.rawValue
         case .alwaysOnline, .alwaysOnlineFooter:
             return VeilgramSettingsSection.presence.rawValue
@@ -167,140 +170,142 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
         switch self {
         case .ghost:
             return 0
-        case .ghostOnline:
+        case .ghostThisAccount:
             return 1
-        case .ghostTyping:
+        case .ghostOnline:
             return 2
-        case .ghostRead:
+        case .ghostTyping:
             return 3
-        case .ghostStories:
+        case .ghostRead:
             return 4
-        case .ghostFooter:
+        case .ghostStories:
             return 5
-        case .alwaysOnline:
+        case .ghostFooter:
             return 6
-        case .alwaysOnlineFooter:
+        case .alwaysOnline:
             return 7
-        case .deletedHeader:
+        case .alwaysOnlineFooter:
             return 8
-        case .keepDeleted:
+        case .deletedHeader:
             return 9
-        case .deletedIcon:
+        case .keepDeleted:
             return 10
-        case .editHistory:
+        case .deletedIcon:
             return 11
-        case .preloadMedia:
+        case .editHistory:
             return 12
-        case .preloadMediaGroups:
+        case .preloadMedia:
             return 13
-        case .deletedLog:
+        case .preloadMediaGroups:
             return 14
-        case .keepDeletedFooter:
+        case .deletedLog:
             return 15
-        case .protectedHeader:
+        case .keepDeletedFooter:
             return 16
-        case .unlockProtected:
+        case .protectedHeader:
             return 17
-        case .keepViewOnce:
+        case .unlockProtected:
             return 18
-        case .protectedFooter:
+        case .keepViewOnce:
             return 19
-        case .filterHeader:
+        case .protectedFooter:
             return 20
-        case .hideBlocked:
+        case .filterHeader:
             return 21
-        case .keywordFilter:
+        case .hideBlocked:
             return 22
-        case .keywords:
+        case .keywordFilter:
             return 23
-        case .hideSponsored:
+        case .keywords:
             return 24
-        case .filterFooter:
+        case .hideSponsored:
             return 25
-        case .newChatsHeader:
+        case .filterFooter:
             return 26
-        case .autoArchive:
+        case .newChatsHeader:
             return 27
-        case .autoArchiveGroups:
+        case .autoArchive:
             return 28
-        case .autoArchiveFooter:
+        case .autoArchiveGroups:
             return 29
-        case .autoReply:
+        case .autoArchiveFooter:
             return 30
-        case .autoReplyText:
+        case .autoReply:
             return 31
-        case .autoReplyContacts:
+        case .autoReplyText:
             return 32
-        case .autoReplyFooter:
+        case .autoReplyContacts:
             return 33
-        case .confirmSend:
+        case .autoReplyFooter:
             return 34
-        case .confirmLinks:
+        case .confirmSend:
             return 35
-        case .confirmSendFooter:
+        case .confirmLinks:
             return 36
-        case .screenHeader:
+        case .confirmSendFooter:
             return 37
-        case .streamerMode:
+        case .screenHeader:
             return 38
-        case .hidePhone:
+        case .streamerMode:
             return 39
-        case .hideUsername:
+        case .hidePhone:
             return 40
-        case .hideChatListTime:
+        case .hideUsername:
             return 41
-        case .hideChatListPreviews:
+        case .hideChatListTime:
             return 42
-        case .screenFooter:
+        case .hideChatListPreviews:
             return 43
-        case .bannerHeader:
+        case .screenFooter:
             return 44
-        case .bannerColor:
+        case .bannerHeader:
             return 45
-        case .bannerPhoto:
+        case .bannerColor:
             return 46
-        case .bannerVideo:
+        case .bannerPhoto:
             return 47
-        case .bannerRemove:
+        case .bannerVideo:
             return 48
-        case .bannerFooter:
+        case .bannerRemove:
             return 49
-        case .premiumHeader:
+        case .bannerFooter:
             return 50
-        case .hidePremiumBadges:
+        case .premiumHeader:
             return 51
-        case .hidePremiumBanners:
+        case .hidePremiumBadges:
             return 52
-        case .hidePremiumOffers:
+        case .hidePremiumBanners:
             return 53
-        case .hideGifts:
+        case .hidePremiumOffers:
             return 54
-        case .tabsHeader:
+        case .hideGifts:
             return 55
-        case .tabContacts:
+        case .tabsHeader:
             return 56
-        case .tabCalls:
+        case .tabContacts:
             return 57
-        case .tabNews:
+        case .tabCalls:
             return 58
-        case .hideStories:
+        case .tabNews:
             return 59
-        case .otherHeader:
+        case .hideStories:
             return 60
-        case .localTranscription:
+        case .otherHeader:
             return 61
-        case .localTranslation:
+        case .localTranscription:
             return 62
-        case .quietHours:
+        case .localTranslation:
             return 63
-        case .fastTransfers:
+        case .quietHours:
             return 64
-        case .fastTransfersFooter:
+        case .fastTransfers:
             return 65
-        case .loginButton:
+        case .fastTransfersFooter:
             return 66
-        case .loginButtonFooter:
+        case .loginButton:
             return 67
+        case .loginButtonFooter:
+            return 68
         }
     }
 
@@ -322,6 +327,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
         switch self {
         case let .ghost(value):
             return switchItem(VeilgramSettingsIcons.ghost, "Veilgram.Ghost", strings.Veilgram_Ghost, value, { arguments.update(.ghost, $0) })
+        case let .ghostThisAccount(value):
+            return switchItem(VeilgramSettingsIcons.ghost, "Veilgram.GhostThisAccount", strings.Veilgram_GhostThisAccount, value, { arguments.updateGhostThisAccount($0) })
         case let .ghostOnline(value):
             return switchItem(VeilgramSettingsIcons.ghostOnline, "Veilgram.GhostOnline", strings.Veilgram_GhostOnline, value, { arguments.update(.ghostOnline, $0) })
         case let .ghostTyping(value):
@@ -475,11 +482,12 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
 }
 
 /// Sub-options are listed under their switch only while it is on, so they slide in and out with it.
-private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEntry] {
+private func veilgramSettingsEntries(showCallsTab: Bool, accountPeerId: EnginePeer.Id) -> [VeilgramSettingsEntry] {
     var entries: [VeilgramSettingsEntry] = []
 
     entries.append(.ghost(VeilgramSettings.value(.ghost)))
     if VeilgramSettings.value(.ghost) {
+        entries.append(.ghostThisAccount(VeilgramSettings.ghostEnabled(account: accountPeerId)))
         entries.append(.ghostOnline(VeilgramSettings.value(.ghostOnline)))
         entries.append(.ghostTyping(VeilgramSettings.value(.ghostTyping)))
         entries.append(.ghostRead(VeilgramSettings.value(.ghostRead)))
@@ -585,6 +593,9 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
         update: { key, value in
             VeilgramSettings.set(key, value)
         },
+        updateGhostThisAccount: { value in
+            VeilgramSettings.setGhostEnabled(value, account: context.account.peerId)
+        },
         updateShowCallsTab: { value in
             let _ = updateCallListSettingsInteractively(accountManager: context.sharedContext.accountManager, {
                 $0.withUpdatedShowTab(value)
@@ -680,7 +691,7 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
     |> map { presentationData, showCallsTab, _ -> (ItemListControllerState, (ItemListNodeState, Any)) in
         let title = veilgramLocalized(presentationData.strings, "Veilgram.Title", presentationData.strings.Veilgram_Title)
         let controllerState = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text(title), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
-        let listState = ItemListNodeState(presentationData: ItemListPresentationData(presentationData), entries: veilgramSettingsEntries(showCallsTab: showCallsTab), style: .blocks, animateChanges: true)
+        let listState = ItemListNodeState(presentationData: ItemListPresentationData(presentationData), entries: veilgramSettingsEntries(showCallsTab: showCallsTab, accountPeerId: context.account.peerId), style: .blocks, animateChanges: true)
         return (controllerState, (listState, arguments))
     }
 

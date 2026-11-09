@@ -91,9 +91,45 @@ public enum VeilgramSettings {
         }
     }
 
+    private static let ghostDisabledAccountsKey = keyPrefix + "ghostDisabledAccounts"
+    private static let ghostDisabledAccountsCache = Atomic<Set<Int64>?>(value: nil)
+
+    /// Accounts where ghost mode is off although its main switch is on.
+    public static var ghostDisabledAccounts: Set<Int64> {
+        if let cached = ghostDisabledAccountsCache.with({ $0 }) {
+            return cached
+        }
+        let value = Set((UserDefaults.standard.array(forKey: ghostDisabledAccountsKey) as? [Int64]) ?? [])
+        let _ = ghostDisabledAccountsCache.swap(value)
+        return value
+    }
+
+    public static func setGhostEnabled(_ isEnabled: Bool, account: PeerId) {
+        var value = ghostDisabledAccounts
+        if isEnabled {
+            value.remove(account.toInt64())
+        } else {
+            value.insert(account.toInt64())
+        }
+        UserDefaults.standard.set(Array(value), forKey: ghostDisabledAccountsKey)
+        let _ = ghostDisabledAccountsCache.swap(value)
+        self.notifyChanged()
+    }
+
+    /// The main switch for one account. A nil account (no account known yet) follows the main switch.
+    public static func ghostEnabled(account: PeerId?) -> Bool {
+        guard value(.ghost) else {
+            return false
+        }
+        if let account, ghostDisabledAccounts.contains(account.toInt64()) {
+            return false
+        }
+        return true
+    }
+
     /// Always Online wins over hiding the online status.
-    public static var ghostOnline: Bool {
-        return value(.ghost) && value(.ghostOnline) && !value(.alwaysOnline)
+    public static func ghostOnline(account: PeerId?) -> Bool {
+        return ghostEnabled(account: account) && value(.ghostOnline) && !value(.alwaysOnline)
     }
 
     public static var alwaysOnline: Bool {
@@ -182,28 +218,20 @@ public enum VeilgramSettings {
         self.notifyChanged()
     }
 
-    public static func ghostRead(for peerId: PeerId) -> Bool {
-        return ghostRead && !isGhostException(peerId)
+    public static func ghostRead(for peerId: PeerId, account: PeerId?) -> Bool {
+        return ghostRead(account: account) && !isGhostException(peerId)
     }
 
-    public static func ghostTyping(for peerId: PeerId) -> Bool {
-        return ghostTyping && !isGhostException(peerId)
+    public static func ghostTyping(for peerId: PeerId, account: PeerId?) -> Bool {
+        return ghostEnabled(account: account) && value(.ghostTyping) && !isGhostException(peerId)
     }
 
-    public static func ghostStories(for peerId: PeerId) -> Bool {
-        return ghostStories && !isGhostException(peerId)
+    public static func ghostStories(for peerId: PeerId, account: PeerId?) -> Bool {
+        return ghostEnabled(account: account) && value(.ghostStories) && !isGhostException(peerId)
     }
 
-    public static var ghostTyping: Bool {
-        return value(.ghost) && value(.ghostTyping)
-    }
-
-    public static var ghostRead: Bool {
-        return value(.ghost) && value(.ghostRead)
-    }
-
-    public static var ghostStories: Bool {
-        return value(.ghost) && value(.ghostStories)
+    public static func ghostRead(account: PeerId?) -> Bool {
+        return ghostEnabled(account: account) && value(.ghostRead)
     }
 
     public static var keepDeleted: Bool {

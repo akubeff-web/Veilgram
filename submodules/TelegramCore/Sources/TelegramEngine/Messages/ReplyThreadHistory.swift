@@ -485,7 +485,7 @@ private class ReplyThreadHistoryContextImpl {
                 |> ignoreValues
                 if revalidate {
                 }
-                if !VeilgramSettings.ghostRead(for: strongSelf.peerId) {
+                if !VeilgramSettings.ghostRead(for: strongSelf.peerId, account: strongSelf.account.peerId) {
                     strongSelf.readDisposable.set(signal.start())
                 }
             } else {
@@ -522,7 +522,7 @@ private class ReplyThreadHistoryContextImpl {
                     signal = signal
                     |> then(validateSignal)
                 }
-                if !VeilgramSettings.ghostRead(for: strongSelf.peerId) {
+                if !VeilgramSettings.ghostRead(for: strongSelf.peerId, account: strongSelf.account.peerId) {
                     strongSelf.readDisposable.set(signal.start())
                 }
             }
