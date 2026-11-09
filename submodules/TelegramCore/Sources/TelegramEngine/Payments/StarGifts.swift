@@ -4796,15 +4796,17 @@ public func veilgramSetAllProfileGiftsVisible(account: Account, visible: Bool) -
         }
         return collect(offset: "", references: [])
         |> mapToSignal { references -> Signal<Int, NoError> in
-            var signal: Signal<Int, NoError> = .complete()
+            var signal: Signal<Never, NoError> = .complete()
             for reference in references {
-                signal = signal |> then(_internal_updateStarGiftAddedToProfile(account: account, reference: reference, added: visible)
-                |> map { _ -> Int in
-                    return 0
+                signal = signal |> then(_internal_updateStarGiftAddedToProfile(account: account, reference: reference, added: visible))
+            }
+            let updates = signal
+            return Signal<Int, NoError> { subscriber in
+                return updates.start(completed: {
+                    subscriber.putNext(references.count)
+                    subscriber.putCompletion()
                 })
             }
-            return signal
-            |> then(Signal<Int, NoError>.single(references.count))
         }
     }
 }
