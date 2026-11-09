@@ -480,7 +480,7 @@ func settingsEditingItems(data: PeerInfoScreenData?, state: PeerInfoState, conte
         }))
     }
     var username = ""
-    if let addressName = data.peer?.addressName, !addressName.isEmpty {
+    if let addressName = data.peer?.addressName, !addressName.isEmpty, !VeilgramSettings.hideUsername {
         username = "@\(addressName)"
     }
     items[.info]!.append(PeerInfoScreenDisclosureItem(id: ItemUsername, label: .text(username), text: presentationData.strings.Settings_Username, icon: PresentationResourcesSettings.email, action: {

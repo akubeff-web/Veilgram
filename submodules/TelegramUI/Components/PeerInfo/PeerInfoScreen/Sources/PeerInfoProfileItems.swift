@@ -191,7 +191,7 @@ func infoItems(
                 interaction.requestLayout(animated)
             }))
         }
-        if let mainUsername = user.addressName {
+        if let mainUsername = user.addressName, !(VeilgramSettings.hideUsername && user.id == context.account.peerId) {
             var additionalUsernames: String?
             let usernames = user.usernames.filter { $0.isActive && $0.username != mainUsername }
             if !usernames.isEmpty {

@@ -89,6 +89,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case screenHeader
     case streamerMode(Bool)
     case hidePhone(Bool)
+    case hideUsername(Bool)
     case screenFooter
 
     case premiumHeader
@@ -129,7 +130,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.autoReply.rawValue
         case .confirmSend, .confirmSendFooter:
             return VeilgramSettingsSection.sending.rawValue
-        case .screenHeader, .streamerMode, .hidePhone, .screenFooter:
+        case .screenHeader, .streamerMode, .hidePhone, .hideUsername, .screenFooter:
             return VeilgramSettingsSection.screen.rawValue
         case .premiumHeader, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts:
             return VeilgramSettingsSection.premium.rawValue
@@ -220,40 +221,42 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 36
         case .hidePhone:
             return 37
-        case .screenFooter:
+        case .hideUsername:
             return 38
-        case .premiumHeader:
+        case .screenFooter:
             return 39
-        case .hidePremiumBadges:
+        case .premiumHeader:
             return 40
-        case .hidePremiumBanners:
+        case .hidePremiumBadges:
             return 41
-        case .hidePremiumOffers:
+        case .hidePremiumBanners:
             return 42
-        case .hideGifts:
+        case .hidePremiumOffers:
             return 43
-        case .tabsHeader:
+        case .hideGifts:
             return 44
-        case .tabContacts:
+        case .tabsHeader:
             return 45
-        case .tabCalls:
+        case .tabContacts:
             return 46
-        case .tabNews:
+        case .tabCalls:
             return 47
-        case .hideStories:
+        case .tabNews:
             return 48
-        case .otherHeader:
+        case .hideStories:
             return 49
-        case .localTranscription:
+        case .otherHeader:
             return 50
-        case .fastTransfers:
+        case .localTranscription:
             return 51
-        case .fastTransfersFooter:
+        case .fastTransfers:
             return 52
-        case .loginButton:
+        case .fastTransfersFooter:
             return 53
-        case .loginButtonFooter:
+        case .loginButton:
             return 54
+        case .loginButtonFooter:
+            return 55
         }
     }
 
@@ -357,6 +360,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.streamerMode, "Veilgram.StreamerMode", strings.Veilgram_StreamerMode, value, { arguments.update(.streamerMode, $0) })
         case let .hidePhone(value):
             return switchItem(VeilgramSettingsIcons.hidePhone, "Veilgram.HidePhone", strings.Veilgram_HidePhone, value, { arguments.update(.hidePhone, $0) })
+        case let .hideUsername(value):
+            return switchItem(VeilgramSettingsIcons.hidePhone, "Veilgram.HideUsername", strings.Veilgram_HideUsername, value, { arguments.update(.hideUsername, $0) })
         case .screenFooter:
             return footerItem("Veilgram.ScreenInfo", strings.Veilgram_ScreenInfo)
         case .premiumHeader:
@@ -455,6 +460,7 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     entries.append(.screenHeader)
     entries.append(.streamerMode(VeilgramSettings.value(.streamerMode)))
     entries.append(.hidePhone(VeilgramSettings.value(.hidePhone)))
+    entries.append(.hideUsername(VeilgramSettings.value(.hideUsername)))
     entries.append(.screenFooter)
 
     entries.append(.premiumHeader)

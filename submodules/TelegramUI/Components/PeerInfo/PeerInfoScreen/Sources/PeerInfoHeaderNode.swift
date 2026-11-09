@@ -1275,7 +1275,7 @@ final class PeerInfoHeaderNode: ASDisplayNode {
                     subtitle = ""
                 }
                 
-                if let mainUsername = user.addressName, !mainUsername.isEmpty {
+                if let mainUsername = user.addressName, !mainUsername.isEmpty, !VeilgramSettings.hideUsername {
                     subtitle = subtitle.isEmpty ? "@\(mainUsername)" : "\(subtitle) • @\(mainUsername)"
                 }
                 subtitleStringText = subtitle
