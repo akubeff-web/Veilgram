@@ -329,6 +329,9 @@ final class AuthorizedApplicationContext {
             }
 
             if let strongSelf = self, let (messages, _, notify, threadData) = messageList.last, let firstMessage = messages.first {
+                if UIApplication.shared.applicationState != .active {
+                    veilgramPostLocalNotification(context: strongSelf.context, messages: messages.map { EngineMessage($0) }, notify: notify)
+                }
                 if UIApplication.shared.applicationState == .active {
                     let chatLocation: NavigateToChatControllerParams.Location
                     if let _ = threadData, let threadId = firstMessage.threadId {

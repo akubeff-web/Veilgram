@@ -50,6 +50,7 @@ public enum VeilgramSettings {
         case readOnReply
         case ghostOfflineSend
         case keepKickedChats
+        case localNotifications
 
         public var defaultValue: Bool {
             switch self {
@@ -328,6 +329,10 @@ public enum VeilgramSettings {
         }
         UserDefaults.standard.set(Int(color), forKey: profileBannerColorKey)
         self.notifyChanged()
+    }
+
+    public static var localNotifications: Bool {
+        return value(.localNotifications)
     }
 
     public static var keepKickedChats: Bool {

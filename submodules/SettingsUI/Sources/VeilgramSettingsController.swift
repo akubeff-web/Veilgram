@@ -130,6 +130,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case localTranscription(Bool)
     case localTranslation(Bool)
     case quietHours(Bool)
+    case localNotifications(Bool)
     case fastTransfers(Bool)
     case fastTransfersFooter
 
@@ -168,7 +169,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.premium.rawValue
         case .tabsHeader, .tabContacts, .tabCalls, .tabNews, .hideStories:
             return VeilgramSettingsSection.tabs.rawValue
-        case .otherHeader, .localTranscription, .localTranslation, .quietHours, .fastTransfers, .fastTransfersFooter:
+        case .otherHeader, .localTranscription, .localTranslation, .quietHours, .localNotifications, .fastTransfers, .fastTransfersFooter:
             return VeilgramSettingsSection.transfers.rawValue
         case .loginButton, .loginButtonFooter:
             return VeilgramSettingsSection.login.rawValue
@@ -317,14 +318,16 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 68
         case .quietHours:
             return 69
-        case .fastTransfers:
+        case .localNotifications:
             return 70
-        case .fastTransfersFooter:
+        case .fastTransfers:
             return 71
-        case .loginButton:
+        case .fastTransfersFooter:
             return 72
-        case .loginButtonFooter:
+        case .loginButton:
             return 73
+        case .loginButtonFooter:
+            return 74
         }
     }
 
@@ -492,6 +495,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.localTranslation, "Veilgram.LocalTranslation", strings.Veilgram_LocalTranslation, value, { arguments.update(.localTranslation, $0) })
         case let .quietHours(value):
             return switchItem(VeilgramSettingsIcons.quietHours, "Veilgram.QuietHours", strings.Veilgram_QuietHours, value, { arguments.update(.quietHours, $0) })
+        case let .localNotifications(value):
+            return switchItem(VeilgramSettingsIcons.quietHours, "Veilgram.LocalNotifications", strings.Veilgram_LocalNotifications, value, { arguments.update(.localNotifications, $0) })
         case let .fastTransfers(value):
             return switchItem(VeilgramSettingsIcons.fastTransfers, "Veilgram.FastTransfers", strings.Veilgram_FastTransfers, value, { arguments.update(.fastTransfers, $0) })
         case .fastTransfersFooter:
@@ -620,6 +625,7 @@ private func veilgramSettingsEntries(showCallsTab: Bool, accountPeerId: EnginePe
     entries.append(.localTranscription(VeilgramSettings.value(.localTranscription)))
     entries.append(.localTranslation(VeilgramSettings.value(.localTranslation)))
     entries.append(.quietHours(VeilgramSettings.value(.quietHours)))
+    entries.append(.localNotifications(VeilgramSettings.value(.localNotifications)))
     entries.append(.fastTransfers(VeilgramSettings.value(.fastTransfers)))
     entries.append(.fastTransfersFooter)
 
