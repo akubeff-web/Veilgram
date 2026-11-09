@@ -437,6 +437,30 @@ public enum VeilgramSettings {
         return UserDefaults.standard.string(forKey: filterKeywordsKey) ?? ""
     }
 
+    private static let deletedMarkKey = keyPrefix + "deletedMark"
+    private static let editedMarkKey = keyPrefix + "editedMark"
+
+    /// Text shown before the time of a message deleted on the server, in place of the trash icon.
+    /// Empty: the icon.
+    public static var deletedMarkText: String {
+        return UserDefaults.standard.string(forKey: deletedMarkKey) ?? ""
+    }
+
+    public static func setDeletedMarkText(_ text: String) {
+        UserDefaults.standard.set(text, forKey: deletedMarkKey)
+        self.notifyChanged()
+    }
+
+    /// Text shown before the time of an edited message in place of "edited". Empty: Telegram's label.
+    public static var editedMarkText: String {
+        return UserDefaults.standard.string(forKey: editedMarkKey) ?? ""
+    }
+
+    public static func setEditedMarkText(_ text: String) {
+        UserDefaults.standard.set(text, forKey: editedMarkKey)
+        self.notifyChanged()
+    }
+
     public static func setFilterKeywordsText(_ text: String) {
         UserDefaults.standard.set(text, forKey: filterKeywordsKey)
         let _ = filterKeywordsCache.swap(nil)

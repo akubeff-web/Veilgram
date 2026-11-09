@@ -16,11 +16,13 @@ private final class VeilgramSettingsControllerArguments {
     let updateShowCallsTab: (Bool) -> Void
     let openDeletedLog: () -> Void
     let updateKeywords: (String) -> Void
+    let updateDeletedMark: (String) -> Void
+    let updateEditedMark: (String) -> Void
     let updateAutoReplyText: (String) -> Void
     let chooseBanner: (VeilgramSettings.ProfileBannerKind) -> Void
     let removeBanner: () -> Void
 
-    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateGhostThisAccount: @escaping (Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void, updateAutoReplyText: @escaping (String) -> Void, chooseBanner: @escaping (VeilgramSettings.ProfileBannerKind) -> Void, removeBanner: @escaping () -> Void) {
+    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateGhostThisAccount: @escaping (Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void, updateDeletedMark: @escaping (String) -> Void, updateEditedMark: @escaping (String) -> Void, updateAutoReplyText: @escaping (String) -> Void, chooseBanner: @escaping (VeilgramSettings.ProfileBannerKind) -> Void, removeBanner: @escaping () -> Void) {
         self.chooseBanner = chooseBanner
         self.removeBanner = removeBanner
         self.updateAutoReplyText = updateAutoReplyText
@@ -29,6 +31,8 @@ private final class VeilgramSettingsControllerArguments {
         self.updateShowCallsTab = updateShowCallsTab
         self.openDeletedLog = openDeletedLog
         self.updateKeywords = updateKeywords
+        self.updateDeletedMark = updateDeletedMark
+        self.updateEditedMark = updateEditedMark
     }
 }
 
@@ -66,7 +70,9 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case deletedHeader
     case keepDeleted(Bool)
     case deletedIcon(Bool)
+    case deletedMark(String)
     case editHistory(Bool)
+    case editedMark(String)
     case preloadMedia(Bool)
     case preloadMediaGroups(Bool)
     case deletedLog
@@ -141,7 +147,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.ghost.rawValue
         case .alwaysOnline, .alwaysOnlineFooter:
             return VeilgramSettingsSection.presence.rawValue
-        case .deletedHeader, .keepDeleted, .deletedIcon, .editHistory, .preloadMedia, .preloadMediaGroups, .deletedLog, .keepDeletedFooter:
+        case .deletedHeader, .keepDeleted, .deletedIcon, .deletedMark, .editHistory, .editedMark, .preloadMedia, .preloadMediaGroups, .deletedLog, .keepDeletedFooter:
             return VeilgramSettingsSection.deleted.rawValue
         case .protectedHeader, .unlockProtected, .keepViewOnce, .protectedFooter:
             return VeilgramSettingsSection.protected.rawValue
@@ -198,120 +204,124 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 12
         case .deletedIcon:
             return 13
-        case .editHistory:
+        case .deletedMark:
             return 14
-        case .preloadMedia:
+        case .editHistory:
             return 15
-        case .preloadMediaGroups:
+        case .editedMark:
             return 16
-        case .deletedLog:
+        case .preloadMedia:
             return 17
-        case .keepDeletedFooter:
+        case .preloadMediaGroups:
             return 18
-        case .protectedHeader:
+        case .deletedLog:
             return 19
-        case .unlockProtected:
+        case .keepDeletedFooter:
             return 20
-        case .keepViewOnce:
+        case .protectedHeader:
             return 21
-        case .protectedFooter:
+        case .unlockProtected:
             return 22
-        case .filterHeader:
+        case .keepViewOnce:
             return 23
-        case .hideBlocked:
+        case .protectedFooter:
             return 24
-        case .keywordFilter:
+        case .filterHeader:
             return 25
-        case .keywords:
+        case .hideBlocked:
             return 26
-        case .hideSponsored:
+        case .keywordFilter:
             return 27
-        case .filterFooter:
+        case .keywords:
             return 28
-        case .newChatsHeader:
+        case .hideSponsored:
             return 29
-        case .autoArchive:
+        case .filterFooter:
             return 30
-        case .autoArchiveGroups:
+        case .newChatsHeader:
             return 31
-        case .autoArchiveFooter:
+        case .autoArchive:
             return 32
-        case .autoReply:
+        case .autoArchiveGroups:
             return 33
-        case .autoReplyText:
+        case .autoArchiveFooter:
             return 34
-        case .autoReplyContacts:
+        case .autoReply:
             return 35
-        case .autoReplyFooter:
+        case .autoReplyText:
             return 36
-        case .confirmSend:
+        case .autoReplyContacts:
             return 37
-        case .confirmLinks:
+        case .autoReplyFooter:
             return 38
-        case .confirmSendFooter:
+        case .confirmSend:
             return 39
-        case .screenHeader:
+        case .confirmLinks:
             return 40
-        case .streamerMode:
+        case .confirmSendFooter:
             return 41
-        case .hidePhone:
+        case .screenHeader:
             return 42
-        case .hideUsername:
+        case .streamerMode:
             return 43
-        case .hideChatListTime:
+        case .hidePhone:
             return 44
-        case .hideChatListPreviews:
+        case .hideUsername:
             return 45
-        case .screenFooter:
+        case .hideChatListTime:
             return 46
-        case .bannerHeader:
+        case .hideChatListPreviews:
             return 47
-        case .bannerColor:
+        case .screenFooter:
             return 48
-        case .bannerPhoto:
+        case .bannerHeader:
             return 49
-        case .bannerVideo:
+        case .bannerColor:
             return 50
-        case .bannerRemove:
+        case .bannerPhoto:
             return 51
-        case .bannerFooter:
+        case .bannerVideo:
             return 52
-        case .premiumHeader:
+        case .bannerRemove:
             return 53
-        case .hidePremiumBadges:
+        case .bannerFooter:
             return 54
-        case .hidePremiumBanners:
+        case .premiumHeader:
             return 55
-        case .hidePremiumOffers:
+        case .hidePremiumBadges:
             return 56
-        case .hideGifts:
+        case .hidePremiumBanners:
             return 57
-        case .tabsHeader:
+        case .hidePremiumOffers:
             return 58
-        case .tabContacts:
+        case .hideGifts:
             return 59
-        case .tabCalls:
+        case .tabsHeader:
             return 60
-        case .tabNews:
+        case .tabContacts:
             return 61
-        case .hideStories:
+        case .tabCalls:
             return 62
-        case .otherHeader:
+        case .tabNews:
             return 63
-        case .localTranscription:
+        case .hideStories:
             return 64
-        case .localTranslation:
+        case .otherHeader:
             return 65
-        case .quietHours:
+        case .localTranscription:
             return 66
-        case .fastTransfers:
+        case .localTranslation:
             return 67
-        case .fastTransfersFooter:
+        case .quietHours:
             return 68
-        case .loginButton:
+        case .fastTransfers:
             return 69
-        case .loginButtonFooter:
+        case .fastTransfersFooter:
             return 70
+        case .loginButton:
+            return 71
+        case .loginButtonFooter:
+            return 72
         }
     }
 
@@ -369,6 +379,14 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.keepDeleted, "Veilgram.KeepDeleted", strings.Veilgram_KeepDeleted, value, { arguments.update(.keepDeleted, $0) })
         case let .deletedIcon(value):
             return switchItem(VeilgramSettingsIcons.deletedIcon, "Veilgram.DeletedIcon", strings.Veilgram_DeletedIcon, value, { arguments.update(.deletedIcon, $0) })
+        case let .deletedMark(text):
+            return ItemListSingleLineInputItem(presentationData: presentationData, systemStyle: .glass, title: NSAttributedString(string: veilgramLocalized(strings, "Veilgram.DeletedMark", strings.Veilgram_DeletedMark)), text: text, placeholder: veilgramLocalized(strings, "Veilgram.MarkPlaceholderIcon", strings.Veilgram_MarkPlaceholderIcon), type: .regular(capitalization: false, autocorrection: false), maxLength: 16, sectionId: self.section, textUpdated: { text in
+                arguments.updateDeletedMark(text)
+            }, action: {})
+        case let .editedMark(text):
+            return ItemListSingleLineInputItem(presentationData: presentationData, systemStyle: .glass, title: NSAttributedString(string: veilgramLocalized(strings, "Veilgram.EditedMark", strings.Veilgram_EditedMark)), text: text, placeholder: strings.Conversation_MessageEditedLabel, type: .regular(capitalization: false, autocorrection: false), maxLength: 16, sectionId: self.section, textUpdated: { text in
+                arguments.updateEditedMark(text)
+            }, action: {})
         case let .preloadMedia(value):
             return switchItem(VeilgramSettingsIcons.preloadMedia, "Veilgram.PreloadMedia", strings.Veilgram_PreloadMedia, value, { arguments.update(.preloadMedia, $0) })
         case let .preloadMediaGroups(value):
@@ -518,8 +536,12 @@ private func veilgramSettingsEntries(showCallsTab: Bool, accountPeerId: EnginePe
     entries.append(.keepDeleted(VeilgramSettings.value(.keepDeleted)))
     if VeilgramSettings.value(.keepDeleted) {
         entries.append(.deletedIcon(VeilgramSettings.value(.deletedIcon)))
+        if VeilgramSettings.value(.deletedIcon) {
+            entries.append(.deletedMark(VeilgramSettings.deletedMarkText))
+        }
     }
     entries.append(.editHistory(VeilgramSettings.value(.editHistory)))
+    entries.append(.editedMark(VeilgramSettings.editedMarkText))
     entries.append(.preloadMedia(VeilgramSettings.value(.preloadMedia)))
     if VeilgramSettings.value(.preloadMedia) {
         entries.append(.preloadMediaGroups(VeilgramSettings.value(.preloadMediaGroups)))
@@ -653,6 +675,12 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
         },
         updateKeywords: { text in
             VeilgramSettings.setFilterKeywordsText(text)
+        },
+        updateDeletedMark: { text in
+            VeilgramSettings.setDeletedMarkText(text)
+        },
+        updateEditedMark: { text in
+            VeilgramSettings.setEditedMarkText(text)
         },
         updateAutoReplyText: { text in
             VeilgramSettings.setAutoReplyText(text)

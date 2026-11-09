@@ -17367,3 +17367,6 @@ Error: %8$@";
 "Veilgram.GhostThisAccount" = "In This Account";
 "Veilgram.ReadOnReply" = "Read Chat When Replying";
 "Veilgram.GhostOfflineSend" = "Send Without Going Online";
+"Veilgram.DeletedMark" = "Deleted Mark";
+"Veilgram.EditedMark" = "Edited Mark";
+"Veilgram.MarkPlaceholderIcon" = "trash icon";

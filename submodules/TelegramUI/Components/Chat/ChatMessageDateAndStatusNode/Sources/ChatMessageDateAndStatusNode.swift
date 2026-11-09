@@ -612,8 +612,14 @@ public class ChatMessageDateAndStatusNode: ASDisplayNode {
             if arguments.edited {
                 if let useEditedTimestamp = arguments.context.getAppConfigValue("message_primary_edited_date") as? Bool, useEditedTimestamp {
                 } else {
-                    updatedDateText = "\(arguments.presentationData.strings.Conversation_MessageEditedLabel) \(updatedDateText)"
+                    let editedMark = VeilgramSettings.editedMarkText
+                    updatedDateText = "\(editedMark.isEmpty ? arguments.presentationData.strings.Conversation_MessageEditedLabel : editedMark) \(updatedDateText)"
                 }
+            }
+            // Veilgram: a custom deleted mark is text before the time instead of the trash icon.
+            let deletedMarkText = arguments.isDeletedRemotely ? VeilgramSettings.deletedMarkText : ""
+            if !deletedMarkText.isEmpty {
+                updatedDateText = "\(deletedMarkText) \(updatedDateText)"
             }
             if let impressionCount = arguments.impressionCount {
                 updatedDateText = compactNumericCountString(impressionCount, decimalSeparator: arguments.presentationData.dateTimeFormat.decimalSeparator) + " " + updatedDateText
@@ -651,7 +657,7 @@ public class ChatMessageDateAndStatusNode: ASDisplayNode {
             // its place in the same leading offset as the views icon, which moves the date over.
             var deletedIconImage: UIImage?
             var deletedIconWidth: CGFloat = 0.0
-            if arguments.isDeletedRemotely {
+            if arguments.isDeletedRemotely && deletedMarkText.isEmpty {
                 let deletedIconSide = floor(dateFont.pointSize * 12.0 / 11.0)
                 deletedIconImage = veilgramCachedIcon(.trash, size: CGSize(width: deletedIconSide, height: deletedIconSide), color: dateColor)
             }
