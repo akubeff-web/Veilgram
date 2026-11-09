@@ -95,6 +95,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case streamerMode(Bool)
     case hidePhone(Bool)
     case hideUsername(Bool)
+    case hideChatListTime(Bool)
+    case hideChatListPreviews(Bool)
     case screenFooter
 
     case bannerHeader
@@ -143,7 +145,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.autoReply.rawValue
         case .confirmSend, .confirmSendFooter:
             return VeilgramSettingsSection.sending.rawValue
-        case .screenHeader, .streamerMode, .hidePhone, .hideUsername, .screenFooter:
+        case .screenHeader, .streamerMode, .hidePhone, .hideUsername, .hideChatListTime, .hideChatListPreviews, .screenFooter:
             return VeilgramSettingsSection.screen.rawValue
         case .bannerHeader, .bannerColor, .bannerPhoto, .bannerVideo, .bannerRemove, .bannerFooter:
             return VeilgramSettingsSection.banner.rawValue
@@ -238,54 +240,58 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 37
         case .hideUsername:
             return 38
-        case .screenFooter:
+        case .hideChatListTime:
             return 39
-        case .bannerHeader:
+        case .hideChatListPreviews:
             return 40
-        case .bannerColor:
+        case .screenFooter:
             return 41
-        case .bannerPhoto:
+        case .bannerHeader:
             return 42
-        case .bannerVideo:
+        case .bannerColor:
             return 43
-        case .bannerRemove:
+        case .bannerPhoto:
             return 44
-        case .bannerFooter:
+        case .bannerVideo:
             return 45
-        case .premiumHeader:
+        case .bannerRemove:
             return 46
-        case .hidePremiumBadges:
+        case .bannerFooter:
             return 47
-        case .hidePremiumBanners:
+        case .premiumHeader:
             return 48
-        case .hidePremiumOffers:
+        case .hidePremiumBadges:
             return 49
-        case .hideGifts:
+        case .hidePremiumBanners:
             return 50
-        case .tabsHeader:
+        case .hidePremiumOffers:
             return 51
-        case .tabContacts:
+        case .hideGifts:
             return 52
-        case .tabCalls:
+        case .tabsHeader:
             return 53
-        case .tabNews:
+        case .tabContacts:
             return 54
-        case .hideStories:
+        case .tabCalls:
             return 55
-        case .otherHeader:
+        case .tabNews:
             return 56
-        case .localTranscription:
+        case .hideStories:
             return 57
-        case .localTranslation:
+        case .otherHeader:
             return 58
-        case .fastTransfers:
+        case .localTranscription:
             return 59
-        case .fastTransfersFooter:
+        case .localTranslation:
             return 60
-        case .loginButton:
+        case .fastTransfers:
             return 61
-        case .loginButtonFooter:
+        case .fastTransfersFooter:
             return 62
+        case .loginButton:
+            return 63
+        case .loginButtonFooter:
+            return 64
         }
     }
 
@@ -391,6 +397,10 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.hidePhone, "Veilgram.HidePhone", strings.Veilgram_HidePhone, value, { arguments.update(.hidePhone, $0) })
         case let .hideUsername(value):
             return switchItem(VeilgramSettingsIcons.hidePhone, "Veilgram.HideUsername", strings.Veilgram_HideUsername, value, { arguments.update(.hideUsername, $0) })
+        case let .hideChatListTime(value):
+            return switchItem(VeilgramSettingsIcons.hideStories, "Veilgram.HideChatListTime", strings.Veilgram_HideChatListTime, value, { arguments.update(.hideChatListTime, $0) })
+        case let .hideChatListPreviews(value):
+            return switchItem(VeilgramSettingsIcons.hideStories, "Veilgram.HideChatListPreviews", strings.Veilgram_HideChatListPreviews, value, { arguments.update(.hideChatListPreviews, $0) })
         case .screenFooter:
             return footerItem("Veilgram.ScreenInfo", strings.Veilgram_ScreenInfo)
         case .bannerHeader:
@@ -512,6 +522,8 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     entries.append(.streamerMode(VeilgramSettings.value(.streamerMode)))
     entries.append(.hidePhone(VeilgramSettings.value(.hidePhone)))
     entries.append(.hideUsername(VeilgramSettings.value(.hideUsername)))
+    entries.append(.hideChatListTime(VeilgramSettings.value(.hideChatListTime)))
+    entries.append(.hideChatListPreviews(VeilgramSettings.value(.hideChatListPreviews)))
     entries.append(.screenFooter)
 
     entries.append(.bannerHeader)

@@ -42,10 +42,12 @@ public enum VeilgramSettings {
         case localTranscription
         case hideUsername
         case localTranslation
+        case hideChatListTime
+        case hideChatListPreviews
 
         public var defaultValue: Bool {
             switch self {
-            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce, .hidePhone, .streamerMode, .autoReply, .autoReplyContacts, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts, .fastTransfers, .preloadMedia, .preloadMediaGroups, .hideUsername:
+            case .autoArchiveGroups, .alwaysOnline, .confirmSend, .keywordFilter, .hideStories, .unlockProtected, .keepViewOnce, .hidePhone, .streamerMode, .autoReply, .autoReplyContacts, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts, .fastTransfers, .preloadMedia, .preloadMediaGroups, .hideUsername, .hideChatListTime, .hideChatListPreviews:
                 return false
             default:
                 return true
@@ -281,6 +283,14 @@ public enum VeilgramSettings {
         }
         UserDefaults.standard.set(Int(color), forKey: profileBannerColorKey)
         self.notifyChanged()
+    }
+
+    public static var hideChatListTime: Bool {
+        return value(.hideChatListTime)
+    }
+
+    public static var hideChatListPreviews: Bool {
+        return value(.hideChatListPreviews)
     }
 
     public static var localTranslation: Bool {

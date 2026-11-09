@@ -3672,6 +3672,9 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             
             let rawContentWidth = params.width - leftInset - params.rightInset - 18.0 - editingOffset
             
+            if VeilgramSettings.hideChatListTime, dateAttributedString != nil {
+                dateAttributedString = NSAttributedString(string: "", font: dateFont, textColor: theme.dateTextColor)
+            }
             let (dateLayout, dateApply) = dateLayout(TextNodeLayoutArguments(attributedString: dateAttributedString, backgroundColor: nil, maximumNumberOfLines: 1, truncationType: .end, constrainedSize: CGSize(width: rawContentWidth, height: CGFloat.greatestFiniteMagnitude), alignment: .natural, cutout: nil, insets: UIEdgeInsets()))
             
             let (badgeLayout, badgeApply) = badgeLayout(CGSize(width: rawContentWidth, height: CGFloat.greatestFiniteMagnitude), badgeDiameter, badgeFont, currentBadgeBackgroundImage, badgeContent)
@@ -3788,6 +3791,10 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                 }
             }
 
+            if VeilgramSettings.hideChatListPreviews, textAttributedString != nil {
+                effectiveAuthorTitle = nil
+                textAttributedString = NSAttributedString(string: " ", font: textFont, textColor: theme.messageTextColor)
+            }
             if VeilgramSettings.streamerMode {
                 // Veilgram streamer mode: avatars stay, names and message previews do not.
                 effectiveAuthorTitle = nil
