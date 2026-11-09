@@ -237,6 +237,52 @@ public enum VeilgramSettings {
         return value(.keepViewOnce)
     }
 
+    public enum ProfileBannerKind: String {
+        case color
+        case photo
+        case video
+    }
+
+    private static let profileBannerKindKey = keyPrefix + "profileBanner.kind"
+    private static let profileBannerColorKey = keyPrefix + "profileBanner.color"
+
+    /// The header of the own profile, drawn by Veilgram on this device only.
+    public static var profileBannerKind: ProfileBannerKind? {
+        guard let value = UserDefaults.standard.string(forKey: profileBannerKindKey) else {
+            return nil
+        }
+        return ProfileBannerKind(rawValue: value)
+    }
+
+    public static var profileBannerColor: UInt32 {
+        return UInt32(truncatingIfNeeded: UserDefaults.standard.integer(forKey: profileBannerColorKey))
+    }
+
+    /// Where the banner's photo or video is kept: the app's Documents folder.
+    public static func profileBannerFileURL(kind: ProfileBannerKind) -> URL? {
+        guard let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        switch kind {
+        case .color:
+            return nil
+        case .photo:
+            return documents.appendingPathComponent("veilgram-banner.jpg")
+        case .video:
+            return documents.appendingPathComponent("veilgram-banner.mp4")
+        }
+    }
+
+    public static func setProfileBanner(kind: ProfileBannerKind?, color: UInt32 = 0) {
+        if let kind {
+            UserDefaults.standard.set(kind.rawValue, forKey: profileBannerKindKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: profileBannerKindKey)
+        }
+        UserDefaults.standard.set(Int(color), forKey: profileBannerColorKey)
+        self.notifyChanged()
+    }
+
     public static var localTranslation: Bool {
         return value(.localTranslation)
     }

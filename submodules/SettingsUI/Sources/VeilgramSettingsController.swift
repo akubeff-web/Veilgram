@@ -16,8 +16,12 @@ private final class VeilgramSettingsControllerArguments {
     let openDeletedLog: () -> Void
     let updateKeywords: (String) -> Void
     let updateAutoReplyText: (String) -> Void
+    let chooseBanner: (VeilgramSettings.ProfileBannerKind) -> Void
+    let removeBanner: () -> Void
 
-    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void, updateAutoReplyText: @escaping (String) -> Void) {
+    init(update: @escaping (VeilgramSettings.Key, Bool) -> Void, updateShowCallsTab: @escaping (Bool) -> Void, openDeletedLog: @escaping () -> Void, updateKeywords: @escaping (String) -> Void, updateAutoReplyText: @escaping (String) -> Void, chooseBanner: @escaping (VeilgramSettings.ProfileBannerKind) -> Void, removeBanner: @escaping () -> Void) {
+        self.chooseBanner = chooseBanner
+        self.removeBanner = removeBanner
         self.updateAutoReplyText = updateAutoReplyText
         self.update = update
         self.updateShowCallsTab = updateShowCallsTab
@@ -36,6 +40,7 @@ private enum VeilgramSettingsSection: Int32 {
     case autoReply
     case sending
     case screen
+    case banner
     case premium
     case tabs
     case transfers
@@ -92,6 +97,13 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case hideUsername(Bool)
     case screenFooter
 
+    case bannerHeader
+    case bannerColor
+    case bannerPhoto
+    case bannerVideo
+    case bannerRemove
+    case bannerFooter
+
     case premiumHeader
     case hidePremiumBadges(Bool)
     case hidePremiumBanners(Bool)
@@ -133,6 +145,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.sending.rawValue
         case .screenHeader, .streamerMode, .hidePhone, .hideUsername, .screenFooter:
             return VeilgramSettingsSection.screen.rawValue
+        case .bannerHeader, .bannerColor, .bannerPhoto, .bannerVideo, .bannerRemove, .bannerFooter:
+            return VeilgramSettingsSection.banner.rawValue
         case .premiumHeader, .hidePremiumBadges, .hidePremiumBanners, .hidePremiumOffers, .hideGifts:
             return VeilgramSettingsSection.premium.rawValue
         case .tabsHeader, .tabContacts, .tabCalls, .tabNews, .hideStories:
@@ -226,40 +240,52 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 38
         case .screenFooter:
             return 39
-        case .premiumHeader:
+        case .bannerHeader:
             return 40
-        case .hidePremiumBadges:
+        case .bannerColor:
             return 41
-        case .hidePremiumBanners:
+        case .bannerPhoto:
             return 42
-        case .hidePremiumOffers:
+        case .bannerVideo:
             return 43
-        case .hideGifts:
+        case .bannerRemove:
             return 44
-        case .tabsHeader:
+        case .bannerFooter:
             return 45
-        case .tabContacts:
+        case .premiumHeader:
             return 46
-        case .tabCalls:
+        case .hidePremiumBadges:
             return 47
-        case .tabNews:
+        case .hidePremiumBanners:
             return 48
-        case .hideStories:
+        case .hidePremiumOffers:
             return 49
-        case .otherHeader:
+        case .hideGifts:
             return 50
-        case .localTranscription:
+        case .tabsHeader:
             return 51
-        case .localTranslation:
+        case .tabContacts:
             return 52
-        case .fastTransfers:
+        case .tabCalls:
             return 53
-        case .fastTransfersFooter:
+        case .tabNews:
             return 54
-        case .loginButton:
+        case .hideStories:
             return 55
-        case .loginButtonFooter:
+        case .otherHeader:
             return 56
+        case .localTranscription:
+            return 57
+        case .localTranslation:
+            return 58
+        case .fastTransfers:
+            return 59
+        case .fastTransfersFooter:
+            return 60
+        case .loginButton:
+            return 61
+        case .loginButtonFooter:
+            return 62
         }
     }
 
@@ -367,6 +393,26 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.hidePhone, "Veilgram.HideUsername", strings.Veilgram_HideUsername, value, { arguments.update(.hideUsername, $0) })
         case .screenFooter:
             return footerItem("Veilgram.ScreenInfo", strings.Veilgram_ScreenInfo)
+        case .bannerHeader:
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.BannerHeader", strings.Veilgram_BannerHeader).uppercased(), sectionId: self.section)
+        case .bannerColor:
+            return ItemListDisclosureItem(presentationData: presentationData, systemStyle: .glass, title: veilgramLocalized(strings, "Veilgram.BannerColor", strings.Veilgram_BannerColor), label: "", sectionId: self.section, style: .blocks, action: {
+                arguments.chooseBanner(.color)
+            })
+        case .bannerPhoto:
+            return ItemListDisclosureItem(presentationData: presentationData, systemStyle: .glass, title: veilgramLocalized(strings, "Veilgram.BannerPhoto", strings.Veilgram_BannerPhoto), label: "", sectionId: self.section, style: .blocks, action: {
+                arguments.chooseBanner(.photo)
+            })
+        case .bannerVideo:
+            return ItemListDisclosureItem(presentationData: presentationData, systemStyle: .glass, title: veilgramLocalized(strings, "Veilgram.BannerVideo", strings.Veilgram_BannerVideo), label: "", sectionId: self.section, style: .blocks, action: {
+                arguments.chooseBanner(.video)
+            })
+        case .bannerRemove:
+            return ItemListActionItem(presentationData: presentationData, systemStyle: .glass, title: veilgramLocalized(strings, "Veilgram.BannerRemove", strings.Veilgram_BannerRemove), kind: .destructive, alignment: .natural, sectionId: self.section, style: .blocks, action: {
+                arguments.removeBanner()
+            })
+        case .bannerFooter:
+            return footerItem("Veilgram.BannerInfo", strings.Veilgram_BannerInfo)
         case .premiumHeader:
             return ItemListSectionHeaderItem(presentationData: presentationData, text: veilgramLocalized(strings, "Veilgram.PremiumHeader", strings.Veilgram_PremiumHeader).uppercased(), sectionId: self.section)
         case let .hidePremiumBadges(value):
@@ -468,6 +514,15 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     entries.append(.hideUsername(VeilgramSettings.value(.hideUsername)))
     entries.append(.screenFooter)
 
+    entries.append(.bannerHeader)
+    entries.append(.bannerColor)
+    entries.append(.bannerPhoto)
+    entries.append(.bannerVideo)
+    if VeilgramSettings.profileBannerKind != nil {
+        entries.append(.bannerRemove)
+    }
+    entries.append(.bannerFooter)
+
     entries.append(.premiumHeader)
     entries.append(.hidePremiumBadges(VeilgramSettings.value(.hidePremiumBadges)))
     entries.append(.hidePremiumBanners(VeilgramSettings.value(.hidePremiumBanners)))
@@ -494,6 +549,8 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
 
 public func veilgramSettingsController(context: AccountContext) -> ViewController {
     var pushImpl: ((ViewController) -> Void)?
+    var presentImpl: ((ViewController) -> Void)?
+    var controllerViewImpl: (() -> UIView?)?
     let arguments = VeilgramSettingsControllerArguments(
         update: { key, value in
             VeilgramSettings.set(key, value)
@@ -542,6 +599,37 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
         },
         updateAutoReplyText: { text in
             VeilgramSettings.setAutoReplyText(text)
+        },
+        chooseBanner: { kind in
+            switch kind {
+            case .color:
+                let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+                let strings = presentationData.strings
+                let colors: [(String, UInt32)] = [
+                    ("Veilgram.ColorBlack", 0x000000), ("Veilgram.ColorGray", 0x3A3A3C), ("Veilgram.ColorBlue", 0x007AFF),
+                    ("Veilgram.ColorPurple", 0x5856D6), ("Veilgram.ColorPink", 0xFF2D55), ("Veilgram.ColorRed", 0xFF3B30),
+                    ("Veilgram.ColorOrange", 0xFF9500), ("Veilgram.ColorGreen", 0x34C759), ("Veilgram.ColorTeal", 0x5AC8FA)
+                ]
+                let actionSheet = ActionSheetController(presentationData: presentationData)
+                var items: [ActionSheetItem] = []
+                for (key, color) in colors {
+                    items.append(ActionSheetButtonItem(title: veilgramLocalized(strings, key, key), action: { [weak actionSheet] in
+                        actionSheet?.dismissAnimated()
+                        VeilgramSettings.setProfileBanner(kind: .color, color: color)
+                    }))
+                }
+                actionSheet.setItemGroups([ActionSheetItemGroup(items: items), ActionSheetItemGroup(items: [
+                    ActionSheetButtonItem(title: strings.Common_Cancel, color: .accent, font: .bold, action: { [weak actionSheet] in
+                        actionSheet?.dismissAnimated()
+                    })
+                ])])
+                presentImpl?(actionSheet)
+            case .photo, .video:
+                VeilgramBannerPicker.present(kind: kind, from: controllerViewImpl?())
+            }
+        },
+        removeBanner: {
+            VeilgramSettings.setProfileBanner(kind: nil)
         }
     )
 
@@ -569,6 +657,12 @@ public func veilgramSettingsController(context: AccountContext) -> ViewControlle
     let controller = ItemListController(context: context, state: signal)
     pushImpl = { [weak controller] c in
         controller?.push(c)
+    }
+    presentImpl = { [weak controller] c in
+        controller?.present(c, in: .window(.root))
+    }
+    controllerViewImpl = { [weak controller] in
+        return controller?.view
     }
     return controller
 }

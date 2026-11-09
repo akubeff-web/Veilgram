@@ -91,6 +91,7 @@ final class PeerInfoHeaderNode: ASDisplayNode {
     
     let backgroundBannerView: UIView
     let backgroundCover = ComponentView<Empty>()
+    private var veilgramBannerView: VeilgramProfileBannerView?
     let giftsCover = ComponentView<Empty>()
     var didSetupBackgroundCover = false
     let buttonsContainerNode: SparseNode
@@ -639,6 +640,12 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             }
         } else {
             backgroundCoverSubject = nil
+        }
+        
+        // Veilgram: the own profile's header picture from Veilgram settings.
+        let showsVeilgramBanner = (self.isSettings || self.isMyProfile || peer?.id == self.context.account.peerId) && VeilgramProfileBannerView.currentKey != nil
+        if showsVeilgramBanner {
+            hasBackground = true
         }
         
         let currentSavedMusic = self.profileMusic(peer: peer, screenData: screenData)
@@ -2441,6 +2448,27 @@ final class PeerInfoHeaderNode: ASDisplayNode {
                 transition.updateFrameAdditive(view: backgroundCoverView, frame: CGRect(origin: CGPoint(x: -bannerInset, y: bannerFrame.height - backgroundCoverSize.height), size: backgroundCoverSize))
             } else {
                 transition.updateFrame(view: backgroundCoverView, frame: CGRect(origin: CGPoint(x: -bannerInset, y: bannerFrame.height - backgroundCoverSize.height), size: backgroundCoverSize))
+            }
+            
+            if showsVeilgramBanner {
+                let bannerView: VeilgramProfileBannerView
+                if let current = self.veilgramBannerView {
+                    bannerView = current
+                } else {
+                    bannerView = VeilgramProfileBannerView(frame: CGRect())
+                    self.veilgramBannerView = bannerView
+                    self.backgroundBannerView.insertSubview(bannerView, aboveSubview: backgroundCoverView)
+                }
+                bannerView.update()
+                let veilgramBannerFrame = CGRect(origin: CGPoint(x: 0.0, y: bannerFrame.height - apparentBackgroundHeight - bannerInset), size: CGSize(width: bannerFrame.width, height: apparentBackgroundHeight + bannerInset))
+                if additive {
+                    transition.updateFrameAdditive(view: bannerView, frame: veilgramBannerFrame)
+                } else {
+                    transition.updateFrame(view: bannerView, frame: veilgramBannerFrame)
+                }
+            } else if let bannerView = self.veilgramBannerView {
+                self.veilgramBannerView = nil
+                bannerView.removeFromSuperview()
             }
             if backgroundCoverAnimateIn {
                 if !self.isAvatarExpanded {
