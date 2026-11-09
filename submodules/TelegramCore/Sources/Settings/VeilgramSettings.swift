@@ -46,6 +46,7 @@ public enum VeilgramSettings {
         case hideChatListPreviews
         case confirmLinks
         case quietHours
+        case hideSponsored
 
         public var defaultValue: Bool {
             switch self {
@@ -285,6 +286,10 @@ public enum VeilgramSettings {
         }
         UserDefaults.standard.set(Int(color), forKey: profileBannerColorKey)
         self.notifyChanged()
+    }
+
+    public static var hideSponsored: Bool {
+        return value(.hideSponsored)
     }
 
     public static var quietHours: Bool {

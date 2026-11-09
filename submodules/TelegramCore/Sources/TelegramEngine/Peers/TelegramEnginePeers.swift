@@ -1675,6 +1675,9 @@ public extension TelegramEngine {
         }
                 
         public func searchAdPeers(query: String) -> Signal<[AdPeer], NoError> {
+            if VeilgramSettings.hideSponsored {
+                return .single([])
+            }
             return _internal_searchAdPeers(account: self.account, query: query)
         }
                 

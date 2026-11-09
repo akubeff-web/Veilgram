@@ -85,6 +85,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case hideBlocked(Bool)
     case keywordFilter(Bool)
     case keywords(String)
+    case hideSponsored(Bool)
     case filterFooter
 
     case protectedHeader
@@ -139,7 +140,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.deleted.rawValue
         case .protectedHeader, .unlockProtected, .keepViewOnce, .protectedFooter:
             return VeilgramSettingsSection.protected.rawValue
-        case .filterHeader, .hideBlocked, .keywordFilter, .keywords, .filterFooter:
+        case .filterHeader, .hideBlocked, .keywordFilter, .keywords, .hideSponsored, .filterFooter:
             return VeilgramSettingsSection.filter.rawValue
         case .newChatsHeader, .autoArchive, .autoArchiveGroups, .autoArchiveFooter:
             return VeilgramSettingsSection.archive.rawValue
@@ -212,92 +213,94 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 22
         case .keywords:
             return 23
-        case .filterFooter:
+        case .hideSponsored:
             return 24
-        case .newChatsHeader:
+        case .filterFooter:
             return 25
-        case .autoArchive:
+        case .newChatsHeader:
             return 26
-        case .autoArchiveGroups:
+        case .autoArchive:
             return 27
-        case .autoArchiveFooter:
+        case .autoArchiveGroups:
             return 28
-        case .autoReply:
+        case .autoArchiveFooter:
             return 29
-        case .autoReplyText:
+        case .autoReply:
             return 30
-        case .autoReplyContacts:
+        case .autoReplyText:
             return 31
-        case .autoReplyFooter:
+        case .autoReplyContacts:
             return 32
-        case .confirmSend:
+        case .autoReplyFooter:
             return 33
-        case .confirmLinks:
+        case .confirmSend:
             return 34
-        case .confirmSendFooter:
+        case .confirmLinks:
             return 35
-        case .screenHeader:
+        case .confirmSendFooter:
             return 36
-        case .streamerMode:
+        case .screenHeader:
             return 37
-        case .hidePhone:
+        case .streamerMode:
             return 38
-        case .hideUsername:
+        case .hidePhone:
             return 39
-        case .hideChatListTime:
+        case .hideUsername:
             return 40
-        case .hideChatListPreviews:
+        case .hideChatListTime:
             return 41
-        case .screenFooter:
+        case .hideChatListPreviews:
             return 42
-        case .bannerHeader:
+        case .screenFooter:
             return 43
-        case .bannerColor:
+        case .bannerHeader:
             return 44
-        case .bannerPhoto:
+        case .bannerColor:
             return 45
-        case .bannerVideo:
+        case .bannerPhoto:
             return 46
-        case .bannerRemove:
+        case .bannerVideo:
             return 47
-        case .bannerFooter:
+        case .bannerRemove:
             return 48
-        case .premiumHeader:
+        case .bannerFooter:
             return 49
-        case .hidePremiumBadges:
+        case .premiumHeader:
             return 50
-        case .hidePremiumBanners:
+        case .hidePremiumBadges:
             return 51
-        case .hidePremiumOffers:
+        case .hidePremiumBanners:
             return 52
-        case .hideGifts:
+        case .hidePremiumOffers:
             return 53
-        case .tabsHeader:
+        case .hideGifts:
             return 54
-        case .tabContacts:
+        case .tabsHeader:
             return 55
-        case .tabCalls:
+        case .tabContacts:
             return 56
-        case .tabNews:
+        case .tabCalls:
             return 57
-        case .hideStories:
+        case .tabNews:
             return 58
-        case .otherHeader:
+        case .hideStories:
             return 59
-        case .localTranscription:
+        case .otherHeader:
             return 60
-        case .localTranslation:
+        case .localTranscription:
             return 61
-        case .quietHours:
+        case .localTranslation:
             return 62
-        case .fastTransfers:
+        case .quietHours:
             return 63
-        case .fastTransfersFooter:
+        case .fastTransfers:
             return 64
-        case .loginButton:
+        case .fastTransfersFooter:
             return 65
-        case .loginButtonFooter:
+        case .loginButton:
             return 66
+        case .loginButtonFooter:
+            return 67
         }
     }
 
@@ -391,6 +394,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return ItemListMultilineInputItem(presentationData: presentationData, systemStyle: .glass, text: text, placeholder: veilgramLocalized(strings, "Veilgram.KeywordsPlaceholder", strings.Veilgram_KeywordsPlaceholder), maxLength: nil, sectionId: self.section, style: .blocks, capitalization: false, autocorrection: false, textUpdated: { text in
                 arguments.updateKeywords(text)
             })
+        case let .hideSponsored(value):
+            return switchItem(VeilgramSettingsIcons.keywordFilter, "Veilgram.HideSponsored", strings.Veilgram_HideSponsored, value, { arguments.update(.hideSponsored, $0) })
         case .filterFooter:
             return footerItem("Veilgram.FilterInfo", strings.Veilgram_FilterInfo)
         case let .unlockProtected(value):
@@ -509,6 +514,7 @@ private func veilgramSettingsEntries(showCallsTab: Bool) -> [VeilgramSettingsEnt
     if VeilgramSettings.value(.keywordFilter) {
         entries.append(.keywords(VeilgramSettings.filterKeywordsText))
     }
+    entries.append(.hideSponsored(VeilgramSettings.value(.hideSponsored)))
     entries.append(.filterFooter)
 
     entries.append(.newChatsHeader)

@@ -249,6 +249,9 @@ private final class UniversalVideoGalleryItemOverlayNode: GalleryOverlayContentN
         }
         self.message = message
         
+        if VeilgramSettings.hideSponsored {
+            return
+        }
         let adContext = context.engine.messages.adMessages(peerId: message.id.peerId, messageId: message.id)
         self.adContext = adContext
         self.adDisposable.set((adContext.state
