@@ -3255,6 +3255,11 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             default:
                 break
             }
+            // Veilgram: a locked chat shows no media thumbnails or message type in the list.
+            if case let .peer(peerData) = item.content, VeilgramSettings.isChatLocked(peerData.peer.peerId) {
+                contentImageSpecs.removeAll()
+                currentMessageTypeIcon = nil
+            }
             let messageTypeIconScale = min(1.0, item.presentationData.fontSize.itemListBaseFontSize / 17.0)
             
             if let currentMessageTypeIcon {
@@ -3794,6 +3799,10 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             if VeilgramSettings.hideChatListPreviews, textAttributedString != nil {
                 effectiveAuthorTitle = nil
                 textAttributedString = NSAttributedString(string: " ", font: textFont, textColor: theme.messageTextColor)
+            }
+            if case let .peer(peerData) = item.content, VeilgramSettings.isChatLocked(peerData.peer.peerId), textAttributedString != nil {
+                effectiveAuthorTitle = nil
+                textAttributedString = NSAttributedString(string: veilgramLocalized(item.presentationData.strings, "Veilgram.ChatLocked", item.presentationData.strings.Veilgram_ChatLocked), font: textFont, textColor: theme.messageTextColor)
             }
             if VeilgramSettings.streamerMode {
                 // Veilgram streamer mode: avatars stay, names and message previews do not.

@@ -1926,6 +1926,12 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
                 let threadInfo = peerData.threadInfo
                 let promoInfo = peerData.promoInfo
                 
+                // Veilgram: a locked chat shows no preview of its messages.
+                if VeilgramSettings.isChatLocked(peer.peerId) {
+                    gesture?.cancel()
+                    return
+                }
+                
                 switch item.index {
                 case .chatList:
                     if case let .channel(channel) = peer.peer, (channel.isForum || (channel.isMonoForum && threadId != nil)) {
@@ -2037,6 +2043,10 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
         
         self.chatListDisplayNode.peerContextAction = { [weak self] peer, source, node, gesture, location in
             guard let strongSelf = self else {
+                gesture?.cancel()
+                return
+            }
+            if VeilgramSettings.isChatLocked(peer.id) {
                 gesture?.cancel()
                 return
             }

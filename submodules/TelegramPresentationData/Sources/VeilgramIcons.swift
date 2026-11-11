@@ -29,6 +29,8 @@ public enum VeilgramIcon: String {
     case user
     case phone
     case newspaper
+    case lock
+    case lockOpen
 
     fileprivate var elements: [VeilgramIconElement] {
         switch self {
@@ -82,6 +84,16 @@ public enum VeilgramIcon: String {
             return [
                 .path("M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"),
                 .circle(cx: 12.0, cy: 12.0, r: 3.0)
+            ]
+        case .lock:
+            return [
+                .rect(x: 3.0, y: 11.0, width: 18.0, height: 11.0, rx: 2.0),
+                .path("M7 11V7a5 5 0 0 1 10 0v4")
+            ]
+        case .lockOpen:
+            return [
+                .rect(x: 3.0, y: 11.0, width: 18.0, height: 11.0, rx: 2.0),
+                .path("M7 11V7a5 5 0 0 1 9.9-1")
             ]
         case .eyeOff:
             return [

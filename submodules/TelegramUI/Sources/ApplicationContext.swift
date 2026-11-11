@@ -428,6 +428,10 @@ final class AuthorizedApplicationContext {
                             if chatIsVisible {
                                 return
                             }
+                            // Veilgram: a locked chat sounds, but shows no banner with its text.
+                            if VeilgramSettings.isChatLocked(firstMessage.id.peerId) {
+                                return
+                            }
                             
                             if firstMessage.restrictionReason(platform: "ios", contentSettings: strongSelf.context.currentContentSettings.with { $0 }) != nil {
                                 return

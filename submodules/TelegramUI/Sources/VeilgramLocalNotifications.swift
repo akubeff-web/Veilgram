@@ -45,7 +45,7 @@ func veilgramPostLocalNotification(context: AccountContext, messages: [EngineMes
     }
 
     let content = UNMutableNotificationContent()
-    if VeilgramSettings.streamerMode {
+    if VeilgramSettings.streamerMode || VeilgramSettings.isChatLocked(peerId) {
         content.title = "Veilgram"
         content.body = veilgramLocalized(strings, "Veilgram.NewMessage", strings.Veilgram_NewMessage)
     } else {

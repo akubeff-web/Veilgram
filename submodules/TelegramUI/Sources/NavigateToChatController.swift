@@ -20,8 +20,23 @@ import SavedMessagesScreen
 import WallpaperGalleryScreen
 import ChatMessageNotificationItem
 import FaceScanScreen
+import LocalAuth
+import TelegramPresentationData
 
 public func navigateToChatControllerImpl(_ params: NavigateToChatControllerParams) {
+    // Veilgram: a locked chat opens only after Face ID (or the device passcode).
+    let veilgramPeerId = params.chatLocation.peerId
+    if VeilgramSettings.isChatLocked(veilgramPeerId) && !VeilgramSettings.takeLockedChatPass(veilgramPeerId) {
+        let strings = params.context.sharedContext.currentPresentationData.with { $0 }.strings
+        let _ = (LocalAuth.veilgramAuthenticate(reason: veilgramLocalized(strings, "Veilgram.UnlockChat", strings.Veilgram_UnlockChat))
+        |> deliverOnMainQueue).startStandalone(next: { success in
+            if success {
+                VeilgramSettings.passLockedChatOnce(veilgramPeerId)
+                navigateToChatControllerImpl(params)
+            }
+        })
+        return
+    }
     if case let .peer(peer) = params.chatLocation {
         let _ = params.context.engine.peers.ensurePeerIsLocallyAvailable(peer: peer).startStandalone()
     }

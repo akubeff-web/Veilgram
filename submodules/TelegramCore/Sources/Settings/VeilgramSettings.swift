@@ -222,6 +222,56 @@ public enum VeilgramSettings {
         self.notifyChanged()
     }
 
+    private static let lockedChatsKey = keyPrefix + "lockedChats"
+    private static let lockedChatsCache = Atomic<Set<Int64>?>(value: nil)
+    private static let lockedChatsPassed = Atomic<Set<Int64>>(value: Set())
+
+    /// Chats that open only after Face ID. They stay in the list, without a message preview.
+    public static var lockedChats: Set<Int64> {
+        if let cached = lockedChatsCache.with({ $0 }) {
+            return cached
+        }
+        let value = Set((UserDefaults.standard.array(forKey: lockedChatsKey) as? [Int64]) ?? [])
+        let _ = lockedChatsCache.swap(value)
+        return value
+    }
+
+    public static func isChatLocked(_ peerId: PeerId) -> Bool {
+        return lockedChats.contains(peerId.toInt64())
+    }
+
+    public static func setChatLocked(_ peerId: PeerId, _ isLocked: Bool) {
+        var value = lockedChats
+        if isLocked {
+            value.insert(peerId.toInt64())
+        } else {
+            value.remove(peerId.toInt64())
+        }
+        UserDefaults.standard.set(Array(value), forKey: lockedChatsKey)
+        let _ = lockedChatsCache.swap(value)
+        self.notifyChanged()
+    }
+
+    /// Lets the next opening of a locked chat through once, after Face ID succeeded.
+    public static func passLockedChatOnce(_ peerId: PeerId) {
+        let _ = lockedChatsPassed.modify { current in
+            var current = current
+            current.insert(peerId.toInt64())
+            return current
+        }
+    }
+
+    /// True (and used up) when Face ID was just passed for this chat.
+    public static func takeLockedChatPass(_ peerId: PeerId) -> Bool {
+        var passed = false
+        let _ = lockedChatsPassed.modify { current in
+            var current = current
+            passed = current.remove(peerId.toInt64()) != nil
+            return current
+        }
+        return passed
+    }
+
     public static func ghostRead(for peerId: PeerId, account: PeerId?) -> Bool {
         return ghostRead(account: account) && !isGhostException(peerId)
     }
