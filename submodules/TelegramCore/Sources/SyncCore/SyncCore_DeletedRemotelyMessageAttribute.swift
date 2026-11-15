@@ -34,7 +34,7 @@ public extension Message {
 /// and the caller must not delete it. Only regular messages of cloud chats other than Saved Messages
 /// are kept; secret chats, scheduled messages and quick replies use other namespaces.
 func veilgramKeepRemotelyDeletedMessage(transaction: Transaction, accountPeerId: PeerId, id: MessageId) -> Bool {
-    if !VeilgramSettings.keepDeleted {
+    if !VeilgramSettings.keepDeleted || VeilgramSettings.isKeepDeletedException(id.peerId) {
         return false
     }
     if id.namespace != Namespaces.Message.Cloud || id.peerId == accountPeerId {

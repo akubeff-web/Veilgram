@@ -63,7 +63,7 @@ public extension Message {
 func veilgramEditHistoryAttributes(previous previousMessage: Message, updatedText: String, attributes: [MessageAttribute]) -> [MessageAttribute] {
     let previousAttribute = previousMessage.attributes.first(where: { $0 is VeilgramEditHistoryMessageAttribute }) as? VeilgramEditHistoryMessageAttribute
     var updatedAttribute = previousAttribute
-    if VeilgramSettings.editHistory, previousMessage.flags.contains(.Incoming), previousMessage.id.namespace == Namespaces.Message.Cloud, previousMessage.text != updatedText, !previousMessage.text.isEmpty {
+    if VeilgramSettings.editHistory, !VeilgramSettings.isKeepDeletedException(previousMessage.id.peerId), previousMessage.flags.contains(.Incoming), previousMessage.id.namespace == Namespaces.Message.Cloud, previousMessage.text != updatedText, !previousMessage.text.isEmpty {
         let timestamp = Int32(CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970)
         let entry = VeilgramEditHistoryMessageAttribute.Entry(date: timestamp, text: previousMessage.text)
         updatedAttribute = (updatedAttribute ?? VeilgramEditHistoryMessageAttribute(entries: [])).appending(entry)

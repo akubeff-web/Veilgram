@@ -6158,6 +6158,15 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
                             f(.dismissWithoutContent)
                             VeilgramSettings.setChatLocked(peer.id, !isLocked)
                         })))
+                        if VeilgramSettings.keepDeleted || VeilgramSettings.editHistory {
+                            let isKeepException = VeilgramSettings.isKeepDeletedException(peer.id)
+                            items.append(.action(ContextMenuActionItem(text: isKeepException ? veilgramLocalized(veilgramStrings, "Veilgram.KeepDeletedHere", veilgramStrings.Veilgram_KeepDeletedHere) : veilgramLocalized(veilgramStrings, "Veilgram.DontKeepDeletedHere", veilgramStrings.Veilgram_DontKeepDeletedHere), icon: { theme in
+                                return veilgramCachedIcon(isKeepException ? .history : .trash, size: CGSize(width: 24.0, height: 24.0), color: theme.actionSheet.primaryTextColor)
+                            }, action: { _, f in
+                                f(.dismissWithoutContent)
+                                VeilgramSettings.setKeepDeletedException(peer.id, !isKeepException)
+                            })))
+                        }
                         if VeilgramSettings.ghostEnabled(account: strongSelf.context.account.peerId) {
                             let isException = VeilgramSettings.isGhostException(peer.id)
                             let title = isException ? veilgramLocalized(veilgramStrings, "Veilgram.GhostExceptionRemove", veilgramStrings.Veilgram_GhostExceptionRemove) : veilgramLocalized(veilgramStrings, "Veilgram.GhostExceptionAdd", veilgramStrings.Veilgram_GhostExceptionAdd)

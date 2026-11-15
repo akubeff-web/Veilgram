@@ -17371,6 +17371,8 @@ Error: %8$@";
 "Veilgram.KeepKickedChats" = "Keep Chats After a Ban";
 "Veilgram.LocalNotifications" = "Notifications Without Push";
 "Veilgram.LockChat" = "Lock Chat";
+"Veilgram.DontKeepDeletedHere" = "Don't Keep Deleted Here";
+"Veilgram.KeepDeletedHere" = "Keep Deleted Here";
 "Veilgram.UnlockChatAction" = "Remove Chat Lock";
 "Veilgram.UnlockChat" = "Open the locked chat";
 "Veilgram.ChatLocked" = "🔒 Chat Locked";

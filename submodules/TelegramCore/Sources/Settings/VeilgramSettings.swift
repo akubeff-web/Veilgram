@@ -222,6 +222,35 @@ public enum VeilgramSettings {
         self.notifyChanged()
     }
 
+    private static let keepDeletedExceptionsKey = keyPrefix + "keepDeletedExceptions"
+    private static let keepDeletedExceptionsCache = Atomic<Set<Int64>?>(value: nil)
+
+    /// Chats where deleted messages are not kept or logged and edits are not recorded.
+    public static var keepDeletedExceptions: Set<Int64> {
+        if let cached = keepDeletedExceptionsCache.with({ $0 }) {
+            return cached
+        }
+        let value = Set((UserDefaults.standard.array(forKey: keepDeletedExceptionsKey) as? [Int64]) ?? [])
+        let _ = keepDeletedExceptionsCache.swap(value)
+        return value
+    }
+
+    public static func isKeepDeletedException(_ peerId: PeerId) -> Bool {
+        return keepDeletedExceptions.contains(peerId.toInt64())
+    }
+
+    public static func setKeepDeletedException(_ peerId: PeerId, _ isException: Bool) {
+        var value = keepDeletedExceptions
+        if isException {
+            value.insert(peerId.toInt64())
+        } else {
+            value.remove(peerId.toInt64())
+        }
+        UserDefaults.standard.set(Array(value), forKey: keepDeletedExceptionsKey)
+        let _ = keepDeletedExceptionsCache.swap(value)
+        self.notifyChanged()
+    }
+
     private static let lockedChatsKey = keyPrefix + "lockedChats"
     private static let lockedChatsCache = Atomic<Set<Int64>?>(value: nil)
     private static let lockedChatsPassed = Atomic<Set<Int64>>(value: Set())
