@@ -233,7 +233,7 @@ final class EditAccessoryPanelNode: AccessoryPanelNode {
         }
         self.previousMediaReference = updatedMediaReference
         
-        let hasSpoiler = message?.attributes.contains(where: { $0 is MediaSpoilerMessageAttribute }) ?? false
+        let hasSpoiler = message?.attributes.contains(where: { $0 is MediaSpoilerMessageAttribute }) ?? false && !VeilgramSettings.revealMediaSpoilers
         
         var isPhoto = false
         var updateImageSignal: Signal<(TransformImageArguments) -> DrawingContext?, NoError>?

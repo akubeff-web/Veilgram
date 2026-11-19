@@ -48,6 +48,7 @@ private let veilgramRussianStrings: [String: String] = [
     "Veilgram.QuietHours": "Тишина ночью (23–8)",
     "Veilgram.HideSponsored": "Скрывать рекламу в каналах",
     "Veilgram.LockChat": "Заблокировать чат",
+    "Veilgram.RevealMediaSpoilers": "Фото и видео без спойлера",
     "Veilgram.DontKeepDeletedHere": "Не сохранять удалённые здесь",
     "Veilgram.KeepDeletedHere": "Сохранять удалённые здесь",
     "Veilgram.UnlockChatAction": "Снять блокировку чата",

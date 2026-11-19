@@ -804,7 +804,7 @@ final class ChatPinnedMessageTitlePanelNode: ChatTitleAccessoryPanelNode {
             mediaUpdated = true
         }
         
-        let hasSpoiler = message.attributes.contains(where: { $0 is MediaSpoilerMessageAttribute })
+        let hasSpoiler = message.attributes.contains(where: { $0 is MediaSpoilerMessageAttribute }) && !VeilgramSettings.revealMediaSpoilers
         
         var updateImageSignal: Signal<(TransformImageArguments) -> DrawingContext?, NoError>?
         var updatedFetchMediaSignal: Signal<EngineFetchResourceSourceType, EngineFetchResourceError>?

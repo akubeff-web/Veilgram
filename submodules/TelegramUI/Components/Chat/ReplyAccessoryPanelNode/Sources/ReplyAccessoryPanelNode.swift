@@ -223,7 +223,7 @@ public final class ReplyAccessoryPanelNode: AccessoryPanelNode {
                 }
                 strongSelf.previousMediaReference = updatedMediaReference
                 
-                let hasSpoiler = message?.attributes.contains(where: { $0 is MediaSpoilerMessageAttribute }) ?? false
+                let hasSpoiler = message?.attributes.contains(where: { $0 is MediaSpoilerMessageAttribute }) ?? false && !VeilgramSettings.revealMediaSpoilers
                 
                 var updateImageSignal: Signal<(TransformImageArguments) -> DrawingContext?, NoError>?
                 if mediaUpdated {

@@ -103,6 +103,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
     case protectedHeader
     case unlockProtected(Bool)
     case keepViewOnce(Bool)
+    case revealMediaSpoilers(Bool)
     case protectedFooter
 
     case screenHeader
@@ -151,7 +152,7 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return VeilgramSettingsSection.presence.rawValue
         case .deletedHeader, .keepDeleted, .deletedIcon, .deletedMark, .editHistory, .editedMark, .keepKickedChats, .preloadMedia, .preloadMediaGroups, .deletedLog, .keepDeletedFooter:
             return VeilgramSettingsSection.deleted.rawValue
-        case .protectedHeader, .unlockProtected, .keepViewOnce, .protectedFooter:
+        case .protectedHeader, .unlockProtected, .keepViewOnce, .revealMediaSpoilers, .protectedFooter:
             return VeilgramSettingsSection.protected.rawValue
         case .filterHeader, .hideBlocked, .keywordFilter, .keywords, .hideSponsored, .filterFooter:
             return VeilgramSettingsSection.filter.rawValue
@@ -228,106 +229,108 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return 23
         case .keepViewOnce:
             return 24
-        case .protectedFooter:
+        case .revealMediaSpoilers:
             return 25
-        case .filterHeader:
+        case .protectedFooter:
             return 26
-        case .hideBlocked:
+        case .filterHeader:
             return 27
-        case .keywordFilter:
+        case .hideBlocked:
             return 28
-        case .keywords:
+        case .keywordFilter:
             return 29
-        case .hideSponsored:
+        case .keywords:
             return 30
-        case .filterFooter:
+        case .hideSponsored:
             return 31
-        case .newChatsHeader:
+        case .filterFooter:
             return 32
-        case .autoArchive:
+        case .newChatsHeader:
             return 33
-        case .autoArchiveGroups:
+        case .autoArchive:
             return 34
-        case .autoArchiveFooter:
+        case .autoArchiveGroups:
             return 35
-        case .autoReply:
+        case .autoArchiveFooter:
             return 36
-        case .autoReplyText:
+        case .autoReply:
             return 37
-        case .autoReplyContacts:
+        case .autoReplyText:
             return 38
-        case .autoReplyFooter:
+        case .autoReplyContacts:
             return 39
-        case .confirmSend:
+        case .autoReplyFooter:
             return 40
-        case .confirmLinks:
+        case .confirmSend:
             return 41
-        case .confirmSendFooter:
+        case .confirmLinks:
             return 42
-        case .screenHeader:
+        case .confirmSendFooter:
             return 43
-        case .streamerMode:
+        case .screenHeader:
             return 44
-        case .hidePhone:
+        case .streamerMode:
             return 45
-        case .hideUsername:
+        case .hidePhone:
             return 46
-        case .hideChatListTime:
+        case .hideUsername:
             return 47
-        case .hideChatListPreviews:
+        case .hideChatListTime:
             return 48
-        case .screenFooter:
+        case .hideChatListPreviews:
             return 49
-        case .bannerHeader:
+        case .screenFooter:
             return 50
-        case .bannerColor:
+        case .bannerHeader:
             return 51
-        case .bannerPhoto:
+        case .bannerColor:
             return 52
-        case .bannerVideo:
+        case .bannerPhoto:
             return 53
-        case .bannerRemove:
+        case .bannerVideo:
             return 54
-        case .bannerFooter:
+        case .bannerRemove:
             return 55
-        case .premiumHeader:
+        case .bannerFooter:
             return 56
-        case .hidePremiumBadges:
+        case .premiumHeader:
             return 57
-        case .hidePremiumBanners:
+        case .hidePremiumBadges:
             return 58
-        case .hidePremiumOffers:
+        case .hidePremiumBanners:
             return 59
-        case .hideGifts:
+        case .hidePremiumOffers:
             return 60
-        case .tabsHeader:
+        case .hideGifts:
             return 61
-        case .tabContacts:
+        case .tabsHeader:
             return 62
-        case .tabCalls:
+        case .tabContacts:
             return 63
-        case .tabNews:
+        case .tabCalls:
             return 64
-        case .hideStories:
+        case .tabNews:
             return 65
-        case .otherHeader:
+        case .hideStories:
             return 66
-        case .localTranscription:
+        case .otherHeader:
             return 67
-        case .localTranslation:
+        case .localTranscription:
             return 68
-        case .quietHours:
+        case .localTranslation:
             return 69
-        case .localNotifications:
+        case .quietHours:
             return 70
-        case .fastTransfers:
+        case .localNotifications:
             return 71
-        case .fastTransfersFooter:
+        case .fastTransfers:
             return 72
-        case .loginButton:
+        case .fastTransfersFooter:
             return 73
-        case .loginButtonFooter:
+        case .loginButton:
             return 74
+        case .loginButtonFooter:
+            return 75
         }
     }
 
@@ -445,6 +448,8 @@ private enum VeilgramSettingsEntry: ItemListNodeEntry {
             return switchItem(VeilgramSettingsIcons.unlockProtected, "Veilgram.UnlockProtected", strings.Veilgram_UnlockProtected, value, { arguments.update(.unlockProtected, $0) })
         case let .keepViewOnce(value):
             return switchItem(VeilgramSettingsIcons.keepViewOnce, "Veilgram.KeepViewOnce", strings.Veilgram_KeepViewOnce, value, { arguments.update(.keepViewOnce, $0) })
+        case let .revealMediaSpoilers(value):
+            return switchItem(VeilgramSettingsIcons.keepViewOnce, "Veilgram.RevealMediaSpoilers", strings.Veilgram_RevealMediaSpoilers, value, { arguments.update(.revealMediaSpoilers, $0) })
         case .protectedFooter:
             return footerItem("Veilgram.ProtectedInfo", strings.Veilgram_ProtectedInfo)
         case let .streamerMode(value):
@@ -563,6 +568,7 @@ private func veilgramSettingsEntries(showCallsTab: Bool, accountPeerId: EnginePe
     entries.append(.protectedHeader)
     entries.append(.unlockProtected(VeilgramSettings.value(.unlockProtected)))
     entries.append(.keepViewOnce(VeilgramSettings.value(.keepViewOnce)))
+    entries.append(.revealMediaSpoilers(VeilgramSettings.value(.revealMediaSpoilers)))
     entries.append(.protectedFooter)
 
     entries.append(.filterHeader)

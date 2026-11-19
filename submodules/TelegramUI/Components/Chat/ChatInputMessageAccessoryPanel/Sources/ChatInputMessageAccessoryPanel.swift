@@ -502,7 +502,7 @@ public final class ChatInputMessageAccessoryPanel: Component {
                  }
                  self.previousMediaReference = updatedMediaReference*/
                 
-                let hasSpoiler = message.attributes.contains(where: { $0 is MediaSpoilerMessageAttribute })
+                let hasSpoiler = message.attributes.contains(where: { $0 is MediaSpoilerMessageAttribute }) && !VeilgramSettings.revealMediaSpoilers
                 
                 var updateImageSignal: Signal<(TransformImageArguments) -> DrawingContext?, NoError>?
                 let _ = updateImageSignal

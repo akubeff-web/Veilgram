@@ -712,7 +712,7 @@ public class ChatMessageReplyInfoNode: ASDisplayNode {
             
             let hasSpoiler: Bool
             if let message = arguments.message {
-                hasSpoiler = message.attributes.contains(where: { $0 is MediaSpoilerMessageAttribute })
+                hasSpoiler = message.attributes.contains(where: { $0 is MediaSpoilerMessageAttribute }) && !VeilgramSettings.revealMediaSpoilers
             } else {
                 hasSpoiler = false
             }

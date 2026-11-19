@@ -1003,7 +1003,7 @@ private final class ChatListMediaPreviewNode: ASDisplayNode {
             self.playIcon.frame = CGRect(origin: CGPoint(x: floor((size.width - image.size.width) / 2.0), y: floor((size.height - image.size.height) / 2.0)), size: image.size)
         }
         
-        let hasSpoiler = self.message.attributes.contains(where: { $0 is MediaSpoilerMessageAttribute })
+        let hasSpoiler = self.message.attributes.contains(where: { $0 is MediaSpoilerMessageAttribute }) && !VeilgramSettings.revealMediaSpoilers
         
         var isRound = false
         var dimensions = CGSize(width: 100.0, height: 100.0)

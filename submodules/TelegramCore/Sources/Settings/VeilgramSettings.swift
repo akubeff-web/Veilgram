@@ -51,6 +51,7 @@ public enum VeilgramSettings {
         case ghostOfflineSend
         case keepKickedChats
         case localNotifications
+        case revealMediaSpoilers
 
         public var defaultValue: Bool {
             switch self {
@@ -408,6 +409,11 @@ public enum VeilgramSettings {
         }
         UserDefaults.standard.set(Int(color), forKey: profileBannerColorKey)
         self.notifyChanged()
+    }
+
+    /// Photos and videos sent under a spoiler show without the blur.
+    public static var revealMediaSpoilers: Bool {
+        return value(.revealMediaSpoilers)
     }
 
     public static var localNotifications: Bool {
